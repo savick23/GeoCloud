@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <Import Project="..\..\RmSolution.RmGeo.3.1.csproj" />
+
+  <PropertyGroup>
+    <AssemblyName>rmgeosrv</AssemblyName>
+    <UserSecretsId>dotnet-Ciclop.Server-00bbf18a-9d25-4d6f-b9ff-058fd023d422</UserSecretsId>
+    <BaseOutputPath>..\..\Bin</BaseOutputPath>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="runtimeconfig.template.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="runtimeconfig.template.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
+  </ItemGroup>
+</Project>
