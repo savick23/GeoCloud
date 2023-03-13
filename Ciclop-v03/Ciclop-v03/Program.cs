@@ -43,5 +43,3 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
-
-Console.WriteLine("Test");
