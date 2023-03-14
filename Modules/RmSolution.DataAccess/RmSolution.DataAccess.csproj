@@ -5,4 +5,8 @@
     <BaseOutputPath>..\..\Bin</BaseOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RmSolution.Data\RmSolution.Data.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,10 @@
 //--------------------------------------------------------------------------------------------------
-// (С) 2020-2023 ООО «РМ Солюшн». Smart System Platform 3.1. Все права защищены.
-// Описание: RuntimeService –
+// (РЎ) 2020-2023 РћРћРћ В«Р Рњ РЎРѕР»СЋС€РЅВ». Smart System Platform 3.1. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.
+// РћРїРёСЃР°РЅРёРµ: RuntimeService вЂ“
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
+    using RmSolution.DataAccess;
     #region Using
     using RmSolution.Runtime;
     using System.Collections.Concurrent;
@@ -22,7 +23,7 @@ namespace RmSolution.Server
 
         public RuntimeStatus Status { get; private set; }
 
-        /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
+        /// <summary> Р—Р°РїСѓС‰РµРЅРЅС‹Рµ РјРѕРґСѓР»Рё РІ СЃРёСЃС‚РµРјРµ. Р”РёСЃРїРµС‚С‡РµСЂ Р·Р°РґР°С‡.</summary>
         internal readonly ModuleCollection Modules = new();
 
         #endregion Properties
@@ -48,12 +49,13 @@ namespace RmSolution.Server
         {
             Status = RuntimeStatus.StartPending;
 
-            AppDomain.CurrentDomain.GetAssemblies() // Звапуск системных обязательных модулей -->
+            AppDomain.CurrentDomain.GetAssemblies() // Р—РІР°РїСѓСЃРє СЃРёСЃС‚РµРјРЅС‹С… РѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… РјРѕРґСѓР»РµР№ -->
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.GetInterfaces().Contains(typeof(IStartup))).ToList()
                 .ForEach(t => Modules.AddSingleton(t));
 
             Status = RuntimeStatus.Running;
+            new LeicaTotalStationDevice();
 
             while (!stoppingToken.IsCancellationRequested)
             {

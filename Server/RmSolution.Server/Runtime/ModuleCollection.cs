@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
-// (С) 2020-2023 ООО «РМ Солюшн». Smart System Platform 3.1. Все права защищены.
-// Описание: ModuleCollection –
+// (РЎ) 2020-2023 РћРћРћ В«Р Рњ РЎРѕР»СЋС€РЅВ». Smart System Platform 3.1. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.
+// РћРїРёСЃР°РЅРёРµ: ModuleCollection вЂ“
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
@@ -8,10 +8,10 @@ namespace RmSolution.Server
     using RmSolution.Runtime;
     #endregion Using
 
-    /// <summary> Модуль управления модулями (микросервисами).</summary>
+    /// <summary> РњРѕРґСѓР»СЊ СѓРїСЂР°РІР»РµРЅРёСЏ РјРѕРґСѓР»СЏРјРё (РјРёРєСЂРѕСЃРµСЂРІРёСЃР°РјРё).</summary>
     internal sealed class ModuleCollection : List<IModule>
     {
-        /// <summary> Создание и запуск единственного экземпляра модуля.</summary>
+        /// <summary> РЎРѕР·РґР°РЅРёРµ Рё Р·Р°РїСѓСЃРє РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РјРѕРґСѓР»СЏ.</summary>
         public IModule AddSingleton(Type serviceType, params object[] args)
         {
             return null;

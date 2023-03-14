@@ -4,9 +4,9 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
-    public interface IModule
+    public interface IModule : IMicroService, IDisposable
     {
-        /// <summary> Статус выполнения.</summary>
-        RuntimeStatus Status { get; }
+        long Site { get; set; }
+        string Name { get; set; }
     }
 }

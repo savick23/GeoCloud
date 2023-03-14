@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
-// (С) 2020-2023 ООО «РМ Солюшн». Smart System Platform 3.1. Все права защищены.
-// Описание: RuntimeService –
+// (РЎ) 2020-2023 РћРћРћ В«Р Рњ РЎРѕР»СЋС€РЅВ». Smart System Platform 3.1. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.
+// РћРїРёСЃР°РЅРёРµ: RuntimeService вЂ“
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
@@ -10,5 +10,16 @@ namespace RmSolution.Server
 
     public sealed class TerminalService : ModuleBase, IStartup
     {
+        #region Declarations
+
+        public int Port { get; }
+
+        #endregion Declarations
+
+        public TerminalService(IRuntime runtime, int port) : base(runtime)
+        {
+            Port = 23;
+            Name = "РЎР»СѓР¶Р±Р° С‚РµСЂРјРёРЅР°Р»РѕРІ, РїРѕСЂС‚ " + Port;
+        }
     }
 }
