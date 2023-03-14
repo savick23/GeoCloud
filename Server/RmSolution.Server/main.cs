@@ -12,6 +12,11 @@ await Host.CreateDefaultBuilder(args)
     .UseWindowsService()
     .UseSystemd()
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+    .ConfigureAppConfiguration((ctx, cfg) =>
+    {
+        cfg.AddCommandLine(args, new Dictionary<string, string>());
+        cfg.AddJsonFile(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location) + ".runtimeconfig.json", true);
+    })
     .ConfigureServices(srv => srv.AddHostedService<RuntimeService>())
     .Build()
     .RunAsync();

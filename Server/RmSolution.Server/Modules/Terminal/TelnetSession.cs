@@ -18,7 +18,7 @@ namespace RmSolution.Runtime
     {
         #region Declarations
 
-        const string LOGO = "*********************\r\n*   ГС ПВДПН 3.1   *\r\n*********************";
+        const string LOGO = "*********************\r\n*     РМ ГЕО 3.1    *\r\n*********************";
         const string USER_PROMPT = "USER> ";
         const string PASS_PROMPT = "PASS> ";
         const string BREAK = "BREAK";

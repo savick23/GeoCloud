@@ -11,11 +11,11 @@ namespace RmSolution.Server
     using System.Net.WebSockets;
     #endregion Using
 
+    delegate void ProcessMessageEventHandler(ref TMessage m);
+
     public sealed class RuntimeService : BackgroundService, IRuntime
     {
         #region Declarations
-
-        readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
 
         readonly ILogger<RuntimeService> _logger;
 
@@ -23,6 +23,11 @@ namespace RmSolution.Server
         readonly ConcurrentQueue<TMessage> _esb = new();
         /// <summary> Системная шина предприятия. Менеджер расписаний.</summary>
         readonly TaskScheduler<TMessage> _schedule = new();
+
+        /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
+        readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
+        /// <summary> Диспетчер системной шины предприятия ESB.</summary>
+        internal readonly ConcurrentDictionary<int, ProcessMessageEventHandler> Dispatcher = new();
 
         #endregion Declarations
 
@@ -35,7 +40,7 @@ namespace RmSolution.Server
         public Version Version { get; }
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
-        internal readonly ModuleCollection Modules = new();
+        internal readonly ModuleCollection Modules;
         public long MessageCount { get; private set; }
 
         public readonly Dictionary<string, object> Parameters;
@@ -104,24 +109,30 @@ namespace RmSolution.Server
 
         #endregion Message
 
-        public RuntimeService(ILogger<RuntimeService> logger)
+        #region Constructors
+
+        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config)
         {
             _logger = logger;
             Name = "РМ Гео";
             Version = System.Reflection.Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
+
+            Modules = new ModuleCollection(this, config, logger);
         }
 
-        public override Task StartAsync(CancellationToken cancellationToken)
+        #endregion Constructors
+
+        public override Task StartAsync(CancellationToken tkn)
         {
-            return base.StartAsync(cancellationToken);
+            return base.StartAsync(tkn);
         }
 
-        public override Task StopAsync(CancellationToken cancellationToken)
+        public override Task StopAsync(CancellationToken tkn)
         {
-            return base.StopAsync(cancellationToken);
+            return base.StopAsync(tkn);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken tkn)
         {
             Status = RuntimeStatus.StartPending;
 
@@ -130,14 +141,26 @@ namespace RmSolution.Server
                 .Where(t => t.GetInterfaces().Contains(typeof(IStartup))).ToList()
                 .ForEach(t => Modules.AddSingleton(t));
 
-            Status = RuntimeStatus.Running;
-            new LeicaTotalStationDevice();
+            _schedule.Start();
+            await Task.Delay(100, tkn);
 
-            while (!stoppingToken.IsCancellationRequested)
+            Status = RuntimeStatus.Running;
+            Send(MSG.StartRuntime, 0, 0, null);
+
+            while (!tkn.IsCancellationRequested && (Status & RuntimeStatus.Loop) > 0)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
+                if (_esb.TryDequeue(out TMessage m))
+                {
+                    if (Dispatcher.ContainsKey(MSG.All))
+                        Dispatcher[MSG.All].Invoke(ref m);
+
+                    if (Dispatcher.ContainsKey(m.Msg))
+                        Dispatcher[m.Msg]?.Invoke(ref m);
+                }
+                else
+                    await Task.Delay(50, tkn);
             }
+            _schedule.Stop();
             Status = RuntimeStatus.Stopped;
         }
 

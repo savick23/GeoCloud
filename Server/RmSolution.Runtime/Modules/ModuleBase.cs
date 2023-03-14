@@ -28,7 +28,7 @@ namespace RmSolution.Runtime
         public RuntimeStatus Status { get; set; }
 
         public Version Version { get; protected set; }
-        public int[] Subscribe { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int[] Subscribe { get; set; }
 
         public Exception LastError { get; set; }
 
