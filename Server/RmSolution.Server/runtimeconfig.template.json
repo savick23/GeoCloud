@@ -1,5 +1,10 @@
 {
   "terminal": 23,
   "modules": [
+    {
+      "name": "Сервер сбора геоданных",
+      "type": "RmSolution.DataAccess.GeoComService, RmSolution.DataAccess",
+      "start": "auto"
+    }
   ]
 }

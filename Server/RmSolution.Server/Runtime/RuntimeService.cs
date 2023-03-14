@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// (С) 2020-2023 ООО «РМ Солюшн». Smart System Platform 3.1. Все права защищены.
+// (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: RuntimeService –
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
@@ -112,7 +112,7 @@ namespace RmSolution.Server
         public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config)
         {
             _logger = logger;
-            Name = (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
+            Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
             Modules = new ModuleCollection(this, config, logger);
@@ -159,6 +159,8 @@ namespace RmSolution.Server
             }
             _schedule.Stop();
         }
+
+        public string GetWorkDirectory() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
         #region Events
 
