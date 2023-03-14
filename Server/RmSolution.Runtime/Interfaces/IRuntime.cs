@@ -4,8 +4,13 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
-    public interface IRuntime : IService
+    public interface IRuntime
     {
+        /// <summary> Наименование сервера приложений.</summary>
+        string Name { get; set; }
+        /// <summary> Версия модуля.</summary>
+        Version Version { get; }
+
         void Send(TMessage m);
         void Send(int type, long lparam);
         void Send(int type, long lparam, long hparam);

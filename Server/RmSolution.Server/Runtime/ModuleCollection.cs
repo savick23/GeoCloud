@@ -18,7 +18,7 @@ namespace RmSolution.Server
         readonly ILogger _logger;
         readonly RuntimeService _rtm;
         readonly IConfiguration _cfg;
-        readonly ConcurrentDictionary<ModuleDescript, IService> _modules = new();
+        readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
 
         volatile int _count;
 
@@ -32,14 +32,13 @@ namespace RmSolution.Server
             _rtm = runtime;
             _cfg = configuration;
             _logger = logger;
-            AddSingleton<IRuntime>(runtime);
         }
 
         #region Add/Remove operations
 
-        public ModuleCollection AddSingleton<TModule>(IService implementationInstance) where TModule : IService
+        public ModuleCollection AddSingleton<TModule>(IModule implementationInstance) where TModule : IModule
         {
-            _modules.TryAdd(new ModuleDescript(++_count, typeof(IService)), implementationInstance);
+            _modules.TryAdd(new ModuleDescript(++_count, typeof(IModule)), implementationInstance);
             return this;
         }
 
@@ -57,8 +56,8 @@ namespace RmSolution.Server
                 {
                     var prm = parameters[i];
                     var ptype = prm.ParameterType;
-                    var injectionType = GetService(ptype)
-                        ?? (ptype == typeof(IConfiguration) ? _cfg : null);
+                    var injectionType = ptype == typeof(IRuntime) ? _rtm
+                        : GetService(ptype) ?? (ptype == typeof(IConfiguration) ? _cfg : null);
 
                     if (injectionType == null)
                     {

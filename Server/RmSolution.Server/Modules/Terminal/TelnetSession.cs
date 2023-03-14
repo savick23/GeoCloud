@@ -86,6 +86,7 @@ namespace RmSolution.Runtime
             _handlers = new()
             {
                 { "WHO", ShowModules },
+                { "SYSTEMINFO", ShowSystemInfo },
                 { "TEST", Test }
             };
             GetCpuUsage();

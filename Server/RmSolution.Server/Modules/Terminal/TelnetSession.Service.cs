@@ -29,8 +29,36 @@ namespace RmSolution.Runtime
                 new DataColumn("Время")
             });
             var rtm = (RuntimeService)Runtime;
+            data.Rows.Add(0, rtm.Name, RuntimeStatus.Running, rtm.MessageCount);
+
+            ((RuntimeService)Runtime).Modules.GetModules<IModule>().ForEach(m =>
+                data.Rows.Add(
+                    m.ProcessId,
+                    m.Name,
+                    m.Status,
+                    "—",
+                    "—")
+                );
 
             PrintTable(output, data);
+        }
+
+        /// <summary> Получить сведения о системе СКПТ (объектовый сервер).</summary>
+        void ShowSystemInfo(StringBuilder output, string command, string[] args)
+        {
+            var rtm = (RuntimeService)Runtime;
+            var prc = Process.GetCurrentProcess();
+
+            PrintDictionary(output, new Dictionary<string, string>()
+            {
+                { "Версия ОС", Environment.OSVersion.VersionString
+                    + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) == 8 ? " x64 " : " x86 ")
+                    + Environment.OSVersion.ServicePack },
+                { "Среда выполнения", System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription },
+                { "Загрузка процессора", GetCpuUsage().ToString() + " %" },
+                { "Используемая память", Math.Round(prc.PrivateMemorySize64 / 1048576.0, 2).ToString() + " Мб" }
+            }
+            , ": ");
         }
 
         static double GetCpuUsage()

@@ -9,6 +9,7 @@ namespace RmSolution.Server
     using System.Collections.Concurrent;
     using RmSolution.DataAccess;
     using System.Net.WebSockets;
+    using System.Reflection;
     #endregion Using
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
@@ -33,10 +34,7 @@ namespace RmSolution.Server
 
         #region Properties
 
-        public long Id { get; set; }
         public string Name { get; set; }
-        public int ProcessId { get; set; }
-        public RuntimeStatus Status { get; private set; }
         public Version Version { get; }
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
@@ -114,10 +112,12 @@ namespace RmSolution.Server
         public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config)
         {
             _logger = logger;
-            Name = "РМ Гео";
-            Version = System.Reflection.Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
+            Name = (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
+            Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
             Modules = new ModuleCollection(this, config, logger);
+            Modules.Created += OnModuleCreated;
+            Modules.Removed += OnModuleRemoved;
         }
 
         #endregion Constructors
@@ -134,8 +134,6 @@ namespace RmSolution.Server
 
         protected override async Task ExecuteAsync(CancellationToken tkn)
         {
-            Status = RuntimeStatus.StartPending;
-
             AppDomain.CurrentDomain.GetAssemblies() // Звапуск системных обязательных модулей -->
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.GetInterfaces().Contains(typeof(IStartup))).ToList()
@@ -144,10 +142,9 @@ namespace RmSolution.Server
             _schedule.Start();
             await Task.Delay(100, tkn);
 
-            Status = RuntimeStatus.Running;
             Send(MSG.StartRuntime, 0, 0, null);
 
-            while (!tkn.IsCancellationRequested && (Status & RuntimeStatus.Loop) > 0)
+            while (!tkn.IsCancellationRequested)
             {
                 if (_esb.TryDequeue(out TMessage m))
                 {
@@ -161,8 +158,23 @@ namespace RmSolution.Server
                     await Task.Delay(50, tkn);
             }
             _schedule.Stop();
-            Status = RuntimeStatus.Stopped;
         }
+
+        #region Events
+
+        void OnModuleCreated(object sender, EventArgs e)
+        {
+            if (sender is IModule mod)
+                Console.WriteLine($"Created[{mod.ProcessId}]: {mod.Name}");
+        }
+
+        void OnModuleRemoved(object sender, EventArgs e)
+        {
+            if (sender is IModule mod)
+                Console.WriteLine($"Removed[{mod.ProcessId}]: {mod.Name}");
+        }
+
+        #endregion Events
 
         #region Nested types
 

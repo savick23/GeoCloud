@@ -4,8 +4,19 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
-    public interface IModule : IService, IDisposable
+    public interface IModule : IDisposable
     {
+        /// <summary> Идентификатор модуля.</summary>
+        long Id { get; set; }
+        /// <summary> Наименование модуля (процесса).</summary>
+        string Name { get; set; }
+        /// <summary> Идентификатор запущенного процесса.</summary>
+        int ProcessId { get; set; }
+        /// <summary> Текущий статус выполнения.</summary>
+        RuntimeStatus Status { get; }
+        /// <summary> Версия модуля.</summary>
+        Version Version { get; }
+
         /// <summary> Перечень обрабатываемых сообщений. Подписка. Инициализация.</summary>
         int[] Subscribe { get; set; }
 
@@ -19,4 +30,8 @@ namespace RmSolution.Runtime
         /// <summary> Последняя ошибка.</summary>
         Exception LastError { get; set; }
     }
+
+    /// <summary> Признак автозапуска модуля при старте.</summary>
+    public interface IStartup
+    { }
 }
