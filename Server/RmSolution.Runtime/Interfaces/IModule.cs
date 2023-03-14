@@ -4,9 +4,19 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
-    public interface IModule : IMicroService, IDisposable
+    public interface IModule : IService, IDisposable
     {
-        long Site { get; set; }
-        string Name { get; set; }
+        /// <summary> Перечень обрабатываемых сообщений. Подписка. Инициализация.</summary>
+        int[] Subscribe { get; set; }
+
+        /// <summary> Асинхроный процесс выполнения модуля.</summary>
+        void ProcessMessage(ref TMessage m);
+
+        void Start();
+        void Stop();
+        void Kill();
+
+        /// <summary> Последняя ошибка.</summary>
+        Exception LastError { get; set; }
     }
 }
