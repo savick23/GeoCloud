@@ -3,7 +3,7 @@
   "modules": [
     {
       "name": "Сервер сбора геоданных",
-      "type": "RmSolution.DataAccess.GeoComService, RmSolution.DataAccess",
+      "type": "RmSolution.GeoCom.GeoComService, RmSolution.GeoCom",
       "start": "auto"
     }
   ]

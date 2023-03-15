@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: GeoComService - Сервер сбора геоданных.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.DataAccess
+namespace RmSolution.GeoCom
 {
     #region Using
     using System;
