@@ -7,6 +7,7 @@ namespace RmSolution.Data
     using System.Data;
     using System.Threading;
     using Microsoft.Data.SqlClient;
+    using RmSolution.Runtime;
     #endregion Using
 
     public sealed class MsSqlDatabase : DatabaseFactorySuite

@@ -13,6 +13,9 @@ namespace RmSolution.Runtime
         /// <summary> Версия модуля.</summary>
         Version Version { get; }
 
+        /// <summary> Создаёт новое подключение к базе данных.</summary>
+        IDatabase CreateDbConnection();
+
         void Send(TMessage m);
         void Send(int type, long lparam);
         void Send(int type, long lparam, long hparam);

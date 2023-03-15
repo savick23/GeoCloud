@@ -44,7 +44,7 @@ namespace RmSolution.Runtime
         }
 
         /// <summary> Получить сведения о системе СКПТ (объектовый сервер).</summary>
-        void ShowSystemInfo(StringBuilder output, string command, string[] args)
+        void ShowSystemInfo(StringBuilder output, string command, string[] args) => UseDatabase(db =>
         {
             var rtm = (RuntimeService)Runtime;
             var prc = Process.GetCurrentProcess();
@@ -55,11 +55,12 @@ namespace RmSolution.Runtime
                     + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) == 8 ? " x64 " : " x86 ")
                     + Environment.OSVersion.ServicePack },
                 { "Среда выполнения", System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription },
+                { "СУБД", db.Version.Split(new char[]{'\n'})[0].Trim() },
                 { "Загрузка процессора", GetCpuUsage().ToString() + " %" },
                 { "Используемая память", Math.Round(prc.PrivateMemorySize64 / 1048576.0, 2).ToString() + " Мб" }
             }
             , ": ");
-        }
+        });
 
         static double GetCpuUsage()
         {

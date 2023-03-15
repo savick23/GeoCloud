@@ -6,6 +6,7 @@ namespace RmSolution.Data
     #region Using
     using System.Data;
     using Npgsql;
+    using RmSolution.Runtime;
     #endregion Using
 
     public sealed class PgSqlDatabase : DatabaseFactorySuite

@@ -76,5 +76,23 @@ namespace RmSolution.Runtime
             Status = RuntimeStatus.Stopped;
             await Task.Delay(0);
         }
+
+        #region Database methods...
+
+        /// <summary> Подключение и выполнение в среде БД.</summary>
+        protected void UseDatabase(Action<IDatabase> handler)
+        {
+            var db = Runtime.CreateDbConnection();
+            try
+            {
+                db.Open();
+                handler?.Invoke(db);
+            }
+            finally
+            {
+                db.Close();
+            }
+        }
+        #endregion Database methods...
     }
 }

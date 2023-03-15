@@ -8,6 +8,7 @@ namespace RmSolution.Data
     using System;
     using System.Data;
     using System.Data.Common;
+    using RmSolution.Runtime;
     #endregion Using
 
     public abstract class DatabaseFactorySuite : IDatabase, IDisposable

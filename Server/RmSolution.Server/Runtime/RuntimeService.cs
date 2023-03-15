@@ -9,6 +9,7 @@ namespace RmSolution.Server
     using System.Reflection;
     using RmSolution.Runtime;
     using RmSolution.Data;
+    using System.Text.RegularExpressions;
     #endregion Using
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
@@ -28,6 +29,8 @@ namespace RmSolution.Server
         readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
         /// <summary> Диспетчер системной шины предприятия ESB.</summary>
         internal readonly ConcurrentDictionary<int, ProcessMessageEventHandler> Dispatcher = new();
+
+        readonly Func<IDatabase> _dbf;
 
         #endregion Declarations
 
@@ -108,25 +111,16 @@ namespace RmSolution.Server
 
         #region Constructors
 
-        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config, IDatabase database)
+        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config, Func<IDatabase> databaseF)
         {
             _logger = logger;
+            _dbf = databaseF;
             Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
             Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;
-
-            try
-            {
-                database.Open();
-                var t = database.Version;
-            }
-            finally
-            {
-                database.Close();
-            }
         }
 
         #endregion Constructors
@@ -171,6 +165,8 @@ namespace RmSolution.Server
 
         public string GetWorkDirectory() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
+        public IDatabase CreateDbConnection() => _dbf();
+
         #region Events
 
         void OnModuleCreated(object sender, EventArgs e)
@@ -186,6 +182,29 @@ namespace RmSolution.Server
         }
 
         #endregion Events
+
+        #region Static methods
+
+        static Type _connType;
+        static string _connStr;
+
+        internal static IDatabase CreateDatabaseConnection(IServiceProvider services)
+        {
+            if (_connType == null)
+            {
+                var cfg = services.GetService<IConfiguration>();
+                var providers = cfg.GetSection("runtimeOptions:providers").GetChildren().ToDictionary(sect => cfg[sect.Path + ":name"], sect => cfg[sect.Path + ":type"]);
+                _connStr = cfg.GetSection("runtimeOptions:datasource").Value;
+                var provider = Regex.Match(_connStr, "(?<=Provider=).*?(?=;)").Value;
+                if (!providers.ContainsKey(provider)) return null;
+                _connStr = Regex.Replace(_connStr, @"Provider=[^;.]*;", string.Empty);
+                if (!_connStr.EndsWith(";")) _connStr += ";";
+                _connType = Type.GetType(providers[provider]);
+            }
+            return (IDatabase)Activator.CreateInstance(_connType, _connStr);
+        }
+
+        #endregion Static methods
 
         #region Nested types
 
