@@ -38,7 +38,7 @@ namespace RmSolution.Server
         public Version Version { get; }
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
-        internal readonly ModuleCollection Modules;
+        internal readonly ModuleManager Modules;
         public long MessageCount { get; private set; }
 
         public readonly Dictionary<string, object> Parameters;
@@ -115,7 +115,7 @@ namespace RmSolution.Server
             Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
-            Modules = new ModuleCollection(this, config, logger);
+            Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;
         }
@@ -142,7 +142,7 @@ namespace RmSolution.Server
             _schedule.Start();
             await Task.Delay(100, tkn);
 
-            Send(MSG.StartRuntime, 0, 0, null);
+            Send(MSG.RuntimeStarted, 0, 0, null);
 
             while (!tkn.IsCancellationRequested)
             {

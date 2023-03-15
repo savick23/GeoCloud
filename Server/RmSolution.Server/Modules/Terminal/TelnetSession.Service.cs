@@ -31,7 +31,7 @@ namespace RmSolution.Runtime
             var rtm = (RuntimeService)Runtime;
             data.Rows.Add(0, rtm.Name, RuntimeStatus.Running, rtm.MessageCount);
 
-            ((RuntimeService)Runtime).Modules.GetModules<IModule>().ForEach(m =>
+            ((RuntimeService)Runtime).Modules.ToList().ForEach(m =>
                 data.Rows.Add(
                     m.ProcessId,
                     m.Name,

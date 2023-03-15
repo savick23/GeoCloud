@@ -6,7 +6,9 @@ namespace Inforser.Runtime
 {
     #region Using
     using System;
+    using System.Linq;
     using System.Reflection;
+    using System.Runtime.Intrinsics.Arm;
     using System.Text.RegularExpressions;
     using RmSolution.Runtime;
     using RmSolution.Server;
@@ -19,14 +21,16 @@ namespace Inforser.Runtime
 
         const string ASMEXT = ".dll";
 
+        readonly RuntimeService _rtm;
         readonly IConfiguration _cfg;
 
         #endregion Declarations
 
         public TaskManager(IRuntime runtime, IConfiguration config) : base(runtime)
         {
-            Subscribe = new[] { MSG.StartRuntime };
+            Subscribe = new[] { MSG.RuntimeStarted, MSG.Start };
             Name = "Диспетчер задач";
+            _rtm = (RuntimeService)runtime;
             _cfg = config;
         }
 
@@ -39,7 +43,7 @@ namespace Inforser.Runtime
                 {
                     switch (m.Msg)
                     {
-                        case MSG.StartRuntime:
+                        case MSG.RuntimeStarted:
                             try
                             {
                                 StartModules();
@@ -51,6 +55,22 @@ namespace Inforser.Runtime
                             finally
                             {
                                 Runtime.Send(MSG.StartServer, 0);
+                            }
+                            break;
+
+                        case MSG.Start:
+                            if (_rtm.Modules.Contains(m.LParam) && _rtm.Modules.GetProcess(m.LParam) is IModule mod1 && mod1.Status != RuntimeStatus.Running)
+                            {
+                                mod1.Start();
+                                Runtime.Send(MSG.Terminal, 0, 0, "Запуск модуля: " + mod1.Name + ".\r\n");
+                            }
+                            break;
+
+                        case MSG.Stop:
+                            if (_rtm.Modules.Contains(m.LParam) && _rtm.Modules.GetProcess(m.LParam) is IModule mod2 && mod2.Status != RuntimeStatus.Stopped)
+                            {
+                                mod2.Stop();
+                                Runtime.Send(MSG.Terminal, 0, 0, "Остановка модуля: " + mod2.Name + ".\r\n");
                             }
                             break;
                     }
@@ -65,7 +85,7 @@ namespace Inforser.Runtime
         void StartModules()
         {
             var rtm = (RuntimeService)Runtime;
-            var startlist = ReadConfiguration().Values.ToList();
+            var startlist = ReadModulesConfiguration().Values.ToList();
 
             var started = DateTime.Now;
             do
@@ -138,7 +158,7 @@ namespace Inforser.Runtime
         #region Configurations
 
         /// <summary> Чтение данных из конфигурационного файла приложения.</summary>
-        Dictionary<string, ModuleInfo> ReadConfiguration() =>
+        Dictionary<string, ModuleInfo> ReadModulesConfiguration() =>
             _cfg.GetSection("runtimeOptions:modules").GetChildren()
                 .ToDictionary(sect => _cfg[sect.Path + ":name"], sect => new ModuleInfo(sect));
 

@@ -1,17 +1,17 @@
 //--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: ModuleCollection –
+// Описание: ModuleManager – Модуль управления модулями в Системе.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
     #region Using
-    using RmSolution.Runtime;
+    using System.Collections;
     using System.Collections.Concurrent;
-    using System.Reflection;
+    using RmSolution.Runtime;
     #endregion Using
 
     /// <summary> Модуль управления модулями (микросервисами).</summary>
-    internal sealed class ModuleCollection : List<IModule>
+    internal sealed class ModuleManager : IEnumerable<IModule>
     {
         #region Declarations
 
@@ -27,16 +27,29 @@ namespace RmSolution.Server
 
         #endregion Declarations
 
-        public ModuleCollection(RuntimeService runtime, IConfiguration configuration, ILogger<RuntimeService> logger)
+        public ModuleManager(RuntimeService runtime, IConfiguration configuration, ILogger<RuntimeService> logger)
         {
             _rtm = runtime;
             _cfg = configuration;
             _logger = logger;
         }
 
+        #region IEnumerable implementaion
+
+        public IEnumerator<IModule> GetEnumerator() =>
+            _modules.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() =>
+            _modules.Values.GetEnumerator();
+
+        #endregion IEnumerable implementaion
+
         #region Add/Remove operations
 
-        public ModuleCollection AddSingleton<TModule>(IModule implementationInstance) where TModule : IModule
+        public bool Contains(long idProcess) =>
+            _modules.ContainsKey(idProcess);
+
+        public ModuleManager AddSingleton<TModule>(IModule implementationInstance) where TModule : IModule
         {
             _modules.TryAdd(new ModuleDescript(++_count, typeof(IModule)), implementationInstance);
             return this;
@@ -57,7 +70,7 @@ namespace RmSolution.Server
                     var prm = parameters[i];
                     var ptype = prm.ParameterType;
                     var injectionType = ptype == typeof(IRuntime) ? _rtm
-                        : GetService(ptype) ?? (ptype == typeof(IConfiguration) ? _cfg : null);
+                        : GetModule(ptype) ?? (ptype == typeof(IConfiguration) ? _cfg : null);
 
                     if (injectionType == null)
                     {
@@ -101,9 +114,45 @@ namespace RmSolution.Server
             return mod;
         }
 
+        /// <summary> Remove (kill) of the module.</summary>
+        public bool Remove(IModule instance)
+        {
+            if (instance == null) return false;
+
+            _modules.TryRemove(instance.ProcessId, out IModule removed);
+
+            if (instance is IModule mod && mod.Subscribe != null)
+            {
+                foreach (var msg in mod.Subscribe)
+                    _rtm.Dispatcher[msg] -= mod.ProcessMessage;
+
+                var timer = DateTime.Now;
+                mod.Stop();
+                while (instance.Status != RuntimeStatus.Stopped)
+                {
+                    if ((DateTime.Now - timer).TotalSeconds > 5)
+                    {
+                        mod.Kill();
+                        break;
+                    }
+                    Thread.Sleep(250);
+                }
+                Task.Run(() => Removed?.Invoke(instance, EventArgs.Empty));
+                mod.Dispose();
+            }
+            return true;
+        }
+
+        #endregion Add/Remove operations
+
+        #region Access methods
+
+        public object GetProcess(long processId) =>
+            _modules.FirstOrDefault(s => s.Key.ProcessId == processId).Value;
+
         /// <summary> Возвращает модуль содержащий указанный интерфейс (тип).</summary>
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        object GetService(Type serviceType) =>
+        object GetModule(Type serviceType) =>
             _modules.Values.FirstOrDefault(m => m.GetType().GetInterfaces().Contains(serviceType));
 
         public TService GetModule<TService>() =>
@@ -112,7 +161,7 @@ namespace RmSolution.Server
         public List<TService> GetModules<TService>() =>
             _modules.Values.Where(m => m is TService).Select(m => (TService)m).ToList();
 
-        #endregion Add/Remove operations
+        #endregion Access methods
 
         #region Nested types
 
@@ -164,20 +213,20 @@ namespace RmSolution.Server
         /// <summary> Зависимости. Идентификаторы процесса от которого зависит данная служба.</summary>
         public long[] Depend { get; set; }
 
-        IConfigurationSection _config;
+        IConfigurationSection _cfg;
 
-        public string this[string name] => _config.GetSection(name).Value;
+        public string this[string name] => _cfg.GetSection(name).Value;
         public object Get(Type type, string name)
         {
             object res = Activator.CreateInstance(type);
-            _config.GetSection(name).Bind(res);
+            _cfg.GetSection(name).Bind(res);
             return res;
         }
 
         /// <summary> Чтение параметров запуска модуля.</summary>
         public ModuleInfo(IConfigurationSection config)
         {
-            _config = config;
+            _cfg = config;
             foreach (var p in config.GetChildren().ToDictionary(sect => sect.Key, sect => sect.Value))
                 switch (p.Key)
                 {

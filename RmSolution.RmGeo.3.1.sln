@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ciclop-v03", "Client\Ciclop
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{8116A59C-2925-46B6-A476-B3695DBCC65F}"
 	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
 		RmSolution.RmGeo.3.1.csproj = RmSolution.RmGeo.3.1.csproj
 	EndProjectSection
 EndProject
@@ -20,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Server", "Server
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.DataAccess", "Modules\RmSolution.DataAccess\RmSolution.DataAccess.csproj", "{40F37247-A43D-41F3-9907-F3A70DF0F4C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.DataAccess", "Modules\RmSolution.DataAccess\RmSolution.DataAccess.csproj", "{40F37247-A43D-41F3-9907-F3A70DF0F4C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.Data", "Modules\RmSolution.Data\RmSolution.Data.csproj", "{5618ECA6-3201-4EC4-8072-1077335DA7A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Data", "Modules\RmSolution.Data\RmSolution.Data.csproj", "{5618ECA6-3201-4EC4-8072-1077335DA7A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

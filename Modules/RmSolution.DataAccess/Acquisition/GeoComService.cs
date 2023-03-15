@@ -14,7 +14,7 @@ namespace RmSolution.DataAccess
     {
         public GeoComService(IRuntime runtime) : base(runtime)
         {
-            Subscribe = new[] { MSG.StartServer }; 
+            Subscribe = new[] { MSG.RuntimeStarted }; 
         }
 
         protected override Task ExecuteProcess()
@@ -25,7 +25,7 @@ namespace RmSolution.DataAccess
                 while (_esb.TryDequeue(out TMessage m))
                     switch (m.Msg)
                     {
-                        case MSG.StartServer:
+                        case MSG.RuntimeStarted:
                             break;
                     }
             }

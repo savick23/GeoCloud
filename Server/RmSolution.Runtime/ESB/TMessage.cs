@@ -58,8 +58,14 @@ namespace RmSolution.Runtime
         public const int InstallModule = 0x0003;
         /// <summary> Удалить модуль/службу из Системы.</summary>
         public const int UninstallModule = 0x0004;
+        /// <summary> Команда запустить модуль/службу в Системе.</summary>
+        /// <remarks> LParam = Id процесса; Data = </remarks>
+        public const int Start = 0x0005;
+        /// <summary> Команда остановить модуль/службу из Системе.</summary>
+        /// <remarks> LParam = Id процесса; Data = </remarks>
+        public const int Stop = 0x0006;
         /// <summary> Выполняется после запуска главного процеса выполнения.</summary>
-        public const int StartRuntime = 0x0009;
+        public const int RuntimeStarted = 0x0009;
 
         /// <summary> LParam = Id процесса.</summary>
         public const int ErrorMessage = 0x000c;
