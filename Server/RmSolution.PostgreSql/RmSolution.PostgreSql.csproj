@@ -9,4 +9,8 @@
     <PackageReference Include="Npgsql" Version="7.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RmSolution.FactorySuite\RmSolution.FactorySuite.csproj" />
+  </ItemGroup>
+
 </Project>

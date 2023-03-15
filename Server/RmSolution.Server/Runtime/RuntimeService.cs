@@ -5,9 +5,10 @@
 namespace RmSolution.Server
 {
     #region Using
-    using RmSolution.Runtime;
     using System.Collections.Concurrent;
     using System.Reflection;
+    using RmSolution.Runtime;
+    using RmSolution.Data;
     #endregion Using
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
@@ -107,7 +108,7 @@ namespace RmSolution.Server
 
         #region Constructors
 
-        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config)
+        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config, IDatabase database)
         {
             _logger = logger;
             Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;

@@ -23,7 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\RmSolution.GeoCom\RmSolution.GeoCom.csproj" />
-    <ProjectReference Include="..\RmSolution.FactorySuite\RmSolution.FactorySuite.csproj" />
+    <ProjectReference Include="..\RmSolution.MsSql\RmSolution.MsSql.csproj" />
+    <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
     <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
   </ItemGroup>
 </Project>

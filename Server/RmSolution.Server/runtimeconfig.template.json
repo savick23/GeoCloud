@@ -1,5 +1,18 @@
 {
+  "datasource": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=SKPT0807;User ID=sa;Password=qwe890-;",
+  "datasource2": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=SKPT0807;Persist Security Info=True;Integrated Security=SSPI",
+  "datasource3": "Provider=NPGSQL;Host=localhost;Database=SKPT0001;Username=postgres;Password=qwe890-",
   "terminal": 23,
+  "providers": [
+    {
+      "name": "SQLNCLI11",
+      "type": "RmSolution.Data.MsSqlDatabase, RmSolution.MsSql"
+    },
+    {
+      "name": "NPGSQL",
+      "type": "RmSolution.Data.PgSqlDatabase, RmSolution.PostgreSql"
+    }
+  ],
   "modules": [
     {
       "name": "Сервер сбора геоданных",
