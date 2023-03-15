@@ -1,6 +1,6 @@
 {
-  "datasource": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=SKPT0807;User ID=sa;Password=qwe890-;",
-  "datasource2": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=SKPT0807;Persist Security Info=True;Integrated Security=SSPI",
+  "datasource": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=SKPT0807;User ID=sa;Password=qwe890-;Persist Security Info=False;TrustServerCertificate=True",
+  "datasource2": "Provider=SQLNCLI11;Data Source=localhost;Initial Catalog=RMGEO01;Persist Security Info=True;Integrated Security=SSPI;TrustServerCertificate=True",
   "datasource3": "Provider=NPGSQL;Host=localhost;Database=SKPT0001;Username=postgres;Password=qwe890-",
   "terminal": 23,
   "providers": [

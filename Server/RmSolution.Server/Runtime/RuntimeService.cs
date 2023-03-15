@@ -117,6 +117,16 @@ namespace RmSolution.Server
             Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;
+
+            try
+            {
+                database.Open();
+                var t = database.Version;
+            }
+            finally
+            {
+                database.Close();
+            }
         }
 
         #endregion Constructors
