@@ -20,7 +20,7 @@ namespace RmSolution.DataAccess
         protected override Task ExecuteProcess()
         {
             Status = RuntimeStatus.Running;
-            while ((Status & RuntimeStatus.Loop) > 0)
+            while (_sync.WaitOne() && (Status & RuntimeStatus.Loop) > 0)
             {
                 while (_esb.TryDequeue(out TMessage m))
                     switch (m.Msg)
