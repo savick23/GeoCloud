@@ -134,7 +134,7 @@ namespace RmSolution.Server
                     if (attempt-- > 0)
                     {
                         logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, _md.DatabaseName));
-                        ((IDatabaseFactory)databaseF()).CreateDatabase();
+                        ((IDatabaseFactory)databaseF()).CreateDatabase((msg) => logger.LogInformation(msg));
                         //_needNewDatabase = true;
                         logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, _md.DatabaseName));
                         continue;

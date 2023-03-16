@@ -33,7 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.PostgreSql", "Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.GeoCom", "Modules\RmSolution.GeoCom\RmSolution.GeoCom.csproj", "{D3592E19-2C64-4000-8EAD-4851D05B1BC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.resources.ru", "Server\RmSolution.resources.ru\RmSolution.resources.ru.csproj", "{2EAAC61C-7143-4EA6-8DBC-0AC171587167}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{92D640F8-D444-466C-8344-589B08C18F19}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.resources.ru", "Resources\RmSolution.resources.ru\RmSolution.resources.ru.csproj", "{8775121A-70C7-427B-8411-C081454FDE37}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.resources.en", "Resources\RmSolution.resources.en\RmSolution.resources.en.csproj", "{7F67F596-6891-4980-BE13-95725CBFF299}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,10 +77,14 @@ Global
 		{D3592E19-2C64-4000-8EAD-4851D05B1BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3592E19-2C64-4000-8EAD-4851D05B1BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3592E19-2C64-4000-8EAD-4851D05B1BC8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2EAAC61C-7143-4EA6-8DBC-0AC171587167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EAAC61C-7143-4EA6-8DBC-0AC171587167}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2EAAC61C-7143-4EA6-8DBC-0AC171587167}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2EAAC61C-7143-4EA6-8DBC-0AC171587167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8775121A-70C7-427B-8411-C081454FDE37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8775121A-70C7-427B-8411-C081454FDE37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8775121A-70C7-427B-8411-C081454FDE37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8775121A-70C7-427B-8411-C081454FDE37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F67F596-6891-4980-BE13-95725CBFF299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F67F596-6891-4980-BE13-95725CBFF299}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F67F596-6891-4980-BE13-95725CBFF299}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F67F596-6891-4980-BE13-95725CBFF299}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,7 +99,8 @@ Global
 		{24D08A56-0FC1-48C3-8C1B-A176EF58EE34} = {776EEEA8-3CBD-4E10-A70E-F3A0482A70A1}
 		{6D0E6D09-1876-47C2-8163-D981287B1F6B} = {776EEEA8-3CBD-4E10-A70E-F3A0482A70A1}
 		{D3592E19-2C64-4000-8EAD-4851D05B1BC8} = {4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}
-		{2EAAC61C-7143-4EA6-8DBC-0AC171587167} = {4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}
+		{8775121A-70C7-427B-8411-C081454FDE37} = {92D640F8-D444-466C-8344-589B08C18F19}
+		{7F67F596-6891-4980-BE13-95725CBFF299} = {92D640F8-D444-466C-8344-589B08C18F19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C10EADE4-BB39-4C25-851D-2D7C7586C3F5}

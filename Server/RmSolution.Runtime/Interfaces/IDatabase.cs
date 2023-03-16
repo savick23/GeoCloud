@@ -6,18 +6,19 @@ namespace RmSolution.Runtime
 {
     #region Using
     using System.Data;
+    using Microsoft.Extensions.Logging;
     #endregion Using
 
     public interface IDatabase
     {
         /// <summary> Наименование приложения.</summary>
-        string ApplicationName { get; set; }
+        string? ApplicationName { get; set; }
         /// <summary> Схема по-умолчанию.</summary>
-        string DefaultScheme { get; }
+        string? DefaultScheme { get; }
         /// <summary> Возвращает наименование базы данных.</summary>
-        string DatabaseName { get; }
+        string? DatabaseName { get; }
         /// <summary> Возвращает версию базы данных.</summary>
-        string Version { get; }
+        string? Version { get; }
 
         /// <summary> Открыть соединение с базой данных.</summary>
         IDatabase Open();
@@ -33,11 +34,16 @@ namespace RmSolution.Runtime
         T Scalar<T>(string statement, params object[] args);
         /// <summary> Выполнить инструкцию базы данных.</summary>
         void Exec(string statement, params object[] args);
+
+        /// <summary> Возвращает список схем данных в текущей базе данных.</summary>
+        IEnumerable<string> Schemata();
+        /// <summary> Возвращает список таблиц в текущей базе данных.</summary>
+        IEnumerable<string> Tables();
     }
 
     public interface IDatabaseFactory // For isolation
     {
         /// <summary> Создаёт новую базу данных.</summary>
-        void CreateDatabase();
+        void CreateDatabase(Action<string> message);
     }
 }

@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RmSolution.FactorySuite\RmSolution.FactorySuite.csproj" />
-    <ProjectReference Include="..\RmSolution.resources.ru\RmSolution.resources.ru.csproj" />
   </ItemGroup>
 
 </Project>

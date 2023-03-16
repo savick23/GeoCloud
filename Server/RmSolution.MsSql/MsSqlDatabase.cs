@@ -45,7 +45,7 @@ namespace RmSolution.Data
             try
             {
                 _conn.Open();
-                CreateEnvironment(this);
+                CreateEnvironment(this, (msg) => Console.WriteLine(msg));
             }
             catch (SqlException ex)
             {
@@ -70,7 +70,7 @@ namespace RmSolution.Data
 
         #region IDatabaseFactory implementation
 
-        public override void CreateDatabase()
+        public override void CreateDatabase(Action<string> message)
         {
             var dbname = DatabaseName;
             var newdb = new MsSqlDatabase(Regex.Replace(_connstr, @"INITIAL CATALOG=.*?[;$]", "Initial Catalog=master;", RegexOptions.IgnoreCase));
@@ -81,12 +81,13 @@ namespace RmSolution.Data
                 {
                     newdb.Exec(@$"CREATE DATABASE {LQ}{dbname}{RQ} COLLATE Cyrillic_General_100_CI_AS_SC_UTF8; ALTER DATABASE [{dbname}] SET RECOVERY SIMPLE;");
                     newdb.Close();
+                    message($"Создана база данных {dbname}.");
 
                     Thread.Sleep(5000); // задержка на инициализацию БД
                     newdb = new MsSqlDatabase(_connstr);
                     newdb.Open();
 
-                    CreateEnvironment(newdb);
+                    CreateEnvironment(newdb, message);
                 }
             }
             finally
@@ -96,6 +97,18 @@ namespace RmSolution.Data
         }
 
         #endregion IDatabaseFactory implementation
+
+        #region Database objects
+
+        public override IEnumerable<string> Schemata() =>
+            Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY 1")
+                .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
+
+        public override IEnumerable<string> Tables() =>
+            Query("SELECT TABLE_SCHEMA+'.'+TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY 1")
+                .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
+
+        #endregion Database objects
 
         #region Private methods
 
