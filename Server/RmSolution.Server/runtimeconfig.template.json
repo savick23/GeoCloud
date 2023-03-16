@@ -17,7 +17,20 @@
     {
       "name": "Сервер сбора геоданных",
       "type": "RmSolution.GeoCom.GeoComService, RmSolution.GeoCom",
-      "start": "auto"
+      "start": "auto",
+      "adapter": {
+        "mode": "COM",
+        "port": "COM3",
+        "baudrate": 57600,
+        "databits": 8,
+        "stopbits": 1.0,
+        "parity": "None",
+        "flowcontrol": "None",
+        "fifo": true,
+        "interface": "RS-232",
+        "address": "127.0.0.1",
+        "mask": "255.255.255.0"
+      }
     }
   ]
 }
