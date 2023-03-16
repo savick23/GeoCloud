@@ -45,13 +45,14 @@ namespace RmSolution.Data
             try
             {
                 _conn.Open();
+                CreateEnvironment(this);
             }
             catch (SqlException ex)
             {
                 if (ex.ErrorCode == SQLERR_FAILED && ex.Number == SQLERR_NO_INSTANCE)
-                    throw new DbException(DbException.NO_INSTANCE, ex);
+                    throw new TDbException(TDbException.NO_INSTANCE, ex);
                 else if (ex.ErrorCode == SQLERR_FAILED && (ex.Number == SQLERR_NO_DATABASE || ex.Number == SQLERR_NO_PROCESS_PIPE))
-                    throw new DbNotFoundException(DbException.NO_DATABASE, ex);
+                    throw new TDbNotFoundException(TDbException.NO_DATABASE, ex);
                 else
                     throw;
             }
@@ -84,6 +85,8 @@ namespace RmSolution.Data
                     Thread.Sleep(5000); // задержка на инициализацию БД
                     newdb = new MsSqlDatabase(_connstr);
                     newdb.Open();
+
+                    CreateEnvironment(newdb);
                 }
             }
             finally
@@ -98,7 +101,7 @@ namespace RmSolution.Data
 
         DataTable Query(CommandBehavior behavior, string statement, params object[] args)
         {
-            DataTable res = new DataTable();
+            DataTable res = new();
             SqlTransaction tran = null;
             lock (SyncRoot)
                 try
@@ -131,7 +134,7 @@ namespace RmSolution.Data
                     res.Dispose();
                     if (ex.Number < 60000)
                     {
-                        throw new Exception(string.Format(statement, args), ex);
+                        throw new TDbException(ex.SqlState, string.Format(statement, args), ex);
                     }
                     else throw;
                 }
@@ -158,8 +161,7 @@ namespace RmSolution.Data
                 }
                 catch (SqlException ex)
                 {
-
-                    throw new Exception("<PRE>" + statement + "</PRE>", ex);
+                    throw new TDbException(ex.SqlState, string.Format(statement, args), ex);
                 }
             }
         }

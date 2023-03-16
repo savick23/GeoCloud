@@ -8,6 +8,7 @@ namespace RmSolution.Data
     using System;
     using System.Data;
     using System.Data.Common;
+    using System.Reflection;
     using System.Text.RegularExpressions;
     using RmSolution.Runtime;
     #endregion Using
@@ -69,5 +70,43 @@ namespace RmSolution.Data
             Scalar(statement, args) is T res ? res : default;
 
         #endregion IDatabase implementation
+
+        #region IDatabaseFactory implementation
+
+        /// <summary> Создать системные таблицы на основании атрибутов классов.</summary>
+        protected void CreateEnvironment(IDatabase db)
+        {
+            GetTypes<TableAttribute>().ForEach(t =>
+            {
+                var meta = (TableAttribute)t.GetCustomAttributes(typeof(TableAttribute), false)[0];
+                if (!meta.IsView)
+                {
+                    var tdefn = new TableDefinition(meta.Name);
+                    foreach (var p in t.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken))
+                        if (p.IsDefined(typeof(ColumnAttribute)))
+                        {
+                            tdefn.Columns.Add(((ColumnAttribute)p.GetCustomAttributes(typeof(ColumnAttribute)).First()).Name);
+
+                            //if (!_typeNumeric.Contains(p.Name) &&
+                            //    (p.PropertyType == typeof(int) || p.PropertyType == typeof(long) || p.PropertyType == typeof(decimal) || p.PropertyType == typeof(float) || p.PropertyType == typeof(double)))
+                            //    _typeNumeric.Add(p.Name);
+                        }
+                }
+            });
+        }
+
+        /// <summary> Возвращает типы с указанным аттрибутом.</summary>
+        static List<Type> GetTypes<T>() where T : Attribute
+        {
+            var tkn = Assembly.GetEntryAssembly().GetName().GetPublicKeyToken();
+            return Assembly.GetEntryAssembly()
+                .GetReferencedAssemblies()
+                .Where(a => a.GetPublicKeyToken()?.Where((n, i) => tkn.Length > 0 && tkn[i] == n).Count() == tkn.Length)
+                .SelectMany(a => Assembly.Load(a).GetTypes())
+                .Concat(Assembly.GetEntryAssembly().GetTypes())
+                .Where(t => t.IsDefined(typeof(T), false)).ToList();
+        }
+
+        #endregion IDatabaseFactory implementation
     }
 }

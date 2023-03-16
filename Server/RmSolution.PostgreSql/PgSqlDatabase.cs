@@ -45,9 +45,9 @@ namespace RmSolution.Data
             catch (NpgsqlException ex)
             {
                 if (ex.ErrorCode == SQLERR_FAILED && ex.InnerException is SocketException)
-                    throw new DbException(DbException.NO_INSTANCE, ex);
+                    throw new TDbException(TDbException.NO_INSTANCE, ex);
                 else if (ex.ErrorCode == SQLERR_FAILED && ex is PostgresException sql && sql.SqlState == "3D000")
-                    throw new DbNotFoundException(DbException.NO_DATABASE, ex);
+                    throw new TDbNotFoundException(TDbException.NO_DATABASE, ex);
                 else
                     throw;
             }
@@ -68,7 +68,7 @@ namespace RmSolution.Data
             }
             catch (NpgsqlException ex)
             {
-                //throw new TDatabaseException(ex.SqlState, stmt, ex);
+                throw new TDbException(ex.SqlState, stmt, ex);
             }
             return ds.Tables.Count > 0 ? ds.Tables[0] : null;
         }
@@ -86,7 +86,7 @@ namespace RmSolution.Data
             }
             catch (NpgsqlException ex)
             {
-                //throw new TDatabaseException(ex.SqlState, statement, ex);
+                throw new TDbException(ex.SqlState, string.Format(statement, args), ex);
             }
         }
 
@@ -110,6 +110,8 @@ namespace RmSolution.Data
                     Thread.Sleep(5000); // задержка на инициализацию БД
                     newdb = new PgSqlDatabase(_connstr);
                     newdb.Open();
+
+                    CreateEnvironment(newdb);
                 }
             }
             finally

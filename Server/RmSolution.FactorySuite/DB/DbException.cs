@@ -7,12 +7,15 @@ namespace RmSolution.Data
     #region Using
     using System;
     using System.Collections.Generic;
+    using System.Data.Common;
     #endregion Using
 
-    public class DbException : Exception
+    public class TDbException : DbException
     {
         public const int NO_INSTANCE = 1;
         public const int NO_DATABASE = 2;
+
+        public override string SqlState { get; }
 
         static readonly Dictionary<int, string> _msgs = new Dictionary<int, string>()
         {
@@ -20,18 +23,24 @@ namespace RmSolution.Data
             {NO_DATABASE, "Отсутвует база данных." }
         };
 
-        public int ErrorCode { get; }
-
-        public DbException(int errorCode, Exception innerException = null)
+        public TDbException(int errorCode, Exception innerException = null)
             : base(_msgs.ContainsKey(errorCode) ? _msgs[errorCode] : innerException?.Message ?? "Неизвестная ошибка!", innerException)
         {
-            ErrorCode = errorCode;
+            HResult = errorCode;
         }
+
+        public TDbException(string sqlState, string statement, Exception exception)
+          : base($"{statement}{FullMessage(exception)}", exception)
+        {
+            SqlState = sqlState;
+        }
+
+        static string FullMessage(Exception ex) => $"\r\n{ex.Message}{(ex.InnerException != null ? $"{FullMessage(ex.InnerException)}" : "")}";
     }
 
-    public class DbNotFoundException : DbException
+    public class TDbNotFoundException : TDbException
     {
-        public DbNotFoundException(int errorCode, Exception innerException = null)
+        public TDbNotFoundException(int errorCode, Exception innerException = null)
             : base(errorCode, innerException)
         {
         }

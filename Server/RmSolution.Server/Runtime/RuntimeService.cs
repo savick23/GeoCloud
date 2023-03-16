@@ -122,21 +122,24 @@ namespace RmSolution.Server
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
             Metadata = _md = new Metadata(databaseF());
+            int attempt = 1;
             while (true)
                 try
                 {
                     _md.Open();
                     break;
                 }
-                catch (DbNotFoundException)
+                catch (TDbNotFoundException)
                 {
-                    //if (attempt++ == 0)
+                    if (attempt-- > 0)
                     {
-                        logger.LogWarning("Создание базы данных " + _md.DatabaseName + ".");
+                        logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, _md.DatabaseName));
                         ((IDatabaseFactory)databaseF()).CreateDatabase();
                         //_needNewDatabase = true;
+                        logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, _md.DatabaseName));
                         continue;
                     }
+                    logger.LogError(string.Format(TEXT.CreateDatabaseFailed, _md.DatabaseName));
                     throw;
                 }
 #if !DEBUG
