@@ -3,7 +3,7 @@
 // Описание: LeicaTotalStationDevice – Тахеометр Leica.
 // Протокол: GEOCOM Leica
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.GeoCom
+namespace RmSolution.Devices
 {
     #region Using
     using System;
