@@ -55,7 +55,8 @@ namespace RmSolution.Runtime
                     + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)) == 8 ? " x64 " : " x86 ")
                     + Environment.OSVersion.ServicePack },
                 { "Среда выполнения", System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription },
-                { "СУБД", db.Version.Split(new char[]{'\n'})[0].Trim() },
+                { "СУБД", db.Version },
+                { "Наименование БД", db.DatabaseName },
                 { "Загрузка процессора", GetCpuUsage().ToString() + " %" },
                 { "Используемая память", Math.Round(prc.PrivateMemorySize64 / 1048576.0, 2).ToString() + " Мб" }
             }

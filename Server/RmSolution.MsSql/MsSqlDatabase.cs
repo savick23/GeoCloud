@@ -5,7 +5,9 @@ namespace RmSolution.Data
 {
     #region Using
     using System.Data;
+    using System.Text.RegularExpressions;
     using System.Threading;
+    using System.Xml.Linq;
     using Microsoft.Data.SqlClient;
     using RmSolution.Runtime;
     #endregion Using
@@ -14,6 +16,11 @@ namespace RmSolution.Data
     {
         #region Declarations
 
+        const int SQLERR_FAILED = -2146232060;
+        const int SQLERR_NO_INSTANCE = 2;
+        const int SQLERR_NO_DATABASE = 4060;
+        const int SQLERR_NO_PROCESS_PIPE = 233;
+
         string _connstr;
 
         #endregion Declarations
@@ -21,11 +28,11 @@ namespace RmSolution.Data
         #region Properties
 
         public override string DefaultScheme => "dbo";
-        public override string Version => Scalar("SELECT @@VERSION")?.ToString();
+        public override string Version => Scalar("SELECT @@VERSION")?.ToString().Split(new char[] { '\n' })[0].Trim();
 
         #endregion Properties
 
-        public MsSqlDatabase(string connectionString)
+        public MsSqlDatabase(string connectionString) : base(connectionString)
         {
             _connstr = connectionString;
         }
@@ -41,12 +48,12 @@ namespace RmSolution.Data
             }
             catch (SqlException ex)
             {
-                //if (ex.ErrorCode == SQLERR_FAILED && ex.Number == SQLERR_NO_INSTANCE)
-                //    throw new DbException(DbException.NO_INSTANCE, ex);
-                //else if (ex.ErrorCode == SQLERR_FAILED && ex.Number == SQLERR_NO_DATABASE)
-                //    throw new DbNotFoundException(DbException.NO_DATABASE, ex);
-                //else
-                //    throw;
+                if (ex.ErrorCode == SQLERR_FAILED && ex.Number == SQLERR_NO_INSTANCE)
+                    throw new DbException(DbException.NO_INSTANCE, ex);
+                else if (ex.ErrorCode == SQLERR_FAILED && (ex.Number == SQLERR_NO_DATABASE || ex.Number == SQLERR_NO_PROCESS_PIPE))
+                    throw new DbNotFoundException(DbException.NO_DATABASE, ex);
+                else
+                    throw;
             }
       //      ((SqlConnection)_conn).InfoMessage += new SqlInfoMessageEventHandler(OnInfoMessage);
             return this;
@@ -55,7 +62,37 @@ namespace RmSolution.Data
         public override DataTable Query(string statement, params object[] args) =>
             Query(CommandBehavior.Default, statement, args);
 
+        public override void Exec(string statement, params object[] args) =>
+            Exec(CommandBehavior.Default, statement, args);
+
         #endregion IDatabase implementation
+
+        #region IDatabaseFactory implementation
+
+        public override void CreateDatabase()
+        {
+            var dbname = DatabaseName;
+            var newdb = new MsSqlDatabase(Regex.Replace(_connstr, @"INITIAL CATALOG=.*?[;$]", "Initial Catalog=master;", RegexOptions.IgnoreCase));
+            try
+            {
+                newdb.Open();
+                if (!newdb.Query("EXEC sp_databases").Rows.Cast<DataRow>().Any(r => r[0].ToString().ToUpper() == dbname))
+                {
+                    newdb.Exec(@$"CREATE DATABASE {LQ}{dbname}{RQ} COLLATE Cyrillic_General_100_CI_AS_SC_UTF8; ALTER DATABASE [{dbname}] SET RECOVERY SIMPLE;");
+                    newdb.Close();
+
+                    Thread.Sleep(5000); // задержка на инициализацию БД
+                    newdb = new MsSqlDatabase(_connstr);
+                    newdb.Open();
+                }
+            }
+            finally
+            {
+                newdb.Close();
+            }
+        }
+
+        #endregion IDatabaseFactory implementation
 
         #region Private methods
 
@@ -108,6 +145,23 @@ namespace RmSolution.Data
             using var rd = cmd.ExecuteReader(behavior);
             res.Load(rd);
             return res;
+        }
+
+        void Exec(CommandBehavior behavior, string statement, params object[] args)
+        {
+            lock (SyncRoot)
+            {
+                using var cmd = new SqlCommand(args.Length > 0 ? string.Format(statement, args) : statement, (SqlConnection)_conn);
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+
+                    throw new Exception("<PRE>" + statement + "</PRE>", ex);
+                }
+            }
         }
 
         #endregion Private methods

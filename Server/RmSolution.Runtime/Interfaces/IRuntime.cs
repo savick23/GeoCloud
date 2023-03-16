@@ -6,12 +6,16 @@ namespace RmSolution.Runtime
 {
     public interface IRuntime
     {
+        IMetadata Metadata { get; }
+
         string GetWorkDirectory();
 
         /// <summary> Наименование сервера приложений.</summary>
         string Name { get; set; }
         /// <summary> Версия модуля.</summary>
         Version Version { get; }
+        /// <summary> Дата/Время запуска сервера приложений.</summary>
+        DateTime Started { get; }
 
         /// <summary> Создаёт новое подключение к базе данных.</summary>
         IDatabase CreateDbConnection();

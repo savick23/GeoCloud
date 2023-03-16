@@ -24,6 +24,7 @@ namespace RmSolution.Server
         readonly ConcurrentQueue<TMessage> _esb = new();
         /// <summary> Системная шина предприятия. Менеджер расписаний.</summary>
         readonly TaskScheduler<TMessage> _schedule = new();
+        readonly Metadata _md;
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
         readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
@@ -38,6 +39,8 @@ namespace RmSolution.Server
 
         public string Name { get; set; }
         public Version Version { get; }
+        public IMetadata Metadata { get; }
+        public DateTime Started { get; } = DateTime.Now;
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
         internal readonly ModuleManager Modules;
@@ -118,6 +121,30 @@ namespace RmSolution.Server
             Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
+            Metadata = _md = new Metadata(databaseF());
+            while (true)
+                try
+                {
+                    _md.Open();
+                    break;
+                }
+                catch (DbNotFoundException)
+                {
+                    //if (attempt++ == 0)
+                    {
+                        logger.LogWarning("Создание базы данных " + _md.DatabaseName + ".");
+                        ((IDatabaseFactory)databaseF()).CreateDatabase();
+                        //_needNewDatabase = true;
+                        continue;
+                    }
+                    throw;
+                }
+#if !DEBUG
+                catch (Exception ex)
+                {
+                    throw new Exception("Подключение к база данных \"" + _md.DatabaseName + "\" не установлено! " + ex.Message);
+                }
+#endif
             Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;

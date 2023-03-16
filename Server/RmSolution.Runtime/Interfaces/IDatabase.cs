@@ -14,6 +14,8 @@ namespace RmSolution.Runtime
         string ApplicationName { get; set; }
         /// <summary> Схема по-умолчанию.</summary>
         string DefaultScheme { get; }
+        /// <summary> Возвращает наименование базы данных.</summary>
+        string DatabaseName { get; }
         /// <summary> Возвращает версию базы данных.</summary>
         string Version { get; }
 
@@ -29,5 +31,13 @@ namespace RmSolution.Runtime
         object Scalar(string statement, params object[] args);
         /// <summary> Возвращает единственное значение из БД указанного типа. Первую колонку первой записи.</summary>
         T Scalar<T>(string statement, params object[] args);
+        /// <summary> Выполнить инструкцию базы данных.</summary>
+        void Exec(string statement, params object[] args);
+    }
+
+    public interface IDatabaseFactory // For isolation
+    {
+        /// <summary> Создаёт новую базу данных.</summary>
+        void CreateDatabase();
     }
 }
