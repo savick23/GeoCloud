@@ -10,7 +10,7 @@ namespace RmSolution.GeoCom
     using RmSolution.Runtime;
     #endregion Using
 
-    public class GeoComService : ModuleBase
+    public class GeoComService : ModuleBase, IOServer
     {
         public GeoComService(IRuntime runtime) : base(runtime)
         {

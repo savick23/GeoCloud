@@ -39,6 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.resources.ru", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.resources.en", "Resources\RmSolution.resources.en\RmSolution.resources.en.csproj", "{7F67F596-6891-4980-BE13-95725CBFF299}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{0ACF6D04-C67D-4738-BDDA-A1F51915EA4B}"
+	ProjectSection(SolutionItems) = preProject
+		equipments.xml = equipments.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +106,7 @@ Global
 		{D3592E19-2C64-4000-8EAD-4851D05B1BC8} = {4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}
 		{8775121A-70C7-427B-8411-C081454FDE37} = {92D640F8-D444-466C-8344-589B08C18F19}
 		{7F67F596-6891-4980-BE13-95725CBFF299} = {92D640F8-D444-466C-8344-589B08C18F19}
+		{0ACF6D04-C67D-4738-BDDA-A1F51915EA4B} = {776EEEA8-3CBD-4E10-A70E-F3A0482A70A1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C10EADE4-BB39-4C25-851D-2D7C7586C3F5}

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rmsolution>
+  <objects>
+    <catalogs>
+      <item Id="4503599627370496" code="EQUIPTYPES" source="equiptypes">
+        <data>
+          <item id="4503599627371520" state="1" code="001" name="Тахеометр"/>
+        </data>
+      </item>
+      <item Id="4785074604081152" code="EQUIPMENTS" source="equipments">
+        <data>
+          <item id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520"/>
+        </data>
+      </item>
+      <item Id="5066549580791808" source=""/>
+    </catalogs>
+  </objects>
+</rmsolution>

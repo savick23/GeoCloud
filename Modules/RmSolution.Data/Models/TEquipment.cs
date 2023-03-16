@@ -4,9 +4,16 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
-    [Table("equipments")]
-    public class TEquipment : TCatalogRow
+    [Table("equiptypes")]
+    public class TEquipmentType : TCatalogRow
     {
+    }
+
+    [Table("equipments")]
+    public class TEquipment : TCatalogGroupTreeRow
+    {
+        [Column("type bigint NOT NULL")]
+        public long Type { get; set; }
         [Column("model nvarchar(128) NULL")]
         public string? Model { get; set; }
         [Column("serial nvarchar(32) NULL")]
