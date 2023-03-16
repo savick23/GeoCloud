@@ -5,14 +5,21 @@
 namespace RmSolution.Devices
 {
     #region Using
-    using System;
     using System.IO.Ports;
     using System.Threading.Tasks;
+    using RmSolution.Data;
     using RmSolution.Runtime;
     #endregion Using
 
     public class GeoComService : ModuleBase, IOServer
     {
+        #region Properties
+
+        readonly List<IDevice> _devices = new();
+        public List<IDevice> Devices => _devices;
+
+        #endregion Properties
+
         public GeoComService(IRuntime runtime, GeoComAdapterSet adapter) : base(runtime)
         {
             Subscribe = new[] { MSG.RuntimeStarted }; 
@@ -20,7 +27,7 @@ namespace RmSolution.Devices
 
         protected override Task ExecuteProcess()
         {
-            var sock = new GeoComSocket();
+            var sock = new GeoComSocket(new LeicaTotalStationDevice());
 
             Status = RuntimeStatus.Running;
             while (_sync.WaitOne() && (Status & RuntimeStatus.Loop) > 0)

@@ -5,12 +5,15 @@
 namespace RmSolution.Runtime
 {
     #region Using
-    using System.Data;
+    using RmSolution.Data;
     #endregion Using
 
-    /// <summary> Интерфейс сервера ввода/вывода.</summary>
-    /// <remarks> Должен быть только один в Системе.</remarks>
+    /// <summary> Интерфейс службы сбора данных, реестр оборудования. Сервер ввода/вывода.</summary>
+    /// <remarks> В Системе должен быть только один экземпляр.</remarks>
     public interface IOServer
     {
+        /// <summary> Реестр оборудования.</summary>
+        /// <remarks> Возвращает копию реестра.</remarks>
+        List<IDevice> Devices { get; }
     }
 }

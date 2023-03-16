@@ -11,14 +11,18 @@ namespace RmSolution.Devices
     #endregion Using
 
     /// <summary> Тахеометр Leica.</summary>
-    public class LeicaTotalStationDevice : IDevice
+    public class LeicaTotalStationDevice : IDevice, IDeviceContext
     {
         #region Properties
 
         public long Id { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
-        public string? Description { get; set; }
+        public string? Descript { get; set; }
+
+        public GeoComAccessMode OperationMode { get; }
+        public NetworkSetting NetworkSetting { get; set; }
+        public SerialPortSetting SerialPortSetting { get; set; }
 
         #endregion Properties
 

@@ -9,4 +9,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\RmSolution.Data\RmSolution.Data.csproj" />
+  </ItemGroup>
+
 </Project>

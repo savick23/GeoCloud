@@ -17,6 +17,6 @@ namespace RmSolution.Data
         /// <summary> Наименование устройства.</summary>
         string? Name { get; set; }
         /// <summary> Описание устройства (примечание, комментарий).</summary>
-        string? Description { get; set; }
+        string? Descript { get; set; }
     }
 }
