@@ -47,9 +47,11 @@ namespace RmSolution.Data
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class ColumnAttribute : Attribute
     {
-        public string Name { get; }
+        public string? Name { get; set; }
+        public bool Nullable { get; set; }
+        public int Length { get; set; }
 
-        public ColumnAttribute(string name)
+        public ColumnAttribute(string? name = null)
         {
             Name = name;
         }

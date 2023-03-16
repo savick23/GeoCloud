@@ -123,10 +123,12 @@ namespace RmSolution.Server
 
             Metadata = _md = new Metadata(databaseF());
             int attempt = 1;
+            bool _needNewDatabase = false;
             while (true)
                 try
                 {
                     _md.Open();
+                    if (!_needNewDatabase) ((IDatabaseFactory)databaseF()).UpdateDatabase((msg) => logger.LogInformation(msg));
                     break;
                 }
                 catch (TDbNotFoundException)
@@ -135,7 +137,7 @@ namespace RmSolution.Server
                     {
                         logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, _md.DatabaseName));
                         ((IDatabaseFactory)databaseF()).CreateDatabase((msg) => logger.LogInformation(msg));
-                        //_needNewDatabase = true;
+                        _needNewDatabase = true;
                         logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, _md.DatabaseName));
                         continue;
                     }

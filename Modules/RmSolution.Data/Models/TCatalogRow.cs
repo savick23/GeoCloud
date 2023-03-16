@@ -8,7 +8,7 @@ namespace RmSolution.Data
     {
         [Column("id bigint PRIMARY KEY")]
         public long Id { get; set; }
-        [Column("state int NOT NULL")]
+        [Column]
         public int State { get; set; }
     }
 
@@ -20,31 +20,31 @@ namespace RmSolution.Data
         public string? Name { get; set; }
         [Column("descript nvarchar(1024) NULL")]
         public string? Descript { get; set; }
-        [Column("creator bigint NOT NULL")]
+        [Column]
         public long Creator { get; set; }
-        [Column("created datetime NOT NULL")]
+        [Column]
         public DateTime Created { get; set; }
-        [Column("modifier bigint NULL")]
-        public long Modifier { get; set; }
-        [Column("modified datetime NULL")]
-        public DateTime Modified { get; set; }
+        [Column]
+        public long? Modifier { get; set; }
+        [Column]
+        public DateTime? Modified { get; set; }
     }
 
     public class TCatalogTreeRow : TCatalogRow
     {
-        [Column("parent bigint NOT NULL")]
+        [Column]
         public long Parent { get; set; }
     }
 
     public class TCatalogGroupRow : TCatalogRow
     {
-        [Column("group bigint NOT NULL")]
+        [Column]
         public long Group { get; set; }
     }
 
     public class TCatalogGroupTreeRow : TCatalogTreeRow
     {
-        [Column("group bigint NOT NULL")]
+        [Column]
         public long Group { get; set; }
     }
 }

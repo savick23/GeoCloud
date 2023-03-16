@@ -45,5 +45,7 @@ namespace RmSolution.Runtime
     {
         /// <summary> Создаёт новую базу данных.</summary>
         void CreateDatabase(Action<string> message);
+        /// <summary> Временно.</summary>
+        void UpdateDatabase(Action<string> message);
     }
 }

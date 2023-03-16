@@ -21,6 +21,15 @@ namespace RmSolution.Data
 
         protected DbConnection? _conn;
 
+        static Dictionary<Type, string> _typemapping = new() {
+            { typeof(Int32), "int NOT NULL" },
+            { typeof(Int32?), "int NULL" },
+            { typeof(Int64), "bigint NOT NULL" },
+            { typeof(Int64?), "bigint NULL" },
+            { typeof(DateTime), "datetime NOT NULL" },
+            { typeof(DateTime?), "datetime NULL" }
+        };
+
         /// <summary> Исключаем одновременный доступ (запрос) к данным базы данных.</summary>
         protected object SyncRoot = new();
 
@@ -78,6 +87,19 @@ namespace RmSolution.Data
 
         #region IDatabaseFactory implementation
 
+        public void UpdateDatabase(Action<string> message)
+        {
+            try
+            {
+                Open();
+                CreateEnvironment(this, message);
+            }
+            finally
+            {
+                Close();
+            }
+        }
+
         /// <summary> Возвращает типы с указанным аттрибутом.</summary>
         static List<Type> GetTypes<T>() where T : Attribute
         {
@@ -104,9 +126,9 @@ namespace RmSolution.Data
                 if (!meta.IsView)
                 {
                     var tdefn = new TableDefinition(meta.Name);
-                    foreach (var p in t.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken))
-                        if (p.IsDefined(typeof(ColumnAttribute)))
-                            tdefn.Columns.Add(((ColumnAttribute)p.GetCustomAttributes(typeof(ColumnAttribute)).First()).Name);
+                    foreach (var pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken))
+                        if (pi.IsDefined(typeof(ColumnAttribute)))
+                            tdefn.Columns.Add(((ColumnAttribute)pi.GetCustomAttributes(typeof(ColumnAttribute)).First()).Name ?? BuildColumnDefn(pi));
 
                     t.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).ToList()
                         .ForEach(idx => tdefn.Constraints.Add(string.Concat("PRIMARY KEY ", string.Join(",", ((PrimaryKeyAttribute)idx).Columns))));
@@ -117,6 +139,15 @@ namespace RmSolution.Data
                     CreateTable(db, tdefn, message);
                 }
             });
+        }
+
+        /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
+        static string BuildColumnDefn(PropertyInfo pi)
+        {
+            var finded = _typemapping.TryGetValue(pi.PropertyType, out string? type);
+            return string.Join(" ", pi.Name.ToLower(),
+                finded ? type : "int",
+                finded ? string.Empty : pi.PropertyType.IsValueType && !pi.PropertyType.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
         }
 
         /// <summary> Получает полное имя таблицы со схемой.</summary>

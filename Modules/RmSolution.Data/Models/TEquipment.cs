@@ -2,6 +2,8 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: TEquipment – Справочник оборудования.
 //--------------------------------------------------------------------------------------------------
+using System.ComponentModel;
+
 namespace RmSolution.Data
 {
     [Table("equiptypes")]
@@ -12,7 +14,7 @@ namespace RmSolution.Data
     [Table("equipments")]
     public class TEquipment : TCatalogGroupTreeRow
     {
-        [Column("type bigint NOT NULL")]
+        [Column]
         public long Type { get; set; }
         [Column("model nvarchar(128) NULL")]
         public string? Model { get; set; }

@@ -45,7 +45,6 @@ namespace RmSolution.Data
             try
             {
                 _conn.Open();
-                CreateEnvironment(this, (msg) => Console.WriteLine(msg));
             }
             catch (SqlException ex)
             {
