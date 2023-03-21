@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pack": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)Server\\config\\ $(ProjectDir)Properties\\dbinit.smx -$(ConfigurationName)"
+    }
+  }
+}

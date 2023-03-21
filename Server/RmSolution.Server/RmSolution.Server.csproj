@@ -13,6 +13,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="config\dbinit.smx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="config\dbinit.smx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="runtimeconfig.template.json" />
   </ItemGroup>
 
@@ -28,4 +38,8 @@
     <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
     <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="$(SolutionDir)Tools\Pack\Bin\$(ConfigurationName)\pack &quot;$(SolutionDir)Server\config&quot; &quot;$(ProjectDir)config\dbinit.smx&quot; -$(ConfigurationName)" />
+  </Target>
 </Project>
