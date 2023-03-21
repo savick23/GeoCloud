@@ -9,7 +9,7 @@
       </item>
       <item Id="4785074604081152" code="EQUIPMENTS" source="equipments">
         <data>
-          <item id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520"/>
+          <item id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520" model="" serial=""/>
         </data>
       </item>
     </catalogs>

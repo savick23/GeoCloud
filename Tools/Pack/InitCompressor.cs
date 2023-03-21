@@ -25,17 +25,24 @@ namespace RmSolution.Utils
             using (var arch = new ZipArchive(output, ZipArchiveMode.Update))
             {
                 var config = configuration.ToUpper().Contains("RELEASE") || configuration.ToUpper().Contains("PUBLISH") ? RELEASE : DEBUG;
-                foreach (var filename in Directory.GetFiles(sources, "*.xml", SearchOption.TopDirectoryOnly).OrderBy(f => f))
+                foreach (var filename in Directory.GetFiles(sources, "*.xml", SearchOption.AllDirectories).OrderBy(f => f))
                     if (!(filename.EndsWith(RELEASE, StringComparison.OrdinalIgnoreCase)
                         || filename.EndsWith(DEBUG, StringComparison.OrdinalIgnoreCase))
                         || filename.EndsWith(config, StringComparison.OrdinalIgnoreCase))
                     {
-                        AddContent(arch, Path.GetFileName(filename).Replace(RELEASE, ".xml").Replace(DEBUG, ".xml"),
+                        Console.WriteLine("Add file " + filename);
+                        AddContent(arch, Appear(sources, filename).Replace(RELEASE, ".xml").Replace(DEBUG, ".xml"),
                             File.ReadAllBytes(filename));
                     }
 
                 output.Flush();
             }
+        }
+
+        static string Appear(string sources, string filename)
+        {
+            filename = filename.Replace(sources, string.Empty);
+            return filename.StartsWith("\\") ? filename[1..] : filename;
         }
 
         static byte[] CompressEncode(byte[] input)

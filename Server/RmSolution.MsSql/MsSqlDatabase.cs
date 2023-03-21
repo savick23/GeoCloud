@@ -87,6 +87,7 @@ namespace RmSolution.Data
                     newdb.Open();
 
                     CreateEnvironment(newdb, message);
+                    InitDatabase(newdb, message);
                 }
             }
             finally

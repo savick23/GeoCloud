@@ -19,7 +19,7 @@ namespace RmSolution.Server
 
         #region Properties
 
-        public string DatabaseName => _db.DatabaseName;
+        public string DatabaseName => _db.DatabaseName ?? "RMGEO01";
 
         #endregion Properties
 

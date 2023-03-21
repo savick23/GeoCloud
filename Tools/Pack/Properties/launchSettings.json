@@ -2,7 +2,7 @@
   "profiles": {
     "Pack": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)Server\\config\\ $(ProjectDir)Properties\\dbinit.smx -$(ConfigurationName)"
+      "commandLineArgs": "D:\\Projects\\RMGeo\\Server\\config D:\\Projects\\RMGeo\\Server\\RmSolution.Server\\config\\dbinit.smx -Debug"
     }
   }
 }

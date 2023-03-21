@@ -6,6 +6,8 @@ namespace RmSolution.Data
 {
     public class TBaseRow
     {
+        protected static readonly DateTime DATETIMEEMPTY = new DateTime(1970, 1, 1);
+
         [Column("id bigint PRIMARY KEY")]
         public long Id { get; set; }
         [Column]
@@ -23,7 +25,7 @@ namespace RmSolution.Data
         [Column]
         public long Creator { get; set; }
         [Column]
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DATETIMEEMPTY;
         [Column]
         public long? Modifier { get; set; }
         [Column]
