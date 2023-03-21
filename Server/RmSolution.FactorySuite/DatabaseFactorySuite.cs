@@ -20,7 +20,7 @@ namespace RmSolution.Data
 #if DEBUG
         protected static readonly string CONFIG = Path.Combine(Path.GetDirectoryName(Environment.CommandLine), "config");
 #else
-        protected static readonly string CONFIG = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config");
+        protected static readonly string CONFIG = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "config");
 #endif
         protected DbConnection? _conn;
 
