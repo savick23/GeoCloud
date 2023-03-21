@@ -224,7 +224,7 @@ namespace RmSolution.Data
                 if (srctype != null)
                 {
                     var cols = srctype.GetProperties().ToDictionary(k => k.Name.ToLower(), v => v);
-                    StringBuilder stmt = new("INSERT INTO " + (src.Contains('.') ? string.Empty : db.DefaultScheme + ".") + src + " (");
+                    StringBuilder stmt = new("INSERT INTO " + SchemaTableName(src) + " (");
                     foreach (var sect in item.Elements())
                     {
                         if (sect.Name == "data")

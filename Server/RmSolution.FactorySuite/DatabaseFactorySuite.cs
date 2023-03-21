@@ -9,6 +9,7 @@ namespace RmSolution.Data
     using System.Data;
     using System.Data.Common;
     using System.Text.RegularExpressions;
+    using Dapper;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -58,7 +59,6 @@ namespace RmSolution.Data
 
         public virtual IDatabase Open() => throw new NotImplementedException();
         public virtual DataTable Query(string statement, params object[] args) => throw new NotImplementedException();
-        public virtual IEnumerable<T> Query<T>(string statement, params object[] args) => throw new NotImplementedException();
         public virtual void Exec(string statement, params object[] args) => throw new NotImplementedException();
         public virtual IEnumerable<string> Schemata() => throw new NotImplementedException();
         public virtual IEnumerable<string> Tables() => throw new NotImplementedException();
@@ -75,6 +75,18 @@ namespace RmSolution.Data
         {
             Close();
             GC.SuppressFinalize(this);
+        }
+
+        public virtual IEnumerable<T> Query<T>(string statement, params object[] args) =>
+            _conn.Query<T>(string.Format(statement, args));
+
+        public virtual IEnumerable<T>? Query<T>()
+        {
+            var src = ((TableAttribute?)typeof(T).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Name;
+            if (src != null)
+                return _conn.Query<T>("SELECT * FROM " + SchemaTableName(src));
+
+            return default;
         }
 
         public virtual object Scalar(string statement, params object[] args)

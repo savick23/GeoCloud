@@ -28,6 +28,8 @@ namespace RmSolution.Runtime
         DataTable Query(string statement, params object[] args);
         /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
         IEnumerable<T> Query<T>(string statement, params object[] args);
+        /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
+        IEnumerable<T>? Query<T>();
         /// <summary> Возвращает единственное значение из БД. Первую колонку первой записи.</summary>
         object Scalar(string statement, params object[] args);
         /// <summary> Возвращает единственное значение из БД указанного типа. Первую колонку первой записи.</summary>

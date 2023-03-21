@@ -2,12 +2,13 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: GeoComService - Сервер сбора геоданных.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Devices
+namespace RmSolution.GeoCom
 {
     #region Using
     using System.IO.Ports;
     using System.Threading.Tasks;
     using RmSolution.Data;
+    using RmSolution.Devices;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -22,7 +23,22 @@ namespace RmSolution.Devices
 
         public GeoComService(IRuntime runtime, GeoComAdapterSet adapter) : base(runtime)
         {
-            Subscribe = new[] { MSG.RuntimeStarted }; 
+            Subscribe = new[] { MSG.RuntimeStarted };
+        }
+
+        public override void Start()
+        {
+            var db = Runtime.CreateDbConnection();
+            try
+            {
+                db.Open();
+                var tEquips = db.Query<TEquipment>();
+            }
+            finally
+            {
+                db.Close();
+            }
+            base.Start();
         }
 
         protected override Task ExecuteProcess()
