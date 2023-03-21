@@ -26,20 +26,11 @@ namespace RmSolution.GeoCom
             Subscribe = new[] { MSG.RuntimeStarted };
         }
 
-        public override void Start()
+        public override void Start() => UseDatabase(db =>
         {
-            var db = Runtime.CreateDbConnection();
-            try
-            {
-                db.Open();
-                var tEquips = db.Query<TEquipment>();
-            }
-            finally
-            {
-                db.Close();
-            }
+            var tEquips = db.Query<TEquipment>();
             base.Start();
-        }
+        });
 
         protected override Task ExecuteProcess()
         {
