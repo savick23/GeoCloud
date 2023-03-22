@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Types>
-  <Solution Type="rmgeo" PartNames="catalogs\*" />
+  <Solution Type="rmgeo" PartNames="system\*,catalogs\*" />
 </Types>

@@ -1,12 +1,12 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: TCatalogRow – Базовый клас записей (DataRow) справочников.
+// Описание: TCatalogRow – Базовый клас записей (DataRow) базы данных.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
     public class TBaseRow
     {
-        protected static readonly DateTime DATETIMEEMPTY = new DateTime(1970, 1, 1);
+        internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum
 
         [Column("id bigint PRIMARY KEY")]
         public long Id { get; set; }
@@ -23,9 +23,9 @@ namespace RmSolution.Data
         [Column("descript nvarchar(1024) NULL")]
         public string? Descript { get; set; }
         [Column]
-        public long Creator { get; set; }
+        public long Creator { get; set; } = TUser.ADMINISTRATOR;
         [Column]
-        public DateTime Created { get; set; } = DATETIMEEMPTY;
+        public DateTime Created { get; set; } = DateTime.Now;
         [Column]
         public long? Modifier { get; set; }
         [Column]

@@ -173,6 +173,8 @@ namespace RmSolution.Data
             sqlcmd.AppendLine(")");
         }
 
+        #region Database initialization
+
         /// <summary> Инициализировать БД данными из файлов инициализации dbinit.smx.</summary>
         protected void InitDatabase(IDatabase db, Action<string> message)
         {
@@ -223,16 +225,17 @@ namespace RmSolution.Data
                 var srctype = GetTypes<TableAttribute>().FirstOrDefault(t => ((TableAttribute)t.GetCustomAttribute(typeof(TableAttribute))).Name.Equals(src));
                 if (srctype != null)
                 {
-                    var cols = srctype.GetProperties().ToDictionary(k => k.Name.ToLower(), v => v);
-                    StringBuilder stmt = new("INSERT INTO " + SchemaTableName(src) + " (");
+                    var stmt = new StringBuilder();
                     foreach (var sect in item.Elements())
                     {
                         if (sect.Name == "data")
                         {
-                            StringBuilder sqlvals = new();
-                            string comma = string.Empty;
                             foreach (var row in sect.Elements())
                             {
+                                var cols = srctype.GetProperties().ToDictionary(k => k.Name.ToLower(), v => v);
+                                stmt.Append("INSERT INTO " + SchemaTableName(src) + " (");
+                                StringBuilder sqlvals = new();
+                                string comma = string.Empty;
                                 foreach (var col in row.Attributes())
                                 {
                                     var pname = col.Name.LocalName.ToLower();
@@ -250,6 +253,7 @@ namespace RmSolution.Data
                                     {
                                         stmt.Append(comma).Append('"').Append(pi.Name.ToLower()).Append('"');
                                         sqlvals.Append(comma).Append(InitGetValue(pi.PropertyType, pi.GetValue(Activator.CreateInstance(srctype))));
+                                        comma = ",";
                                     }
 
                                 stmt.Append(") VALUES (").Append(sqlvals).Append(");\n");
@@ -278,5 +282,7 @@ namespace RmSolution.Data
 
             return "'" + val + "'";
         }
+
+        #endregion Database initialization
     }
 }
