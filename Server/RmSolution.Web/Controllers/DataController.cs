@@ -7,11 +7,8 @@ namespace RmSolution.Web
     #region Using
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Runtime;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
     #endregion Using
 
-   // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public class DataController: SmartController
     {
         public DataController(IRuntime runtime) : base (runtime)
@@ -19,13 +16,13 @@ namespace RmSolution.Web
         }
 
         [HttpGet("[action]/{name}")]
-        public async Task<JsonResult> Data(string name) => await UseDatabase(db =>
+        public async Task<IActionResult> Data(string name) => await UseDatabase(db =>
         {
             var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.Type;
             if (mdtype != null)
             {
                 var data = db.Query(mdtype);
-                return new JsonResult(data, new JsonSerializerOptions() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+                return new JsonResult(data);
             }
             throw new Exception("Тип " + name + " не найден!");
         });

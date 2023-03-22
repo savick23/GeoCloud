@@ -6,6 +6,7 @@ namespace RmSolution.Data
 {
     #region Using
     using RmSolution.DataAnnotations;
+    using System.Text.Json.Serialization;
     #endregion Using
 
     public class TBaseRow

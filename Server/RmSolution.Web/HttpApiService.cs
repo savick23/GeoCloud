@@ -49,7 +49,7 @@ namespace RmSolution.Web
                 {
                     opt.JsonSerializerOptions.PropertyNamingPolicy = null;  // Выводит наименования параметров как есть, без изменения регистра букв
                     opt.JsonSerializerOptions.IncludeFields = true;         // Включим в результат поля и свойства
-                    opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
                 });
 
             _host = builder.Build();
