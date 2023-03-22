@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: Annotations –
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Data
+namespace RmSolution.DataAnnotations
 {
     #region Using
     using System;

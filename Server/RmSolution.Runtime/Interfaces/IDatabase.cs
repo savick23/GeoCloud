@@ -46,8 +46,8 @@ namespace RmSolution.Runtime
     public interface IDatabaseFactory // For isolation
     {
         /// <summary> Создаёт новую базу данных.</summary>
-        void CreateDatabase(Action<string> message);
+        void CreateDatabase(TObjectCollection entities, Action<string> message);
         /// <summary> Временно.</summary>
-        void UpdateDatabase(Action<string> message);
+        void UpdateDatabase(TObjectCollection entities, Action<string> message);
     }
 }

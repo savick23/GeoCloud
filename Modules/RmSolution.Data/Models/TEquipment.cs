@@ -2,10 +2,12 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: TEquipment – Справочник оборудования.
 //--------------------------------------------------------------------------------------------------
-using System.ComponentModel;
-
 namespace RmSolution.Data
 {
+    #region Using
+    using RmSolution.DataAnnotations;
+    #endregion Using
+
     [Table("equiptypes")]
     public class TEquipmentType : TCatalogRow
     {

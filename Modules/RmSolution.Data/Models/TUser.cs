@@ -4,6 +4,10 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
+    #region Using
+    using RmSolution.DataAnnotations;
+    #endregion Using
+
     /// <summary> Роли пользователей.</summary>
     [Table("config.roles")]
     public class TRole : TCatalogRow

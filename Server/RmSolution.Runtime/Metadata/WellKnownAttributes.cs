@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: WellKnownAttributes – Известные наименования атрибутов (полей).
 //--------------------------------------------------------------------------------------------------
-namespace SmartMinex.Runtime
+namespace RmSolution.Runtime
 {
     #region Using
     using System;

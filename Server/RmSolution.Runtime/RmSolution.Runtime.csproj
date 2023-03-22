@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\RmSolution.RmGeo.3.1.csproj" />
 
   <PropertyGroup>
@@ -11,6 +11,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\RmSolution.Data\RmSolution.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="rmgeosrv, PublicKey=00240000048000009400000006020000002400005253413100040000010001001d0285b4e2529a2cf24f564620beff80c63d84538aacde135f14b3b431a3e0bba04f72f9a639051621d6ae156f8a2dc6b26921c4c3ce04bf4576fb6089f6286e202e7924ee03b82492204792c445a521819b4a39f3f087e0e7b6290d8d7abe191b4072b0b500b9dda9aa3d48530cd38d967411fab8c2a7e9776de8531c648698" />
   </ItemGroup>
 
 </Project>

@@ -24,7 +24,7 @@ namespace RmSolution.Server
         readonly ConcurrentQueue<TMessage> _esb = new();
         /// <summary> Системная шина предприятия. Менеджер расписаний.</summary>
         readonly TaskScheduler<TMessage> _schedule = new();
-        readonly Metadata _md;
+        readonly SmartMetadata _md;
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
         readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
@@ -121,14 +121,14 @@ namespace RmSolution.Server
             Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
-            Metadata = _md = new Metadata(databaseF());
+            Metadata = _md = new SmartMetadata(databaseF());
             int attempt = 1;
             bool isnewdb = false;
             while (true)
                 try
                 {
                     _md.Open();
-                    if (!isnewdb) ((IDatabaseFactory)databaseF()).UpdateDatabase((msg) => logger.LogInformation(msg));
+                    if (!isnewdb) ((IDatabaseFactory)databaseF()).UpdateDatabase(_md.Entities, (msg) => logger.LogInformation(msg));
                     break;
                 }
                 catch (TDbNotFoundException)
@@ -136,7 +136,7 @@ namespace RmSolution.Server
                     if (attempt-- > 0)
                     {
                         logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, _md.DatabaseName));
-                        ((IDatabaseFactory)databaseF()).CreateDatabase((msg) => logger.LogInformation(msg));
+                        ((IDatabaseFactory)databaseF()).CreateDatabase(_md.Entities, (msg) => logger.LogInformation(msg));
                         isnewdb = true;
                         logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, _md.DatabaseName));
                         continue;

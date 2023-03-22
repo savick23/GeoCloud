@@ -10,6 +10,7 @@ namespace RmSolution.Data
     using System.Data.Common;
     using System.Text.RegularExpressions;
     using Dapper;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -64,7 +65,7 @@ namespace RmSolution.Data
         public virtual IEnumerable<string> Tables() => throw new NotImplementedException();
 
         /// <summary> Создать базу данных с кодовой страницой UTF8.</summary>
-        public virtual void CreateDatabase(Action<string> message) => throw new NotImplementedException();
+        public virtual void CreateDatabase(TObjectCollection entities, Action<string> message) => throw new NotImplementedException();
 
         public virtual void Close()
         {

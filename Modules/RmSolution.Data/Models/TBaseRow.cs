@@ -4,6 +4,10 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
+    #region Using
+    using RmSolution.DataAnnotations;
+    #endregion Using
+
     public class TBaseRow
     {
         internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum

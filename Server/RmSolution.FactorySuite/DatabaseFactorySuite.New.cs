@@ -7,22 +7,20 @@ namespace RmSolution.Data
     #region Using
     using System;
     using System.Data;
-    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using RmSolution.Runtime;
-    using SmartMinex.Runtime;
     #endregion Using
 
     public partial class DatabaseFactorySuite
     {
-        public void UpdateDatabase(Action<string> message)
+        public void UpdateDatabase(TObjectCollection entities, Action<string> message)
         {
             try
             {
                 Open();
-                CreateEnvironment(this, message);
+                CreateEnvironment(this, entities, message);
             }
             finally
             {
@@ -30,54 +28,30 @@ namespace RmSolution.Data
             }
         }
 
-        /// <summary> Возвращает типы с указанным аттрибутом.</summary>
-        static List<Type> GetTypes<T>() where T : Attribute
-        {
-            var entry = Assembly.GetEntryAssembly();
-            if (entry != null)
-            {
-                var tkn = entry.GetName().GetPublicKeyToken();
-                if (tkn != null)
-                    return entry.GetReferencedAssemblies()
-                        .Where(a => a.GetPublicKeyToken()?.Where((n, i) => tkn.Length > 0 && tkn[i] == n).Count() == tkn.Length)
-                        .SelectMany(a => Assembly.Load(a).GetTypes())
-                        .Concat(entry.GetTypes())
-                        .Where(t => t.IsDefined(typeof(T), false)).ToList();
-            }
-            return new List<Type>();
-        }
-
         /// <summary> Создать системные таблицы на основании атрибутов классов.</summary>
-        protected void CreateEnvironment(IDatabase db, Action<string> message)
-        {
-            GetTypes<TableAttribute>().ForEach(t =>
+        protected void CreateEnvironment(IDatabase db, TObjectCollection entities, Action<string> message) =>
+            entities.ForEach(oi =>
             {
-                var meta = (TableAttribute)t.GetCustomAttributes(typeof(TableAttribute), false)[0];
-                if (!meta.IsView)
+                if (!oi.IsView)
                 {
-                    var tdefn = new TableDefinition(meta.Name);
-                    foreach (var pi in t.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken))
-                        if (pi.IsDefined(typeof(ColumnAttribute)))
-                            tdefn.Columns.Add(((ColumnAttribute)pi.GetCustomAttributes(typeof(ColumnAttribute)).First()).Name ?? BuildColumnDefn(pi));
-
-                    t.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).ToList()
-                        .ForEach(idx => tdefn.Constraints.Add(string.Concat("PRIMARY KEY ", string.Join(",", ((PrimaryKeyAttribute)idx).Columns))));
-
-                    t.GetCustomAttributes(typeof(IndexAttribute), false).ToList()
-                        .ForEach(idx => tdefn.Constraints.Add(string.Concat("INDEX ", string.Join(",", ((IndexAttribute)idx).Columns))));
-
+                    var tdefn = new TableDefinition(oi.Source);
+                    foreach (var ai in oi.Attributes)
+                    {
+                        tdefn.Columns.Add(ai.Source ?? BuildColumnDefn(ai));
+                        if (ai.PrimaryKey != null) tdefn.Constraints.Add(string.Concat("PRIMARY KEY ", string.Join(",", ai.PrimaryKey)));
+                        if (ai.Indexes != null) tdefn.Constraints.Add(string.Concat("INDEX ", string.Join(",", ai.Indexes)));
+                    }
                     CreateTable(db, tdefn, message);
                 }
             });
-        }
 
         /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
-        static string BuildColumnDefn(PropertyInfo pi)
+        static string BuildColumnDefn(TAttribute ai)
         {
-            var finded = _typemapping.TryGetValue(pi.PropertyType, out string? type);
-            return string.Join(" ", pi.Name.ToLower(),
+            var finded = _typemapping.TryGetValue(ai.Type, out string? type);
+            return string.Join(" ", ai.Code.ToLower(),
                 finded ? type : "int",
-                finded ? string.Empty : pi.PropertyType.IsValueType && !pi.PropertyType.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
+                finded ? string.Empty : ai.Type.IsValueType && !ai.Type.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
         }
 
         /// <summary> Получает полное имя таблицы со схемой.</summary>
@@ -176,7 +150,7 @@ namespace RmSolution.Data
         #region Database initialization
 
         /// <summary> Инициализировать БД данными из файлов инициализации dbinit.smx.</summary>
-        protected void InitDatabase(IDatabase db, Action<string> message)
+        protected void InitDatabase(IDatabase db, TObjectCollection entities, Action<string> message)
         {
             // Загрузим пользовательские объекты конфигурации -->
             var init_db_filename = Path.Combine(CONFIG, INITFILE);
@@ -200,30 +174,30 @@ namespace RmSolution.Data
                      {
                          var sect = XDocument.Parse(init_db.ReadAllText(filename))?.Root?.Elements().FirstOrDefault();
                          if (sect != null)
-                             LoadInitConfig(db, sect, sect.Name.LocalName);
+                             LoadInitConfig(db, entities, sect, sect.Name.LocalName);
                      });
             }
         }
 
-        void LoadInitConfig(IDatabase db, XElement items, string section)
+        void LoadInitConfig(IDatabase db, TObjectCollection entities, XElement items, string section)
         {
             foreach (var item in items.Elements())
             {
                 if (item.Name == "item")
-                    CreateObjectFrom(db, item, section);
+                    CreateObjectFrom(db, entities, item, section);
                 else
-                    LoadInitConfig(db, item, section);
+                    LoadInitConfig(db, entities, item, section);
             }
         }
 
         /// <summary> Создаём структуру и физические объекты в БД.</summary>
-        void CreateObjectFrom(IDatabase db, XElement item, string section)
+        void CreateObjectFrom(IDatabase db, TObjectCollection entities, XElement item, string section)
         {
             var src = item.Attribute(WellKnownAttributes.Source.ToLower())?.Value;
             if (src != null)
             {
-                var srctype = GetTypes<TableAttribute>().FirstOrDefault(t => ((TableAttribute)t.GetCustomAttribute(typeof(TableAttribute))).Name.Equals(src));
-                if (srctype != null)
+                var oi = entities.FirstOrDefault(oi => oi.Source.Equals(src));
+                if (oi != null)
                 {
                     var stmt = new StringBuilder();
                     foreach (var sect in item.Elements())
@@ -232,27 +206,25 @@ namespace RmSolution.Data
                         {
                             foreach (var row in sect.Elements())
                             {
-                                var cols = srctype.GetProperties().ToDictionary(k => k.Name.ToLower(), v => v);
                                 stmt.Append("INSERT INTO " + SchemaTableName(src) + " (");
                                 StringBuilder sqlvals = new();
                                 string comma = string.Empty;
+                                var attrs = (TAttributeCollection)oi.Attributes.Clone();
                                 foreach (var col in row.Attributes())
                                 {
-                                    var pname = col.Name.LocalName.ToLower();
-                                    if (cols.TryGetValue(pname, out var pi))
+                                    if (oi.Attributes.TryGetAttribute(col.Name.LocalName, out var ai))
                                     {
-                                        var ptyp = pi.PropertyType;
-                                        cols.Remove(pname);
-                                        stmt.Append(comma).Append('"').Append(col.Name.LocalName).Append('"');
-                                        sqlvals.Append(comma).Append(InitGetValue(ptyp, col.Value));
+                                        attrs.Remove(ai);
+                                        stmt.Append(comma).Append(ai.Field);
+                                        sqlvals.Append(comma).Append(InitGetValue(ai.Type, col.Value));
                                         comma = ",";
                                     }
                                 }
-                                foreach (var pi in cols.Values)
-                                    if (pi.PropertyType.IsValueType && !pi.PropertyType.AssemblyQualifiedName.Contains("System.Nullable"))
+                                foreach (var ai in attrs)
+                                    if (ai.Type.IsValueType && !ai.Type.AssemblyQualifiedName.Contains("System.Nullable"))
                                     {
-                                        stmt.Append(comma).Append('"').Append(pi.Name.ToLower()).Append('"');
-                                        sqlvals.Append(comma).Append(InitGetValue(pi.PropertyType, pi.GetValue(Activator.CreateInstance(srctype))));
+                                        stmt.Append(comma).Append(ai.Field);
+                                        sqlvals.Append(comma).Append(InitGetValue(ai.Type, ai.DefaultValue));
                                         comma = ",";
                                     }
 
