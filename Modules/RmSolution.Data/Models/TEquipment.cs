@@ -8,15 +8,15 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
-    [Table("equiptypes")]
+    [Table("Типы оборудования", "equiptypes")]
     public class TEquipmentType : TCatalogRow
     {
     }
 
-    [Table("equipments")]
+    [Table("Оборудование", "equipments")]
     public class TEquipment : TCatalogGroupTreeRow
     {
-        [Column]
+        [Column(Type = "equiptypes")]
         public long Type { get; set; }
         [Column("model nvarchar(128) NULL")]
         public string? Model { get; set; }

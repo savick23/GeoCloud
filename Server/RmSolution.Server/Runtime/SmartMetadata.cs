@@ -26,6 +26,8 @@ namespace RmSolution.Server
 
         #endregion Properties
 
+        #region Constuctors, Initialization
+
         public SmartMetadata(IDatabase connection)
         {
             _db = connection;
@@ -42,9 +44,12 @@ namespace RmSolution.Server
             foreach (var mdtype in GetTypes<TableAttribute>())
             {
                 var props = mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken);
+                var info = (TableAttribute?)mdtype.GetCustomAttribute(typeof(TableAttribute));
                 var obj = new TObject()
                 {
-                    Source = ((TableAttribute?)mdtype.GetCustomAttribute(typeof(TableAttribute)))?.Name ?? throw new Exception("Не указан источник метаданных (таблица).")
+                    Name = info?.Name ?? throw new Exception("Не указано наименование объекта конфигурации."),
+                    Source = info?.Source ?? throw new Exception("Не указан источник метаданных (таблица)."),
+                    Type = mdtype
                 };
                 Entities.Add(obj);
                 foreach (var pi in props)
@@ -79,5 +84,7 @@ namespace RmSolution.Server
             }
             return new List<Type>();
         }
+
+        #endregion Constuctors, Initialization
     }
 }

@@ -8,14 +8,26 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
+    /// <summary> Узлы баз данных в случае распределённой БД.</summary>
+    [Table("Узлы БД", "config.nodes")]
+    public class TNode : TCatalogRow
+    {
+    }
+
+    /// <summary> Площадки.</summary>
+    [Table("Площадки", "config.sites")]
+    public class TSite : TCatalogRow
+    {
+    }
+
     /// <summary> Роли пользователей.</summary>
-    [Table("config.roles")]
+    [Table("Роли пользователей", "config.roles")]
     public class TRole : TCatalogRow
     {
     }
 
     /// <summary> Пользователи.</summary>
-    [Table("config.users")]
+    [Table("Пользователи", "config.users")]
     public class TUser : TCatalogRow
     {
         /// <summary> ИД учётной записи администратора.</summary>

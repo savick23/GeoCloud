@@ -37,6 +37,7 @@
     <ProjectReference Include="..\RmSolution.MsSql\RmSolution.MsSql.csproj" />
     <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
     <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
+    <ProjectReference Include="..\RmSolution.Web\RmSolution.Web.csproj" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

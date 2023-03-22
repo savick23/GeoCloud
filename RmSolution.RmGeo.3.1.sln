@@ -58,6 +58,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "system", "system", "{20700D
 		Server\config\system\users.xml = Server\config\system\users.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.Web", "Server\RmSolution.Web\RmSolution.Web.csproj", "{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,10 @@ Global
 		{7F67F596-6891-4980-BE13-95725CBFF299}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{78171706-E132-4E39-AB6D-0F9B6DD19736} = {2E970C9A-4357-4E90-A03E-443125CA6F71}
 		{B34654F6-B305-4FB3-B79E-B5F800BDA7DA} = {0ACF6D04-C67D-4738-BDDA-A1F51915EA4B}
 		{20700DA3-CED8-47DD-83BD-9ED4FC801E08} = {0ACF6D04-C67D-4738-BDDA-A1F51915EA4B}
+		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D} = {0A8073BC-90C9-4CB2-8BBD-486595397785}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C10EADE4-BB39-4C25-851D-2D7C7586C3F5}

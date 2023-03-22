@@ -6,5 +6,6 @@ namespace RmSolution.Runtime
 {
     public interface IMetadata
     {
+        TObjectCollection Entities { get; }
     }
 }

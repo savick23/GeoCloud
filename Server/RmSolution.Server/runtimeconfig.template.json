@@ -30,6 +30,12 @@
         "interface": "RS-232",
         "address": "127.0.0.1"
       }
+    },
+    {
+      "name": "Веб-сервис доступа к данным",
+      "type": "RmSolution.Web.HttpApiService, RmSolution.Web",
+      "start": "auto",
+      "port": 8087
     }
   ]
 }

@@ -6,17 +6,20 @@ namespace RmSolution.DataAnnotations
 {
     #region Using
     using System;
+    using System.Xml.Linq;
     #endregion Using
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class TableAttribute : Attribute
     {
         public string Name { get; }
+        public string Source { get; }
         public bool IsView { get; }
 
-        public TableAttribute(string name, bool isView = false)
+        public TableAttribute(string name, string source, bool isView = false)
         {
             Name = name;
+            Source = source;
             IsView = isView;
         }
     }
@@ -50,6 +53,7 @@ namespace RmSolution.DataAnnotations
         public string? Name { get; set; }
         public bool Nullable { get; set; }
         public int Length { get; set; }
+        public string? Type { get; set; }
 
         public ColumnAttribute(string? name = null)
         {

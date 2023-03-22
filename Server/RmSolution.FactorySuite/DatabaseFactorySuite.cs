@@ -83,9 +83,27 @@ namespace RmSolution.Data
 
         public virtual IEnumerable<T>? Query<T>()
         {
-            var src = ((TableAttribute?)typeof(T).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Name;
+            var src = ((TableAttribute?)typeof(T).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
             if (src != null)
                 return _conn.Query<T>("SELECT * FROM " + SchemaTableName(src));
+
+            return default;
+        }
+
+        public IEnumerable<dynamic>? Query(Type type)
+        {
+            var src = ((TableAttribute?)type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
+            if (src != null)
+                return _conn.Query("SELECT * FROM " + SchemaTableName(src));
+
+            return default;
+        }
+
+        public async Task<IEnumerable<dynamic>?> QueryAsync(Type type)
+        {
+            var src = ((TableAttribute?)type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
+            if (src != null)
+                return await _conn.QueryAsync("SELECT * FROM " + SchemaTableName(src));
 
             return default;
         }

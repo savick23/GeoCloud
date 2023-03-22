@@ -9,7 +9,13 @@ namespace RmSolution.Runtime
     using System;
     #endregion Using
 
-    public class TAttribute
+    public class TEntity
+    {
+        /// <summary> Уникальный 64-разрядный идентификатор в Системе.</summary>
+        public long Id { get; set; }
+    }
+
+    public class TAttribute : TEntity
     {
         public string Code { get; set; }
         public Type Type { get; set; }
@@ -45,10 +51,12 @@ namespace RmSolution.Runtime
         }
     }
 
-    public class TObject
+    public class TObject : TEntity
     {
+        public string Name { get; set; }
         public string Source { get; set; }
         public bool IsView { get; }
+        public Type Type { get; set; }
 
         public TAttributeCollection Attributes { get; } = new TAttributeCollection();
 
