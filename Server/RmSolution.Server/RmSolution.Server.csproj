@@ -13,16 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="config\dbinit.smx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="config\dbinit.smx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="runtimeconfig.template.json" />
   </ItemGroup>
 
@@ -38,6 +28,10 @@
     <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
     <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
     <ProjectReference Include="..\RmSolution.Web\RmSolution.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="config\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
