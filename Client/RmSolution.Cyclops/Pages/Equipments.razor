@@ -1,44 +1,56 @@
 ﻿@page "/equipments"
-@inject RmHttpClient Http
+@inject RmHttpClient client
 
 <PageTitle>Справочник оборудования</PageTitle>
 
 <h1>Справочник оборудования</h1>
 
-@if (Data == null)
+@if (_data == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Загрузка данных...</em></p>
 }
 else
 {
     <table class="table">
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Model</th>
-                <th>Type</th>
+                @foreach (var cname in _names)
+                {
+                    <td>@cname</td>
+                }
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in Data)
-            {
-                <tr>
-                    <td>@forecast.Code</td>
-                    <td>@forecast.Name</td>
-                    <td>@forecast.Model</td>
-                    <td>@forecast.Type</td>
-                </tr>
+            @{
+                foreach (var item in _data)
+                {
+                    <tr>
+                        @foreach (var cname in _names)
+                        {
+                            <td>@GetValue(item, cname)</td>
+                        }
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
 
 @code {
-    private TEquipment[]? Data;
+    List<string>? _names;
+    dynamic? _data;
 
     protected override async Task OnInitializedAsync()
     {
-        Data = await Http.GetFromJsonAsync<TEquipment[]>(RmHttpClient.DataServer + "data/equipments");
+        _data = await client.Query(typeof(TEquipment[]));
+        if (_data != null)
+            foreach (var item in _data)
+            {
+                _names = ((object)item).GetType().GetProperties().OrderBy(a => a.MetadataToken).Select(a => a.Name).ToList();
+                break;
+            }
     }
+
+    string GetValue(object item, string name) =>
+        item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
 }
