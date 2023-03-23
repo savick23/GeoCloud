@@ -1,6 +1,10 @@
 ﻿@page "/catalog/{name?}"
 @inject RmHttpClient client
-
+<style>
+    .rz-grid-table {
+        width: 100%;
+    }
+</style>
 <PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
 
 <h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
@@ -39,6 +43,19 @@ else
       }
     </tbody>
   </table>
+
+    <RadzenDataGrid TItem="object" Data="@_data" AllowColumnResize="true">
+        <Columns>
+            @foreach (var column in _info.Attributes.Where(a => a.Visible))
+            {
+                <RadzenDataGridColumn TItem="object" Title="@column.Name" Property="@column.Field">
+                    <Template>
+                        @GetValue(@context, column.Field)
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
 }
 
 @code {
