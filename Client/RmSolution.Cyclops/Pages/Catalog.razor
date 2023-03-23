@@ -7,62 +7,62 @@
 
 @if (_data == null)
 {
-    <p><em>Загрузка данных...</em></p>
+  <p><em>Загрузка данных...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
+  <table class="table">
+    <thead>
+      <tr>
+        @foreach (var cname in _names)
+        {
+          <td>@cname</td>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @{
+        if (_data.Count() == 0)
+        {
+          <p>Нет данных!</p>
+        }
+        else
+          foreach (var item in _data)
+          {
             <tr>
-                @foreach (var cname in _names)
-                {
-                    <td>@cname</td>
-                }
+              @foreach (var cname in _names)
+              {
+                <td>@GetValue(item, cname)</td>
+              }
             </tr>
-        </thead>
-        <tbody>
-            @{
-                if (_data.Count() == 0)
-                {
-                    <p>Нет данных!</p>
-                }
-                else
-                    foreach (var item in _data)
-                    {
-                        <tr>
-                            @foreach (var cname in _names)
-                            {
-                                <td>@GetValue(item, cname)</td>
-                            }
-                    </tr>
-                    }
-            }
-        </tbody>
-    </table>
+          }
+      }
+    </tbody>
+  </table>
 }
 
 @code {
-    TObjectDto? _info;
-    List<string>? _names;
-    IEnumerable<object>? _data;
+  TObjectDto? _info;
+  List<string>? _names;
+  IEnumerable<object>? _data;
 
-    [Parameter]
-    public string? Name { get; set; }
+  [Parameter]
+  public string? Name { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        _info = await client.GetObjectAsync(Name);
-        _data = (IEnumerable<object>?)await client.QueryAsync(Name);
-        if (_data != null)
-            foreach (var item in _data)
-            {
-                _names = ((object)item).GetType().GetProperties().OrderBy(a => a.MetadataToken).Select(a => a.Name).ToList();
-                break;
-            }
+  protected override async Task OnParametersSetAsync()
+  {
+    _info = await client.GetObjectAsync(Name);
+    _data = (IEnumerable<object>?)await client.QueryAsync(Name);
+    if (_data != null)
+      foreach (var item in _data)
+      {
+        _names = ((object)item).GetType().GetProperties().OrderBy(a => a.MetadataToken).Select(a => a.Name).ToList();
+        break;
+      }
 
-        StateHasChanged();
-    }
+    StateHasChanged();
+  }
 
-    string GetValue(object item, string name) =>
-    item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
+  string GetValue(object item, string name) =>
+  item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
 }
