@@ -44,7 +44,7 @@ else
     [Parameter]
     public string? Name { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         _info = await client.GetObjectAsync(Name);
         _data = (IEnumerable<object>?)await client.QueryAsync(Name);
@@ -54,8 +54,10 @@ else
                 _names = ((object)item).GetType().GetProperties().OrderBy(a => a.MetadataToken).Select(a => a.Name).ToList();
                 break;
             }
+
+        StateHasChanged();
     }
 
     string GetValue(object item, string name) =>
-        item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
+    item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
 }

@@ -14,7 +14,7 @@ namespace RmSolution.Cyclops
     public class RmHttpClient : HttpClient
     {
         public static string Title => Assembly.GetExecutingAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product ?? "RmSolution.Cyclops";
-        public static string Version => Assembly.GetExecutingAssembly().GetName()?.Version?.ToString(2) ?? "3.1";
+        public static string Version => Assembly.GetExecutingAssembly().GetName()?.Version?.ToString(2) ?? "0.0.0.0";
         public static string DataServer => "http://localhost:8087/api/";
 
         public RmHttpClient()
