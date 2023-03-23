@@ -1,10 +1,5 @@
 ﻿@page "/catalog/{name?}"
 @inject RmHttpClient client
-<style>
-    .rz-grid-table {
-        width: 100%;
-    }
-</style>
 <PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
 
 <h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
