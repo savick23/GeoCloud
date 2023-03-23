@@ -22,15 +22,20 @@ else
         </thead>
         <tbody>
             @{
-                foreach (var item in _data)
+                if (_data.Count() == 0)
                 {
-                    <tr>
-                        @foreach (var cname in _names)
-                        {
-                            <td>@GetValue(item, cname)</td>
-                        }
-                    </tr>
+                    <p>Нет данных!</p>
                 }
+                else
+                    foreach (var item in _data)
+                    {
+                        <tr>
+                            @foreach (var cname in _names)
+                            {
+                                <td>@GetValue(item, cname)</td>
+                            }
+                    </tr>
+                    }
             }
         </tbody>
     </table>
