@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "RmSolution.Web": {
+    "RmSolution.DataAccess": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

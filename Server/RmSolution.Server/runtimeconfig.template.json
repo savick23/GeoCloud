@@ -33,7 +33,7 @@
     },
     {
       "name": "Веб-сервис доступа к данным",
-      "type": "RmSolution.Web.HttpApiService, RmSolution.Web",
+      "type": "RmSolution.DataAccess.HttpApiService, RmSolution.DataAccess",
       "start": "auto",
       "port": 8087
     }

@@ -27,7 +27,7 @@
     <ProjectReference Include="..\RmSolution.MsSql\RmSolution.MsSql.csproj" />
     <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
     <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
-    <ProjectReference Include="..\RmSolution.Web\RmSolution.Web.csproj" />
+    <ProjectReference Include="..\..\Modules\RmSolution.DataAccess\RmSolution.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>
