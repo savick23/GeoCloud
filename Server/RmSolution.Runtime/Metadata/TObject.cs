@@ -18,6 +18,7 @@ namespace RmSolution.Runtime
     public class TAttribute : TEntity
     {
         public string Code { get; set; }
+        public string Name { get; set; }
         public Type Type { get; set; }
 
         /// <summary> Definition </summary>
@@ -30,6 +31,8 @@ namespace RmSolution.Runtime
         public string Field => string.Concat('"', Code.ToLower(), '"');
         /// <summary> Значение поля по умолчанию.</summary>
         public object? DefaultValue { get; set; }
+        /// <summary> Видимость поля по умолчанию в клиенте.</summary>
+        public bool Visible { get; set; }
 
         public override string ToString() =>
             $"{Code} {Type.Name}";

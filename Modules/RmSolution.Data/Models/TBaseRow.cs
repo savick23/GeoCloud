@@ -13,45 +13,45 @@ namespace RmSolution.Data
     {
         internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum
 
-        [Column("id bigint PRIMARY KEY")]
+        [Column("Идентификатор", "id bigint PRIMARY KEY", Visible = false)]
         public long Id { get; set; }
-        [Column]
+        [Column("Состояние", Visible = false)]
         public int State { get; set; }
     }
 
     public class TCatalogRow : TBaseRow
     {
-        [Column("code nvarchar(8) NOT NULL")]
+        [Column("Код", "code nvarchar(8) NOT NULL")]
         public string? Code { get; set; }
-        [Column("name nvarchar(64) NOT NULL")]
+        [Column("Наименование", "name nvarchar(64) NOT NULL")]
         public string? Name { get; set; }
-        [Column("descript nvarchar(1024) NULL")]
+        [Column("Описание", "descript nvarchar(1024) NULL")]
         public string? Descript { get; set; }
-        [Column]
+        [Column("Создал")]
         public long Creator { get; set; } = TUser.ADMINISTRATOR;
-        [Column]
+        [Column("Создано")]
         public DateTime Created { get; set; } = DateTime.Now;
-        [Column]
+        [Column("Изменил")]
         public long? Modifier { get; set; }
-        [Column]
+        [Column("Изменено")]
         public DateTime? Modified { get; set; }
     }
 
     public class TCatalogTreeRow : TCatalogRow
     {
-        [Column]
+        [Column("Родитель")]
         public long Parent { get; set; }
     }
 
     public class TCatalogGroupRow : TCatalogRow
     {
-        [Column]
+        [Column("Группа")]
         public long Group { get; set; }
     }
 
     public class TCatalogGroupTreeRow : TCatalogTreeRow
     {
-        [Column]
+        [Column("Группа")]
         public long Group { get; set; }
     }
 }

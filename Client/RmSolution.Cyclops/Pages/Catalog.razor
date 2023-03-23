@@ -14,9 +14,9 @@ else
   <table class="table">
     <thead>
       <tr>
-        @foreach (var cname in _names)
+        @foreach (var ai in _info.Attributes.Where(a => a.Visible))
         {
-          <td>@cname</td>
+          <td>@ai.Name</td>
         }
       </tr>
     </thead>
@@ -30,9 +30,9 @@ else
           foreach (var item in _data)
           {
             <tr>
-              @foreach (var cname in _names)
+              @foreach (var ai in _info.Attributes.Where(a => a.Visible))
               {
-                <td>@GetValue(item, cname)</td>
+                <td>@GetValue(item, ai.Field)</td>
               }
             </tr>
           }
@@ -43,7 +43,6 @@ else
 
 @code {
   TObjectDto? _info;
-  List<string>? _names;
   IEnumerable<object>? _data;
 
   [Parameter]
@@ -53,16 +52,9 @@ else
   {
     _info = await client.GetObjectAsync(Name);
     _data = (IEnumerable<object>?)await client.QueryAsync(Name);
-    if (_data != null)
-      foreach (var item in _data)
-      {
-        _names = ((object)item).GetType().GetProperties().OrderBy(a => a.MetadataToken).Select(a => a.Name).ToList();
-        break;
-      }
-
     StateHasChanged();
   }
 
   string GetValue(object item, string name) =>
-  item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
+    item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
 }

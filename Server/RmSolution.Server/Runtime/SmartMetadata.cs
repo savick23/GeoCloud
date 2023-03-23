@@ -55,11 +55,14 @@ namespace RmSolution.Server
                 foreach (var pi in props)
                     if (pi.IsDefined(typeof(ColumnAttribute)))
                     {
+                        var ai = (ColumnAttribute?)pi.GetCustomAttributes(typeof(ColumnAttribute)).First();
                         obj.Attributes.Add(new TAttribute()
                         {
                             Code = pi.Name,
+                            Name = ai.Name,
                             Type = pi.PropertyType,
-                            Source = ((ColumnAttribute?)pi.GetCustomAttributes(typeof(ColumnAttribute)).FirstOrDefault())?.Name,
+                            Source = ai.Definition,
+                            Visible  = ai.Visible,
                             PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns,
                             Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns,
                             DefaultValue = pi.GetValue(Activator.CreateInstance(mdtype))

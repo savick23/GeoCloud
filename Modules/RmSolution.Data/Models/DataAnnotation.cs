@@ -50,14 +50,17 @@ namespace RmSolution.DataAnnotations
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class ColumnAttribute : Attribute
     {
-        public string? Name { get; set; }
+        public string Name { get; set; }
+        public string? Definition { get; set; }
         public bool Nullable { get; set; }
         public int Length { get; set; }
         public string? Type { get; set; }
+        public bool Visible { get; set; } = true;
 
-        public ColumnAttribute(string? name = null)
+        public ColumnAttribute(string name, string? definition = null)
         {
             Name = name;
+            Definition = definition;
         }
     }
 

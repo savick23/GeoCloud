@@ -25,6 +25,12 @@ namespace RmSolution.DataAccess
                 Name = entity.Name,
                 Source = entity.Source,
                 Type = entity.Type.AssemblyQualifiedName ?? entity.Type.Name,
+                Attributes = entity.Attributes.Select(a => new TAttributeDto()
+                {
+                    Name = a.Name,
+                    Field = a.Code,
+                    Visible = a.Visible
+                }).ToArray()
             }).ToArray())
         );
 
@@ -39,6 +45,12 @@ namespace RmSolution.DataAccess
                     Name = entity.Name,
                     Source = entity.Source,
                     Type = entity.Type.AssemblyQualifiedName ?? entity.Type.Name,
+                    Attributes = entity.Attributes.Select(a => new TAttributeDto()
+                    {
+                        Name = a.Name,
+                        Field = a.Code,
+                        Visible = a.Visible
+                    }).ToArray()
                 });
             }
             throw new Exception("Тип " + name + " не найден!");

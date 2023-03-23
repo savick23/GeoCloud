@@ -14,5 +14,14 @@ namespace RmSolution.Data
         public string Name { get; set; }
         public string Source { get; set; }
         public string Type { get; set; }
+
+        public TAttributeDto[] Attributes {get;set;}
+    }
+
+    public class TAttributeDto
+    {
+        public string Name { get; set; }
+        public string Field { get; set; }
+        public bool Visible { get; set; }
     }
 }

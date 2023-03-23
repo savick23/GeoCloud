@@ -16,11 +16,11 @@ namespace RmSolution.Data
     [Table("Оборудование", "equipments")]
     public class TEquipment : TCatalogGroupTreeRow
     {
-        [Column(Type = "equiptypes")]
+        [Column("Тип", Type = "equiptypes")]
         public long Type { get; set; }
-        [Column("model nvarchar(128) NULL")]
+        [Column("Модель", "model nvarchar(128) NULL")]
         public string? Model { get; set; }
-        [Column("serial nvarchar(32) NULL")]
+        [Column("Серийный номер", "serial nvarchar(32) NULL")]
         public string? Serial { get; set; }
     }
 }
