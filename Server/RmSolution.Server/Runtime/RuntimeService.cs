@@ -118,7 +118,7 @@ namespace RmSolution.Server
         {
             _logger = logger;
             _dbf = databaseF;
-            Name = "Сервер приложений " + (Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute)).FirstOrDefault() as AssemblyProductAttribute)?.Product;
+            Name = "Сервер приложений " + Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
             Metadata = _md = new SmartMetadata(databaseF());

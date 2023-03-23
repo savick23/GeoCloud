@@ -1,0 +1,44 @@
+﻿@page "/equipments"
+@inject RmHttpClient Http
+
+<PageTitle>Справочник оборудования</PageTitle>
+
+<h1>Справочник оборудования</h1>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Model</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in Data)
+            {
+                <tr>
+                    <td>@forecast.Code</td>
+                    <td>@forecast.Name</td>
+                    <td>@forecast.Model</td>
+                    <td>@forecast.Type</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private TEquipment[]? Data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Data = await Http.GetFromJsonAsync<TEquipment[]>(RmHttpClient.DataServer + "data/equipments");
+    }
+}

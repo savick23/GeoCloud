@@ -38,9 +38,9 @@ namespace RmSolution.Web
 
             builder.Services.AddCors(opt =>
                 opt.AddPolicy(CORSPOLICENAME, police => // Политика для всех узлов -->
-                    police.WithOrigins("http://*")
+                    police.AllowAnyOrigin()
                     .AllowAnyHeader()
-                    /*.AllowAnyMethod()*/.WithMethods("GET", "POST")));
+                    .AllowAnyMethod()));
 
             builder.Services.AddSingleton(Runtime);
             builder.Services.AddControllers() // Добавим контроллеры из сборки -->
@@ -57,8 +57,9 @@ namespace RmSolution.Web
             {
                 _host.UseExceptionHandler(new ExceptionHandlerOptions() { ExceptionHandler = OnExceptionHandler });
             }
-            _host.UseCors(CORSPOLICENAME);
             _host.UseHttpsRedirection();
+            _host.UseRouting();
+            _host.UseCors(CORSPOLICENAME);
             _host.UseAuthorization();
             _host.MapControllers();
         }
