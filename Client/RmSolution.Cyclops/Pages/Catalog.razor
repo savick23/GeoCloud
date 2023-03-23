@@ -1,9 +1,9 @@
-﻿@page "/equipments"
+﻿@page "/catalog/{name?}"
 @inject RmHttpClient client
 
-<PageTitle>Справочник оборудования</PageTitle>
+<PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
 
-<h1>Справочник оборудования</h1>
+<h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
 
 @if (_data == null)
 {
@@ -37,12 +37,17 @@ else
 }
 
 @code {
+    TObjectDto? _info;
     List<string>? _names;
     dynamic? _data;
 
+    [Parameter]
+    public string? Name { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        _data = await client.Query(typeof(TEquipment));
+        _info = await client.GetObject(Name);
+        _data = await client.Query(Name);
         if (_data != null)
             foreach (var item in _data)
             {

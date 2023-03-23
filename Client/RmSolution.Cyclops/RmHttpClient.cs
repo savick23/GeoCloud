@@ -8,6 +8,7 @@ namespace RmSolution.Cyclops
     using System;
     using System.Net.Http.Json;
     using System.Reflection;
+    using RmSolution.Data;
     #endregion Using
 
     public class RmHttpClient : HttpClient
@@ -18,12 +19,25 @@ namespace RmSolution.Cyclops
 
         public RmHttpClient()
         {
-
         }
 
-        public async Task<dynamic?> Query(Type type)
+        public async Task<TObjectDto?> GetObject(string? typeName)
         {
-            return await this.GetFromJsonAsync(string.Concat(DataServer, "data/equipments"), Array.CreateInstance(type, 0).GetType());
+            if (typeName != null)
+                return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "object/" + typeName));
+
+            throw new Exception("Не найден объект типа " + typeName);
+        }
+
+        public async Task<dynamic?> Query(string? typeName)
+        {
+            if (typeName != null)
+            {
+                var mdtype = await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "object/" + typeName));
+                var type = Type.GetType(mdtype.Type);
+                return await this.GetFromJsonAsync(string.Concat(DataServer, "data/" + mdtype.Source), Array.CreateInstance(type, 0).GetType());
+            }
+            throw new Exception("Не найден объект типа " + typeName);
         }
     }
 }
