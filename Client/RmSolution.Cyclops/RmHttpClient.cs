@@ -21,7 +21,12 @@ namespace RmSolution.Cyclops
         {
         }
 
-        public async Task<TObjectDto?> GetObject(string? typeName)
+        public async Task<TObjectDto[]?> GetObjectsAsync()
+        {
+            return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(DataServer, "objects"));
+        }
+
+        public async Task<TObjectDto?> GetObjectAsync(string? typeName)
         {
             if (typeName != null)
                 return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "object/" + typeName));
@@ -29,11 +34,11 @@ namespace RmSolution.Cyclops
             throw new Exception("Не найден объект типа " + typeName);
         }
 
-        public async Task<object?> Query(string? typeName)
+        public async Task<object?> QueryAsync(string? typeName)
         {
             if (typeName != null)
             {
-                var mdtype = await GetObject(typeName);
+                var mdtype = await GetObjectAsync(typeName);
                 if (mdtype != null)
                 {
                     var type = Type.GetType(mdtype.Type);

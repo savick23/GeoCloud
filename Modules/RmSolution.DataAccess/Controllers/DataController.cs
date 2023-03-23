@@ -17,6 +17,17 @@ namespace RmSolution.DataAccess
         {
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Objects() => await UseDatabase(db =>
+            new JsonResult(Runtime.Metadata.Entities.Select(entity =>
+            new TObjectDto()
+            {
+                Name = entity.Name,
+                Source = entity.Source,
+                Type = entity.Type.AssemblyQualifiedName ?? entity.Type.Name,
+            }).ToArray())
+        );
+
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Object(string name) => await UseDatabase(db =>
         {

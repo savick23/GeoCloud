@@ -46,8 +46,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _info = await client.GetObject(Name);
-        _data = (IEnumerable<object>?)await client.Query(Name);
+        _info = await client.GetObjectAsync(Name);
+        _data = (IEnumerable<object>?)await client.QueryAsync(Name);
         if (_data != null)
             foreach (var item in _data)
             {
