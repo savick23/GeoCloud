@@ -42,7 +42,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _data = await client.Query(typeof(TEquipment[]));
+        _data = await client.Query(typeof(TEquipment));
         if (_data != null)
             foreach (var item in _data)
             {

@@ -4,11 +4,10 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Cyclops
 {
+    #region Using
     using System;
     using System.Net.Http.Json;
-    #region Using
     using System.Reflection;
-    using RmSolution.Data;
     #endregion Using
 
     public class RmHttpClient : HttpClient
@@ -17,9 +16,14 @@ namespace RmSolution.Cyclops
         public static string Version => Assembly.GetExecutingAssembly().GetName()?.Version?.ToString(2) ?? "3.1";
         public static string DataServer => "http://localhost:8087/api/";
 
+        public RmHttpClient()
+        {
+
+        }
+
         public async Task<dynamic?> Query(Type type)
         {
-            return await this.GetFromJsonAsync(string.Concat(DataServer, "data/equipments"), type);
+            return await this.GetFromJsonAsync(string.Concat(DataServer, "data/equipments"), Array.CreateInstance(type, 0).GetType());
         }
     }
 }
