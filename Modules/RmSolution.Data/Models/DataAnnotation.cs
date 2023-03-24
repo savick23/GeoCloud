@@ -18,6 +18,8 @@ namespace RmSolution.DataAnnotations
         public bool IsView { get; }
         /// <summary> Порядок в списке объектов конфигурации.</summary>
         public int Ordinal { get; set; }
+        /// <summary> Признак системного объекта.</summary>
+        public bool IsSystem { get; set; }
 
         public TableAttribute(string name, string source, bool isView = false)
         {
@@ -58,6 +60,7 @@ namespace RmSolution.DataAnnotations
         public bool Nullable { get; set; }
         public int Length { get; set; }
         public string? Type { get; set; }
+        public bool IsKey { get; set; }
         public bool Visible { get; set; } = true;
 
         public ColumnAttribute(string name, string? definition = null)

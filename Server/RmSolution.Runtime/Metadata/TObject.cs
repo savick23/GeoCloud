@@ -7,56 +7,31 @@ namespace RmSolution.Runtime
 {
     #region Using
     using System;
+    using RmSolution.DataAnnotations;
     #endregion Using
 
     /// <summary> Базовая сущность объекта конфигурации.</summary>
     public class TEntity
     {
         /// <summary> Уникальный 64-разрядный идентификатор в Системе.</summary>
+        [Column("Идентификатор", "id bigint PRIMARY KEY", IsKey = true)]
         public long Id { get; set; }
-        /// <summary> Код (шифр) объекта, реквизита, свойства.</summary>
+        /// <summary> Родитель, тип.</summary>
+        /// <remarks> 1 - конфигурация; 2 - системный; 3 - перечисление; 4 - справочник; </remarks>
+        [Column("Код", "parent bigint NOT NULL")]
+        public long Parent { get; set; }
+        /// <summary> Код объекта конфигурации.</summary>
+        [Column("Код", "code nvarchar(32) NOT NULL")]
         public string Code { get; set; }
-        /// <summary> Наимменование объекта, реквизита, свойства.</summary>
+        /// <summary> Наимменование объекта конфигурации.</summary>
+        [Column("Наименование", "name nvarchar(64) NOT NULL")]
         public string Name { get; set; }
+        /// <summary> Описание объекта конфигурации.</summary>
+        [Column("Описание", "descript nvarchar(1024) NULL")]
+        public string? Descript { get; set; }
     }
 
-    public class TAttribute : TEntity
-    {
-        public Type Type { get; set; }
-
-        /// <summary> Definition </summary>
-        public string? Source { get; set; }
-        /// <summary> Definition </summary>
-        public string[]? PrimaryKey { get; set; }
-        /// <summary> Definition </summary>
-        public string[]? Indexes { get; set; }
-        /// <summary> Наименование поля БД.</summary>
-        public string Field => string.Concat('"', Code.ToLower(), '"');
-        /// <summary> Значение поля по умолчанию.</summary>
-        public object? DefaultValue { get; set; }
-        /// <summary> Видимость поля по умолчанию в клиенте.</summary>
-        public bool Visible { get; set; }
-
-        public override string ToString() =>
-            $"{Code} {Type.Name}";
-    }
-
-    public class TAttributeCollection : List<TAttribute>, ICloneable
-    {
-        public bool TryGetAttribute(string name, out TAttribute? attribute)
-        {
-            attribute = this.FirstOrDefault(ai => ai.Code.ToUpper() == name.ToUpper());
-            return attribute != null;
-        }
-
-        public object Clone()
-        {
-            var res = new TAttributeCollection();
-            res.AddRange(this);
-            return res;
-        }
-    }
-
+    [Table("Объекты конфигурации", "config.objects", Ordinal = 1, IsSystem = true)]
     public class TObject : TEntity
     {
         public string Source { get; set; }

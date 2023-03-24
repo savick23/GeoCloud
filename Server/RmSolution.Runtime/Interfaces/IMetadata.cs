@@ -7,5 +7,8 @@ namespace RmSolution.Runtime
     public interface IMetadata
     {
         TObjectCollection Entities { get; }
+
+        /// <summary> Возвращает данные объекта конфигурации.</summary>
+        object? GetData(string id);
     }
 }

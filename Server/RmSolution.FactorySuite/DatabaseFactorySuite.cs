@@ -28,6 +28,8 @@ namespace RmSolution.Data
         protected DbConnection? _conn;
 
         static Dictionary<Type, string> _typemapping = new() {
+            { typeof(TRefType), "bigint NOT NULL" },
+            { typeof(TRefType?), "bigint NULL" },
             { typeof(Int32), "int NOT NULL" },
             { typeof(Int32?), "int NULL" },
             { typeof(Int64), "bigint NOT NULL" },

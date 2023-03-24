@@ -13,7 +13,7 @@ namespace RmSolution.Data
     {
         internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum
 
-        [Column("Идентификатор", "id bigint PRIMARY KEY", Visible = false)]
+        [Column("Идентификатор", "id bigint PRIMARY KEY", IsKey = true, Visible = false)]
         public long Id { get; set; }
         [Column("Состояние", Visible = false)]
         public int State { get; set; }

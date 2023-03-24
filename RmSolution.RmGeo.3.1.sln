@@ -54,6 +54,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "system", "system", "{20700DA3-CED8-47DD-83BD-9ED4FC801E08}"
 	ProjectSection(SolutionItems) = preProject
 		Server\config\system\main.xml = Server\config\system\main.xml
+		Server\config\system\system.xml = Server\config\system\system.xml
 		Server\config\system\users.xml = Server\config\system\users.xml
 	EndProjectSection
 EndProject
@@ -63,7 +64,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Cyclops", "Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Web", "Client\RmSolution.Web\RmSolution.Web.csproj", "{C495E4ED-4373-4338-B444-839A032A357F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.Cyclops.AspNet", "Client\RmSolution.Cyclops.AspNet\RmSolution.Cyclops.AspNet.csproj", "{B3393087-00E8-4E71-AE77-7EDEC9A747E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Cyclops.AspNet", "Client\RmSolution.Cyclops.AspNet\RmSolution.Cyclops.AspNet.csproj", "{B3393087-00E8-4E71-AE77-7EDEC9A747E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

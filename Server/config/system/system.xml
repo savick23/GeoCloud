@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rmgeo>
+  <objects>
+    <system>
+      <item Id="0" code="OBJECTS" name="Объекты конфигурации" source="config.objects">
+        <data>
+          <row id="1" parent="0" code="001" name="РМ Гео"/>
+          <row id="2" parent="1" code="002" name="Системный"/>
+          <row id="3" parent="1" code="003" name="Перечисление"/>
+          <row id="4" parent="1" code="004" name="Справочник"/>
+        </data>
+      </item>
+    </system>
+  </objects>
+</rmgeo>

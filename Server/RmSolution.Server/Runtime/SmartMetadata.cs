@@ -9,6 +9,7 @@ namespace RmSolution.Server
     using RmSolution.Runtime;
     using RmSolution.DataAnnotations;
     using System;
+    using RmSolution.Data;
     #endregion Using
 
     internal class SmartMetadata : IMetadata
@@ -47,6 +48,7 @@ namespace RmSolution.Server
                 var info = (TableAttribute?)mdtype.GetCustomAttribute(typeof(TableAttribute));
                 var obj = new TObject()
                 {
+                    Parent = info.IsSystem ? TType.System : TType.Catalog,
                     Name = info?.Name ?? throw new Exception("Не указано наименование объекта конфигурации."),
                     Source = info?.Source ?? throw new Exception("Не указан источник метаданных (таблица)."),
                     Ordinal = info?.Ordinal ?? int.MaxValue,
@@ -63,6 +65,7 @@ namespace RmSolution.Server
                             Name = ai.Name,
                             Type = pi.PropertyType,
                             Source = ai.Definition,
+                            IsKey = ai.IsKey,
                             Visible  = ai.Visible,
                             PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns,
                             Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns,
@@ -90,5 +93,14 @@ namespace RmSolution.Server
         }
 
         #endregion Constuctors, Initialization
+
+        public object? GetData(string id)
+        {
+            var mdtype = Entities.FirstOrDefault(e => e.Name == id || e.Source == id);
+            if (mdtype != null)
+            {
+            }
+            return null;
+        }
     }
 }
