@@ -63,6 +63,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Cyclops", "Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Web", "Client\RmSolution.Web\RmSolution.Web.csproj", "{C495E4ED-4373-4338-B444-839A032A357F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.Cyclops.AspNet", "Client\RmSolution.Cyclops.AspNet\RmSolution.Cyclops.AspNet.csproj", "{B3393087-00E8-4E71-AE77-7EDEC9A747E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +121,10 @@ Global
 		{C495E4ED-4373-4338-B444-839A032A357F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C495E4ED-4373-4338-B444-839A032A357F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C495E4ED-4373-4338-B444-839A032A357F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3393087-00E8-4E71-AE77-7EDEC9A747E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3393087-00E8-4E71-AE77-7EDEC9A747E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3393087-00E8-4E71-AE77-7EDEC9A747E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3393087-00E8-4E71-AE77-7EDEC9A747E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +147,7 @@ Global
 		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D} = {4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}
 		{F7B62C89-2964-4855-8429-C67050199E6D} = {69DFDB2F-67E9-4F90-897D-7DE7272E33A8}
 		{C495E4ED-4373-4338-B444-839A032A357F} = {69DFDB2F-67E9-4F90-897D-7DE7272E33A8}
+		{B3393087-00E8-4E71-AE77-7EDEC9A747E3} = {69DFDB2F-67E9-4F90-897D-7DE7272E33A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C10EADE4-BB39-4C25-851D-2D7C7586C3F5}

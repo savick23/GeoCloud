@@ -16,9 +16,12 @@ namespace RmSolution.Web
         [Inject]
         protected RmHttpClient Client { get; set; }
 
+        /// <summary> Представление, как отображать значения NULL.</summary>
+        public string NullValue { get; set; } = "(null)";
+
         #endregion Properties
 
         protected string GetValue(object item, string name) =>
-          item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
+          item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? NullValue;
     }
 }

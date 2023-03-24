@@ -27,13 +27,13 @@ namespace RmSolution.Data
         public string? Name { get; set; }
         [Column("Описание", "descript nvarchar(1024) NULL")]
         public string? Descript { get; set; }
-        [Column("Создал")]
+        [Column("Создал", Visible = false)]
         public long Creator { get; set; } = TUser.ADMINISTRATOR;
-        [Column("Создано")]
+        [Column("Создано", Visible = false)]
         public DateTime Created { get; set; } = DateTime.Now;
-        [Column("Изменил")]
+        [Column("Изменил", Visible = false)]
         public long? Modifier { get; set; }
-        [Column("Изменено")]
+        [Column("Изменено", Visible = false)]
         public DateTime? Modified { get; set; }
     }
 

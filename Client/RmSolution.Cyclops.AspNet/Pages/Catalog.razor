@@ -1,0 +1,69 @@
+﻿@page "/catalog/{name?}"
+@inherits RmPageBase
+<PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
+
+<h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
+
+@if (_data == null)
+{
+    <p><em>Загрузка данных...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var ai in _info.Attributes.Where(a => a.Visible))
+                {
+                    <td>@ai.Name</td>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (_data.Count() == 0)
+                {
+                    <p>Нет данных!</p>
+                }
+                else
+                    foreach (var item in _data)
+                    {
+                        <tr>
+                            @foreach (var ai in _info.Attributes.Where(a => a.Visible))
+                            {
+                                <td>@GetValue(item, ai.Field)</td>
+                            }
+                        </tr>
+                    }
+            }
+        </tbody>
+    </table>
+
+    <RadzenDataGrid TItem="object" Data="@_data" AllowColumnResize="true">
+        <Columns>
+            @foreach (var column in _info.Attributes.Where(a => a.Visible))
+            {
+                <RadzenDataGridColumn TItem="object" Title="@column.Name" Property="@column.Field">
+                    <Template>
+                        @GetValue(@context, column.Field)
+                    </Template>
+                </RadzenDataGridColumn>
+            }
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+
+    TObjectDto? _info;
+    IEnumerable<object>? _data;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _info = await Client.GetObjectAsync(Name);
+        _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        StateHasChanged();
+    }
+}

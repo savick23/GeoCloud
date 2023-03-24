@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
+
     #region Using
     using System;
     using System.Data;
@@ -50,6 +51,11 @@ namespace RmSolution.Data
         public virtual string RQ => "\"";
 
         #endregion Properties
+
+        static DatabaseFactorySuite()
+        {
+            SqlMapper.AddTypeHandler(new TRefTypeTypeConverter());
+        }
 
         public DatabaseFactorySuite(string connectionString)
         {
@@ -118,5 +124,17 @@ namespace RmSolution.Data
             Scalar(statement, args) is T res ? res : default;
 
         #endregion IDatabase implementation
+
+        #region Nested types
+
+        class TRefTypeTypeConverter : SqlMapper.TypeHandler<TRefType>
+        {
+            public override void SetValue(IDbDataParameter parameter, TRefType value) =>
+                parameter.Value = value.ToString();
+
+            public override TRefType Parse(object value) => new((long?)value);
+        }
+
+        #endregion Nested types
     }
 }

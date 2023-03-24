@@ -17,7 +17,7 @@ namespace RmSolution.Data
     public class TEquipment : TCatalogGroupTreeRow
     {
         [Column("Тип", Type = "equiptypes")]
-        public long Type { get; set; }
+        public TRefType Type { get; set; }
         [Column("Модель", "model nvarchar(128) NULL")]
         public string? Model { get; set; }
         [Column("Серийный номер", "serial nvarchar(32) NULL")]
