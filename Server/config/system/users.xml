@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<rmsolution>
+<rmgeo>
   <objects>
     <system>
       <item Id="1688849860263936" code="ROLES" name="Роли пользователей" source="config.roles">
         <data>
-          <item Id="1688849860264960" state="1" code="001" name="Все" descript="Встроенная группа для всех"/>
-          <item Id="1688849860265984" state="1" code="002" name="Только чтение" descript="Встроенная группа только для чтения"/>
-          <item id="1688849860267008" state="1" code="003" name="Разработчики" descript="Встроенная группа разработчиков"/>
-          <item id="1688849860268032" state="1" code="004" name="Администраторы" descript="Встроенная группа администраторов"/>
+          <item Id="1688849860264960" state="1" code="0001" name="Все" descript="Встроенная группа для всех"/>
+          <item Id="1688849860265984" state="1" code="0002" name="Только чтение" descript="Встроенная группа только для чтения"/>
+          <item id="1688849860267008" state="1" code="0003" name="Разработчики" descript="Встроенная группа разработчиков"/>
+          <item id="1688849860268032" state="1" code="0004" name="Администраторы" descript="Встроенная группа администраторов"/>
         </data>
       </item>
       <item Id="1970324836974592" code="USERS" name="Пользователи" source="config.users">
@@ -18,4 +18,4 @@
       </item>
     </system>
   </objects>
-</rmsolution>
+</rmgeo>

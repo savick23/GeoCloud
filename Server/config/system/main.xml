@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rmgeo>
+  <objects>
+    <system>
+      <item Id="281474976710656" code="NODES" name="Узлы БД" source="config.nodes">
+        <data>
+          <item id="281474976711680" state="1" code="0001" name="Центральный узел" index="1"/>
+        </data>
+      </item>
+      <item Id="562949953421312" code="SITES" name="Площадки" source="config.sites">
+        <data>
+          <item id="562949953422336" state="1" code="0001" name="Строительная площадка 1"/>
+        </data>
+      </item>
+    </system>
+  </objects>
+</rmgeo>

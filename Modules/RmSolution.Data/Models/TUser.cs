@@ -12,6 +12,8 @@ namespace RmSolution.Data
     [Table("Узлы БД", "config.nodes")]
     public class TNode : TCatalogRow
     {
+        /// <summary> Индекс (номер) базы данных.</summary>
+        public int Index { get; set; }
     }
 
     /// <summary> Площадки.</summary>

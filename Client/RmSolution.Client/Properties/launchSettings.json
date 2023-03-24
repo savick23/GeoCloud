@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "RmSolution.Client": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:55614;http://localhost:55615"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <Import Project="..\..\RmSolution.RmGeo.3.1.csproj" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\RmSolution.Data\RmSolution.Data.csproj" />
+  </ItemGroup>
+
+</Project>
