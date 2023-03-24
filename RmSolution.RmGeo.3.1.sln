@@ -61,7 +61,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.DataAccess", "Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Cyclops", "Client\RmSolution.Cyclops\RmSolution.Cyclops.csproj", "{F7B62C89-2964-4855-8429-C67050199E6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RmSolution.Client", "Client\RmSolution.Client\RmSolution.Client.csproj", "{C495E4ED-4373-4338-B444-839A032A357F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Web", "Client\RmSolution.Web\RmSolution.Web.csproj", "{C495E4ED-4373-4338-B444-839A032A357F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

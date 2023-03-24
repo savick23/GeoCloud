@@ -1,43 +1,43 @@
 ﻿@page "/catalog/{name?}"
-@inject RmHttpClient client
+@inherits RmPageBase
 <PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
 
 <h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
 
 @if (_data == null)
 {
-  <p><em>Загрузка данных...</em></p>
+    <p><em>Загрузка данных...</em></p>
 }
 else
 {
-  <table class="table">
-    <thead>
-      <tr>
-        @foreach (var ai in _info.Attributes.Where(a => a.Visible))
-        {
-          <td>@ai.Name</td>
-        }
-      </tr>
-    </thead>
-    <tbody>
-      @{
-        if (_data.Count() == 0)
-        {
-          <p>Нет данных!</p>
-        }
-        else
-          foreach (var item in _data)
-          {
+    <table class="table">
+        <thead>
             <tr>
-              @foreach (var ai in _info.Attributes.Where(a => a.Visible))
-              {
-                <td>@GetValue(item, ai.Field)</td>
-              }
+                @foreach (var ai in _info.Attributes.Where(a => a.Visible))
+                {
+                    <td>@ai.Name</td>
+                }
             </tr>
-          }
-      }
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            @{
+                if (_data.Count() == 0)
+                {
+                    <p>Нет данных!</p>
+                }
+                else
+                    foreach (var item in _data)
+                    {
+                        <tr>
+                            @foreach (var ai in _info.Attributes.Where(a => a.Visible))
+                            {
+                                <td>@GetValue(item, ai.Field)</td>
+                            }
+                        </tr>
+                    }
+            }
+        </tbody>
+    </table>
 
     <RadzenDataGrid TItem="object" Data="@_data" AllowColumnResize="true">
         <Columns>
@@ -54,19 +54,16 @@ else
 }
 
 @code {
-  TObjectDto? _info;
-  IEnumerable<object>? _data;
+    [Parameter]
+    public string? Name { get; set; }
 
-  [Parameter]
-  public string? Name { get; set; }
+    TObjectDto? _info;
+    IEnumerable<object>? _data;
 
-  protected override async Task OnParametersSetAsync()
-  {
-    _info = await client.GetObjectAsync(Name);
-    _data = (IEnumerable<object>?)await client.QueryAsync(Name);
-    StateHasChanged();
-  }
-
-  string GetValue(object item, string name) =>
-    item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? "(null)";
+    protected override async Task OnParametersSetAsync()
+    {
+        _info = await Client.GetObjectAsync(Name);
+        _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        StateHasChanged();
+    }
 }

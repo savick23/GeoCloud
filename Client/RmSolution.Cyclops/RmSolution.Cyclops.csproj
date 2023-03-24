@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RmSolution.Client\RmSolution.Client.csproj" />
+    <ProjectReference Include="..\RmSolution.Web\RmSolution.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

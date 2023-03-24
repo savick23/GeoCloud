@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: HttpApiService – Веб-служба доступа к данным Системы.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.DataAccess
+namespace RmSolution.Web
 {
     #region Using
     using RmSolution.Runtime;

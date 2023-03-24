@@ -1,6 +1,10 @@
+//--------------------------------------------------------------------------------------------------
+// (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
+// Описание:
+//--------------------------------------------------------------------------------------------------
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using RmSolution.DataAccess;
+using RmSolution.Web;
 using RmSolution.Cyclops;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

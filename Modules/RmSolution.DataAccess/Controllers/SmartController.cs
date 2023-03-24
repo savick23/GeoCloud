@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: SmartController – Базовый класс контроллера для доступа к данным.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.DataAccess
+namespace RmSolution.Web
 {
     #region Using
     using Microsoft.AspNetCore.Mvc;
