@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using RmSolution.DataAccess;
 using RmSolution.Cyclops;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

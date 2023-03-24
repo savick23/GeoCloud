@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: RmHttpClient – Веб-клиент.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Cyclops
+namespace RmSolution.DataAccess
 {
     #region Using
     using System;
