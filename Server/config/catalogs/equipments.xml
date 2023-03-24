@@ -3,13 +3,19 @@
   <objects>
     <catalogs>
       <item Id="4503599627370496" code="EQUIPTYPES" name="Типы оборудования" source="equiptypes">
+        <attributes>
+          <item id="4503599627371520" code="ИД" name="Идентификатор" source="id" />
+          <item id="4503599627372544" code="Состояние" name="Состояние" source="state" />
+          <item id="4503599627373568" code="Код" name="Код" source="code" width="100"/>
+          <item id="4503599627374592" code="Наименование" name="Наименование" source="name" width="300"/>
+        </attributes>
         <data>
-          <item id="4503599627371520" state="1" code="001" name="Тахеометр"/>
+          <row id="4503599627371520" state="1" code="001" name="Тахеометр"/>
         </data>
       </item>
       <item Id="4785074604081152" code="EQUIPMENTS" name="Оборудование" source="equipments">
         <data>
-          <item id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520" model="" serial=""/>
+          <row id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520" model="" serial=""/>
         </data>
       </item>
     </catalogs>

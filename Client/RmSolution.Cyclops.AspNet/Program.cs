@@ -3,7 +3,6 @@
 // Описание:
 //--------------------------------------------------------------------------------------------------
 using RmSolution.Web;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
