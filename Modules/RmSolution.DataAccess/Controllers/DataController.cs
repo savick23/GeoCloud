@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: DataController – Доступ к данным.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Web
+namespace RmSolution.DataAccess
 {
     #region Using
     using Microsoft.AspNetCore.Mvc;
@@ -17,9 +17,10 @@ namespace RmSolution.Web
         {
         }
 
+        /// <summary> http://localhost:8087/api/objects </summary>
         [HttpGet("[action]")]
         public async Task<IActionResult> Objects() => await UseDatabase(db =>
-            new JsonResult(Runtime.Metadata.Entities.Select(entity =>
+            new JsonResult(Runtime.Metadata.Entities.OrderBy(e => e.Ordinal).Select(entity =>
             new TObjectDto()
             {
                 Name = entity.Name,
@@ -34,6 +35,7 @@ namespace RmSolution.Web
             }).ToArray())
         );
 
+        /// <summary> http://localhost:8087/api/object/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Object(string name) => await UseDatabase(db =>
         {
@@ -56,6 +58,7 @@ namespace RmSolution.Web
             throw new Exception("Тип " + name + " не найден!");
         });
 
+        /// <summary> http://localhost:8087/api/data/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Data(string name) => await UseDatabase(db =>
         {

@@ -9,7 +9,7 @@ namespace RmSolution.Data
     #endregion Using
 
     /// <summary> Узлы баз данных в случае распределённой БД.</summary>
-    [Table("Узлы БД", "config.nodes")]
+    [Table("Узлы БД", "config.nodes", Ordinal = 5)]
     public class TNode : TCatalogRow
     {
         /// <summary> Индекс (номер) базы данных.</summary>
@@ -17,19 +17,19 @@ namespace RmSolution.Data
     }
 
     /// <summary> Площадки.</summary>
-    [Table("Площадки", "config.sites")]
+    [Table("Площадки", "config.sites", Ordinal = 10)]
     public class TSite : TCatalogRow
     {
     }
 
     /// <summary> Роли пользователей.</summary>
-    [Table("Роли пользователей", "config.roles")]
+    [Table("Роли пользователей", "config.roles", Ordinal = 15)]
     public class TRole : TCatalogRow
     {
     }
 
     /// <summary> Пользователи.</summary>
-    [Table("Пользователи", "config.users")]
+    [Table("Пользователи", "config.users", Ordinal = 20)]
     public class TUser : TCatalogRow
     {
         /// <summary> ИД учётной записи администратора.</summary>

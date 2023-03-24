@@ -49,6 +49,7 @@ namespace RmSolution.Server
                 {
                     Name = info?.Name ?? throw new Exception("Не указано наименование объекта конфигурации."),
                     Source = info?.Source ?? throw new Exception("Не указан источник метаданных (таблица)."),
+                    Ordinal = info?.Ordinal ?? int.MaxValue,
                     Type = mdtype
                 };
                 Entities.Add(obj);

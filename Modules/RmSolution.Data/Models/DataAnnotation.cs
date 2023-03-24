@@ -12,9 +12,12 @@ namespace RmSolution.DataAnnotations
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class TableAttribute : Attribute
     {
+        /// <summary> Наименование объекта конфигурации.</summary>
         public string Name { get; }
         public string Source { get; }
         public bool IsView { get; }
+        /// <summary> Порядок в списке объектов конфигурации.</summary>
+        public int Ordinal { get; set; }
 
         public TableAttribute(string name, string source, bool isView = false)
         {

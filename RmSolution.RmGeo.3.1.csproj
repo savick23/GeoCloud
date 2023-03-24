@@ -6,6 +6,7 @@
     <Product>РМ Гео</Product>
     <Copyright>© 2023 ООО «РМ Солюшн». Все права защищены.</Copyright>
     <Company>ООО «РМ Солюшн»</Company>
+    <Authors>Летуновский Сергей Васильевич (lesev@mail.ru)</Authors>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PlatformTarget>x64</PlatformTarget>

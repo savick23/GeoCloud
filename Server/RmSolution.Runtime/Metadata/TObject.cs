@@ -9,16 +9,19 @@ namespace RmSolution.Runtime
     using System;
     #endregion Using
 
+    /// <summary> Базовая сущность объекта конфигурации.</summary>
     public class TEntity
     {
         /// <summary> Уникальный 64-разрядный идентификатор в Системе.</summary>
         public long Id { get; set; }
+        /// <summary> Код (шифр) объекта, реквизита, свойства.</summary>
+        public string Code { get; set; }
+        /// <summary> Наимменование объекта, реквизита, свойства.</summary>
+        public string Name { get; set; }
     }
 
     public class TAttribute : TEntity
     {
-        public string Code { get; set; }
-        public string Name { get; set; }
         public Type Type { get; set; }
 
         /// <summary> Definition </summary>
@@ -56,9 +59,9 @@ namespace RmSolution.Runtime
 
     public class TObject : TEntity
     {
-        public string Name { get; set; }
         public string Source { get; set; }
         public bool IsView { get; }
+        public int Ordinal { get; set; }
         public Type Type { get; set; }
 
         public TAttributeCollection Attributes { get; } = new TAttributeCollection();
