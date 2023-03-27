@@ -2,9 +2,9 @@
 <rmgeo>
   <objects>
     <system>
-      <item Id="0" code="SETTINGS" name="Объекты конфигурации" source="config.settings">
+      <item id="2" code="SETTINGS" name="Объекты конфигурации" source="config.settings">
         <data>
-          <row id="DBVersion" value="3.0.0.1"/>
+          <row id="DBVersion" value="3.0.0.2"/>
         </data>
       </item>
     </system>

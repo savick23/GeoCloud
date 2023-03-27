@@ -9,6 +9,6 @@ namespace RmSolution.Runtime
         TObjectCollection Entities { get; }
 
         /// <summary> Возвращает данные объекта конфигурации.</summary>
-        object? GetData(string id);
+        IEnumerable<object>? GetData(string id);
     }
 }

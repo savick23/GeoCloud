@@ -2,7 +2,7 @@
 <rmgeo>
   <objects>
     <catalogs>
-      <item Id="4503599627370496" code="EQUIPTYPES" name="Типы оборудования" source="equiptypes">
+      <item id="4503599627370496" code="EQUIPTYPES" name="Типы оборудования" source="equiptypes">
         <attributes>
           <item id="4503599627371520" code="ИД" name="Идентификатор" source="id" />
           <item id="4503599627372544" code="Состояние" name="Состояние" source="state" />
@@ -13,7 +13,14 @@
           <row id="4503599627371520" state="1" code="001" name="Тахеометр"/>
         </data>
       </item>
-      <item Id="4785074604081152" code="EQUIPMENTS" name="Оборудование" source="equipments">
+      <item id="4785074604081152" code="EQUIPMENTS" name="Оборудование" source="equipments">
+        <attributes>
+          <item id="4785074604082176" code="ИД" name="Идентификатор" source="id" />
+          <item id="4785074604083200" code="Состояние" name="Состояние" source="state" />
+          <item id="4785074604084224" code="Код" name="Код" source="code" width="100"/>
+          <item id="4785074604085248" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="4785074604086272" code="Тип" name="Тип" source="type" type="4503599627370496"/>
+        </attributes>
         <data>
           <row id="4785074604082176" state="1" code="000001" name="Тахеометр Leica" type="4503599627371520" model="" serial=""/>
         </data>

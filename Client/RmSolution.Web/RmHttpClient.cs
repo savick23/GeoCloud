@@ -70,8 +70,28 @@ namespace RmSolution.Web
 
         class RefTypeConverter : JsonConverter<TRefType>
         {
-            public override TRefType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-                reader.GetInt64();
+            public override TRefType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                string view = null;
+                long id = 0;
+                while (reader.Read())
+                {
+                    switch(reader.TokenType)
+                    {
+                        case JsonTokenType.StartObject:
+                            break;
+                        case JsonTokenType.Number:
+                            id = reader.GetInt64();
+                            break;
+                        case JsonTokenType.String:
+                            view = reader.GetString();
+                            break;
+                        case JsonTokenType.EndObject:
+                            return new TRefType(id, view);
+                    }
+                }
+                return TRefType.Empty;
+            }
 
             public override void Write(Utf8JsonWriter writer, TRefType value, JsonSerializerOptions options) =>
                 throw new NotImplementedException();

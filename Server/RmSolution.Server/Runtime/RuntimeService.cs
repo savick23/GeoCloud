@@ -121,35 +121,15 @@ namespace RmSolution.Server
             Name = "Сервер приложений " + Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
-            Metadata = _md = new SmartMetadata(databaseF());
-            int attempt = 1;
-            bool isnewdb = false;
-            while (true)
-                try
-                {
-                    _md.Open();
-                    if (!isnewdb) ((IDatabaseFactory)databaseF()).UpdateDatabase(_md.Entities, (msg) => logger.LogInformation(msg));
-                    break;
-                }
-                catch (TDbNotFoundException)
-                {
-                    if (attempt-- > 0)
-                    {
-                        logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, _md.DatabaseName));
-                        ((IDatabaseFactory)databaseF()).CreateDatabase(_md.Entities, (msg) => logger.LogInformation(msg));
-                        isnewdb = true;
-                        logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, _md.DatabaseName));
-                        continue;
-                    }
-                    logger.LogError(string.Format(TEXT.CreateDatabaseFailed, _md.DatabaseName));
-                    throw;
-                }
-#if !DEBUG
-                catch (Exception ex)
-                {
-                    throw new Exception("Подключение к база данных \"" + _md.DatabaseName + "\" не установлено! " + ex.Message);
-                }
-#endif
+            Metadata = _md = new SmartMetadata(logger, databaseF());
+            try
+            {
+                _md.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Подключение к база данных \"" + _md.DatabaseName + "\" не установлено! " + ex.Message);
+            }
             string dbver = _md.Settings.DBVersion;
             if (Version.Parse(dbver) < SmartMetadata.DbVersionRequirements)
             {

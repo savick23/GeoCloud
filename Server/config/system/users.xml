@@ -2,7 +2,7 @@
 <rmgeo>
   <objects>
     <system>
-      <item Id="1688849860263936" code="ROLES" name="Роли пользователей" source="config.roles">
+      <item id="1688849860263936" code="ROLES" name="Роли пользователей" source="config.roles">
         <data>
           <row Id="1688849860264960" state="1" code="0001" name="Все" descript="Встроенная группа для всех"/>
           <row Id="1688849860265984" state="1" code="0002" name="Только чтение" descript="Встроенная группа только для чтения"/>
@@ -10,7 +10,7 @@
           <row id="1688849860268032" state="1" code="0004" name="Администраторы" descript="Встроенная группа администраторов"/>
         </data>
       </item>
-      <item Id="1970324836974592" code="USERS" name="Пользователи" source="config.users">
+      <item id="1970324836974592" code="USERS" name="Пользователи" source="config.users">
         <data>
           <row id="1970324836975616" state="1" code="000001" name="Администратор" login="admin" descript="Встроенная учётная запись администратора"/>
           <row id="1970324836976640" state="1" code="000002" name="Тестировщик" login="tester"/>

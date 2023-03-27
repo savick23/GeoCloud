@@ -13,12 +13,14 @@ namespace RmSolution.Server
     using System.Diagnostics.CodeAnalysis;
     using System.Dynamic;
     using System.Text;
+    using Microsoft.Extensions.Logging;
     #endregion Using
 
     internal class SmartMetadata : IMetadata
     {
         #region Declarations
 
+        ILogger _logger;
         IDatabase _db;
 
         #endregion Declarations
@@ -26,7 +28,7 @@ namespace RmSolution.Server
         #region Properties
 
         /// <summary> Минимальная необходимая версия базы данных.</summary>
-        public static readonly Version DbVersionRequirements = Version.Parse("3.0.0.1");
+        public static readonly Version DbVersionRequirements = Version.Parse("3.0.0.2");
         public string DatabaseName => _db.DatabaseName ?? "RMGEO01";
         public TObjectCollection Entities { get; } = new();
         /// <summary> Настройки, параметры конфигурации.</summary>
@@ -36,26 +38,58 @@ namespace RmSolution.Server
 
         #region Constuctors, Initialization
 
-        public SmartMetadata(IDatabase connection)
+        public SmartMetadata(ILogger logger, IDatabase connection)
         {
+            _logger = logger;
             _db = connection;
         }
 
         public void Open()
         {
-            LoadMetadata();
-            _db.Open();
-            Settings = new TSettingsWrapper(_db.Query<TSettings>());
+            int attempt = 1;
+            bool isnewdb = false;
+            while (true)
+                try
+                {
+                    _db.Open();
+                    LoadMetadata(_db);
+                    if (!isnewdb) ((IDatabaseFactory)_db).UpdateDatabase(Entities, (msg) => _logger.LogInformation(msg));
+                    Settings = new TSettingsWrapper(_db.Query<TSettings>());
+                    break;
+                }
+                catch (TDbNotFoundException)
+                {
+                    if (Entities.Count == 0) LoadMetadata(null);
+                    if (attempt-- > 0)
+                    {
+                        _logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, DatabaseName));
+                        ((IDatabaseFactory)_db).CreateDatabase(Entities, (msg) => _logger.LogInformation(msg));
+                        isnewdb = true;
+                        _logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, DatabaseName));
+                        continue;
+                    }
+                    _logger.LogError(string.Format(TEXT.CreateDatabaseFailed, DatabaseName));
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Подключение к база данных \"" + DatabaseName + "\" не установлено! " + ex.Message);
+                }
         }
 
-        void LoadMetadata()
+        void LoadMetadata(IDatabase? db)
         {
+            var tobjs = db?.Query<TObject>();
+            var tattrs = db?.Query<TAttribute>();
             foreach (var mdtype in GetTypes<TableAttribute>())
             {
                 var props = mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken);
                 var info = (TableAttribute?)mdtype.GetCustomAttribute(typeof(TableAttribute));
+                var dboi = tobjs?.FirstOrDefault(o => o.Code == info?.Source?.ToUpper());
+                var attrs = tattrs?.Where(a => a.Parent == dboi?.Id).ToList();
                 var obj = new TObject()
                 {
+                    Id = dboi?.Id ?? 0,
                     Parent = info.IsSystem ? TType.System : TType.Catalog,
                     Name = info?.Name ?? throw new Exception("Не указано наименование объекта конфигурации."),
                     Source = info?.Source ?? throw new Exception("Не указан источник метаданных (таблица)."),
@@ -67,10 +101,13 @@ namespace RmSolution.Server
                     if (pi.IsDefined(typeof(ColumnAttribute)))
                     {
                         var ai = (ColumnAttribute?)pi.GetCustomAttributes(typeof(ColumnAttribute)).First();
+                        var dbai = attrs?.FirstOrDefault(a => a.Name == ai.Name);
                         obj.Attributes.Add(new TAttribute()
                         {
+                            Id = dbai?.Id ?? 0,
                             Code = pi.Name,
                             Name = ai.Name,
+                            Type = dbai?.Type ?? 0,
                             CType = pi.PropertyType,
                             Source = ai.Definition,
                             IsKey = ai.IsKey,
@@ -105,7 +142,7 @@ namespace RmSolution.Server
 
         #region IMetadata implementation
 
-        public object? GetData(string id)
+        public IEnumerable<object>? GetData(string id)
         {
             var mdtype = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
             if (mdtype != null)
@@ -116,15 +153,16 @@ namespace RmSolution.Server
                 var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
                 stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
                 {
-                    if (ai.CType == typeof(TRefType))
+                    if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObject refobj)
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
-                        stmt_from.Append(" LEFT JOIN ").Append("equiptypes").Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
-                        return string.Concat(alias, ".", ai.Field, ",", ajoin, ".\"name\" \"", ai.Field[1..^1], "_view\"");
+                        stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
+                        return string.Concat("cast(", alias, ".", ai.Field, " as nvarchar(32))+';'+", ajoin, ".\"name\" \"", ai.Field[1..^1], '"');
                     }
                     return string.Concat(alias, ".", ai.Field);
-                })));
-                var stmt = stmt_select.Append(stmt_from).ToString();
+                }
+                )));
+                return _db.Query(mdtype.Type, stmt_select.Append(stmt_from).ToString());
             }
             return null;
         }

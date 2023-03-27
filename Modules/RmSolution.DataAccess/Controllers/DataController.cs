@@ -65,8 +65,7 @@ namespace RmSolution.DataAccess
             var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.Type;
             if (mdtype != null)
             {
-                var data2 = Runtime.Metadata.GetData(name);
-                var data = db.Query(mdtype);
+                var data = Runtime.Metadata.GetData(name);
                 return new JsonResult(data);
             }
             throw new Exception("Тип " + name + " не найден!");

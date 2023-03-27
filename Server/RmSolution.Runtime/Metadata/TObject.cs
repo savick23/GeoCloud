@@ -40,7 +40,14 @@ namespace RmSolution.Runtime
         public Type Type { get; set; }
 
         /// <summary> Полное имя таблицы в базе данных.</summary>
-        public string TableName => string.Concat('"', Source, '"');
+        public string TableName
+        {
+            get
+            {
+                var t = Source.Split(new char[] { '.' });
+                return t.Length == 1 ? string.Concat('"', t[0], '"') : string.Concat(t[0], ".\"", t[1], '"');
+            }
+        }
 
         public TAttributeCollection Attributes { get; } = new TAttributeCollection();
 

@@ -109,6 +109,9 @@ namespace RmSolution.Data
             return default;
         }
 
+        public IEnumerable<object>? Query(Type type, string statement, params object[] args) =>
+            _conn.Query(type, string.Format(statement, args));
+
         public async Task<IEnumerable<dynamic>?> QueryAsync(Type type)
         {
             var src = ((TableAttribute?)type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
@@ -147,23 +150,27 @@ namespace RmSolution.Data
         }
 
 #pragma warning disable CS8603
-        static string GetSqlValue(object obj, string propertyName)
+
+        static string GetSqlValue(object? value)
         {
-            var val = obj.GetType().GetProperty(propertyName)?.GetValue(obj);
-            if (val != null) return "NULL";
-            return val switch
+            if (value == null) return "NULL";
+            return value switch
             {
-                string => string.Concat("'", val.ToString(), "'"),
-                bool => (bool)val ? "1" : "0",
-                DateTime => string.Concat("'", ((DateTime)val).ToString("yyyy-MM-ddTHH:mm:ss.fff"), "'"),
-                TRefType => ((TRefType)val).Value.ToString() ?? "NULL",
-                float => ((float)val).ToString(CultureInfo.InvariantCulture),
-                double => ((double)val).ToString(CultureInfo.InvariantCulture),
-                decimal => ((decimal)val).ToString(CultureInfo.InvariantCulture),
-                byte[] => string.Concat("0x", string.Concat(((byte[])val).Select(n => n.ToString("x2")))),
-                _ => val.ToString()
+                string => string.Concat("'", value.ToString(), "'"),
+                bool => (bool)value ? "1" : "0",
+                DateTime => string.Concat("'", ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fff"), "'"),
+                TRefType => ((TRefType)value).Value.ToString() ?? "NULL",
+                float => ((float)value).ToString(CultureInfo.InvariantCulture),
+                double => ((double)value).ToString(CultureInfo.InvariantCulture),
+                decimal => ((decimal)value).ToString(CultureInfo.InvariantCulture),
+                byte[] => string.Concat("0x", string.Concat(((byte[])value).Select(n => n.ToString("x2")))),
+                _ => value.ToString()
             };
         }
+
+        static string GetSqlValue(object obj, string propertyName) =>
+            GetSqlValue(obj.GetType().GetProperty(propertyName)?.GetValue(obj));
+
 #pragma warning restore CS8603
 
         #endregion IDatabase implementation
@@ -175,7 +182,9 @@ namespace RmSolution.Data
             public override void SetValue(IDbDataParameter parameter, TRefType value) =>
                 parameter.Value = value.ToString();
 
-            public override TRefType Parse(object value) => new((long?)value);
+            public override TRefType Parse(object value) => new TRefType(
+                long.Parse(Regex.Match(value.ToString(), "\\d+").Value),
+                Regex.Match(value.ToString(), @"(?<=\d+;).*?(?=$)").Value);
         }
 
         #endregion Nested types

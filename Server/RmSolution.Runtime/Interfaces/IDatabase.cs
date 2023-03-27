@@ -33,6 +33,8 @@ namespace RmSolution.Runtime
         /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
         IEnumerable<dynamic>? Query(Type type);
         /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
+        IEnumerable<object>? Query(Type type, string statement, params object[] args);
+        /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
         Task<IEnumerable<dynamic>?> QueryAsync(Type type);
         /// <summary> Возвращает единственное значение из БД. Первую колонку первой записи.</summary>
         object Scalar(string statement, params object[] args);
