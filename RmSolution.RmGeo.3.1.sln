@@ -49,6 +49,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "catalogs", "catalogs", "{B34654F6-B305-4FB3-B79E-B5F800BDA7DA}"
 	ProjectSection(SolutionItems) = preProject
 		Server\config\catalogs\equipments.xml = Server\config\catalogs\equipments.xml
+		Server\config\catalogs\geobjects.xml = Server\config\catalogs\geobjects.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "system", "system", "{20700DA3-CED8-47DD-83BD-9ED4FC801E08}"

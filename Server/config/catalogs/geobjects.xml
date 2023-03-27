@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rmgeo>
+  <objects>
+    <catalogs>
+      <item Id="844424930131968" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects">
+        <data>
+          <row id="844424930132992" state="1" code="000001" name="Площадь Конституции" location="Санкт-Петербург, 59.851977, 30.304702"/>
+        </data>
+      </item>
+      <item Id="1125899906842624" code="GEOGROUPS" name="Группы измерений" source="geogroups">
+        <data>
+          <row id="1125899906843648" state="1" code="000001" name="Пиццерия Pizza Hut" project="844424930131968"/>
+        </data>
+      </item>
+      <item Id="1407374883553280" code="GEOPOINTS" name="Точки измерения" source="geopoints">
+        <data>
+          <row id="1407374883554304" state="1" code="000001" name="Фасад 1" group="1125899906843648"/>
+          <row id="1407374883555328" state="1" code="000002" name="Фасад 2" group="1125899906843648"/>
+        </data>
+      </item>
+    </catalogs>
+  </objects>
+</rmgeo>
