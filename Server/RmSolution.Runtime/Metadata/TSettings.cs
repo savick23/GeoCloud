@@ -18,9 +18,9 @@ namespace RmSolution.Runtime
         [Column("Идентификатор", "id nvarchar(64) PRIMARY KEY", IsKey = true)]
         public string Id { get; set; }
         [Column("Группа", "group nvarchar(32) NULL")]
-        public string Parent { get; set; }
+        public string? Parent { get; set; }
         [Column("Значение", "value nvarchar(4000) NULL")]
-        public string Value { get; set; }
+        public string? Value { get; set; }
         [Column("Значение", "modified datetime NOT NULL")]
         public DateTime Modified { get; set; }
     }
@@ -34,11 +34,33 @@ namespace RmSolution.Runtime
             _settings = settings?.ToList() ?? new();
         }
 
+        public override IEnumerable<string> GetDynamicMemberNames() =>
+            _settings.Select(p => string.Concat(xParent(p.Parent), p.Id)).ToList();
+
         public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
-            result = _settings.FirstOrDefault(s => s.Id.Equals(binder.Name))?.Value;
+            var prm = _settings.FirstOrDefault(s => s.Id.Equals(binder.Name));
+            if (prm == null)
+            {
+                result = null;
+                return false;
+            }
+            result = prm.Value;
             return true;
         }
+
+        public override bool TrySetMember(SetMemberBinder binder, object? value)
+        {
+            var prm = _settings.FirstOrDefault(s => s.Id.Equals(binder.Name));
+            if (prm == null) return false;
+            prm.Value = value?.ToString();
+            return true;
+        }
+
+        string xParent(string? parent) =>
+            string.IsNullOrWhiteSpace(parent)
+                ? string.Empty
+                : string.Concat(xParent(_settings.FirstOrDefault(p => p.Id.Equals(parent))?.Parent), parent, ".");
     }
 }
 #pragma warning restore CS8618
