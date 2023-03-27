@@ -150,6 +150,13 @@ namespace RmSolution.Server
                     throw new Exception("Подключение к база данных \"" + _md.DatabaseName + "\" не установлено! " + ex.Message);
                 }
 #endif
+            string dbver = _md.Settings.DBVersion;
+            if (Version.Parse(dbver) < SmartMetadata.DbVersionRequirements)
+            {
+                var msg = "Версия базы данных не соотвествует текущей конфигурации. Необходима версия БД не ниже " + SmartMetadata.DbVersionRequirements;
+                _logger.LogError(msg);
+                throw new Exception(msg);
+            }
             Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;

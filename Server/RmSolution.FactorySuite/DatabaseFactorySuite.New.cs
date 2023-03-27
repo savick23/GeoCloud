@@ -250,7 +250,7 @@ namespace RmSolution.Data
                 return val.ToLower() == "true" || val.ToLower() == "1" ? "1" : "0";
 
             if (type == typeof(DateTime))
-                return "'" + DateTime.Parse(val).ToString("yyyyMMdd HH:mm:ss.fff") + "'";
+                return "'" + DateTime.Parse(val).ToString("yyyy-MM-ddTHH:mm:ss.fff") + "'";
 
             return "'" + val + "'";
         }

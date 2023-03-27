@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rmgeo>
+  <objects>
+    <system>
+      <item Id="0" code="SETTINGS" name="Объекты конфигурации" source="config.settings">
+        <data>
+          <row id="DBVersion" value="3.0.0.1"/>
+        </data>
+      </item>
+    </system>
+  </objects>
+</rmgeo>

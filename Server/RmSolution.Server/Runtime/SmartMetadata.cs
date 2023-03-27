@@ -10,6 +10,8 @@ namespace RmSolution.Server
     using RmSolution.DataAnnotations;
     using System;
     using RmSolution.Data;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Dynamic;
     #endregion Using
 
     internal class SmartMetadata : IMetadata
@@ -22,8 +24,12 @@ namespace RmSolution.Server
 
         #region Properties
 
+        /// <summary> Минимальная необходимая версия базы данных.</summary>
+        public static readonly Version DbVersionRequirements = Version.Parse("3.0.0.1");
         public string DatabaseName => _db.DatabaseName ?? "RMGEO01";
         public TObjectCollection Entities { get; } = new();
+        /// <summary> Настройки, параметры конфигурации.</summary>
+        public dynamic Settings;
 
         #endregion Properties
 
@@ -38,6 +44,7 @@ namespace RmSolution.Server
         {
             LoadMetadata();
             _db.Open();
+            Settings = new TSettingsWrapper(_db.Query<TSettings>());
         }
 
         void LoadMetadata()
@@ -69,7 +76,7 @@ namespace RmSolution.Server
                             Visible  = ai.Visible,
                             PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns,
                             Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns,
-                            DefaultValue = pi.GetValue(Activator.CreateInstance(mdtype))
+                            DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY : pi.GetValue(Activator.CreateInstance(mdtype))
                         });
                     }
             }
