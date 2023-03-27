@@ -65,7 +65,7 @@ namespace RmSolution.DataAccess
             var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.Type;
             if (mdtype != null)
             {
-//                var data2 = Runtime.Metadata.GetData(name);
+                var data2 = Runtime.Metadata.GetData(name);
                 var data = db.Query(mdtype);
                 return new JsonResult(data);
             }

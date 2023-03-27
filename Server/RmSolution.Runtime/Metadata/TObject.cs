@@ -39,6 +39,9 @@ namespace RmSolution.Runtime
         public int Ordinal { get; set; }
         public Type Type { get; set; }
 
+        /// <summary> Полное имя таблицы в базе данных.</summary>
+        public string TableName => string.Concat('"', Source, '"');
+
         public TAttributeCollection Attributes { get; } = new TAttributeCollection();
 
         public override string ToString() =>

@@ -12,6 +12,7 @@ namespace RmSolution.Server
     using RmSolution.Data;
     using System.Diagnostics.CodeAnalysis;
     using System.Dynamic;
+    using System.Text;
     #endregion Using
 
     internal class SmartMetadata : IMetadata
@@ -70,7 +71,7 @@ namespace RmSolution.Server
                         {
                             Code = pi.Name,
                             Name = ai.Name,
-                            Type = pi.PropertyType,
+                            CType = pi.PropertyType,
                             Source = ai.Definition,
                             IsKey = ai.IsKey,
                             Visible  = ai.Visible,
@@ -102,13 +103,32 @@ namespace RmSolution.Server
 
         #endregion Constuctors, Initialization
 
+        #region IMetadata implementation
+
         public object? GetData(string id)
         {
-            var mdtype = Entities.FirstOrDefault(e => e.Name == id || e.Source == id);
+            var mdtype = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
             if (mdtype != null)
             {
+                string alias = "a";
+                string ajoin = "a";
+                var stmt_select = new StringBuilder("SELECT ");
+                var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
+                stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
+                {
+                    if (ai.CType == typeof(TRefType))
+                    {
+                        ajoin = ((char)(ajoin[0] + 1)).ToString();
+                        stmt_from.Append(" LEFT JOIN ").Append("equiptypes").Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
+                        return string.Concat(alias, ".", ai.Field, ",", ajoin, ".\"name\" \"", ai.Field[1..^1], "_view\"");
+                    }
+                    return string.Concat(alias, ".", ai.Field);
+                })));
+                var stmt = stmt_select.Append(stmt_from).ToString();
             }
             return null;
         }
+
+        #endregion IMetadata implementation
     }
 }

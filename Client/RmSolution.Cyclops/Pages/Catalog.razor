@@ -2,7 +2,7 @@
 @inherits RmPageBase
 <PageTitle>Справочник «@(_info?.Name ?? string.Empty)»</PageTitle>
 
-<h1>Справочник «@(_info?.Name ?? string.Empty)»</h1>
+<RadzenText TextStyle="TextStyle.H5">Справочник «@(_info?.Name ?? string.Empty)»</RadzenText>
 
 @if (_data == null)
 {
@@ -12,6 +12,7 @@ else
 {
     <RadzenMenu Click="OnMenuCick">
         <RadzenMenuItem Text="Новый" Icon="add" Value=CMD_NEW />
+        <RadzenMenuItem Text="Копировать" Icon="content_copy" Value=CMD_COPY />
         <RadzenMenuItem Text="Изменить" Icon="edit" Value=CMD_EDIT />
         <RadzenMenuItem Text="Удалить" Icon="delete" Value=CMD_DELETE />
     </RadzenMenu>

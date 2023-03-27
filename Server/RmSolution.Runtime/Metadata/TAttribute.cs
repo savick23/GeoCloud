@@ -13,9 +13,13 @@ namespace RmSolution.Runtime
     [Table("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2, IsSystem = true)]
     public class TAttribute : TEntity
     {
+        /// <summary> Тип данных.</summary>
+        [Column("Тип")]
+        public long Type { get; set; }
         /// <summary> Признак первичного ключа.</summary>
         public bool IsKey { get; set; }
-        public Type Type { get; set; }
+        /// <summary> Встроенный тип C#.</summary>
+        public Type CType { get; set; }
 
         /// <summary> Definition </summary>
         public string? Source { get; set; }
@@ -31,7 +35,7 @@ namespace RmSolution.Runtime
         public bool Visible { get; set; }
 
         public override string ToString() =>
-            $"{Code} {Type.Name}";
+            $"{Code} {CType.Name}";
     }
 
     public class TAttributeCollection : List<TAttribute>, ICloneable

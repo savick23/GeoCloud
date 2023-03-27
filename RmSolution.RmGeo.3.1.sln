@@ -16,6 +16,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Runtime", "Server\RmSolution.Runtime\RmSolution.Runtime.csproj", "{B0CE73CC-8A95-4FE0-A892-3216A10ED143}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RmSolution.Server", "Server\RmSolution.Server\RmSolution.Server.csproj", "{4A02BD38-F612-46D0-968B-9BC324E9A312}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78171706-E132-4E39-AB6D-0F9B6DD19736} = {78171706-E132-4E39-AB6D-0F9B6DD19736}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{4F2BCB6D-9588-4290-A5D7-7B61C0AF7300}"
 EndProject
@@ -111,7 +114,9 @@ Global
 		{7F67F596-6891-4980-BE13-95725CBFF299}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F67F596-6891-4980-BE13-95725CBFF299}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78171706-E132-4E39-AB6D-0F9B6DD19736}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E7B0A9A-B25D-4BD0-89CA-320DDA23301D}.Release|Any CPU.ActiveCfg = Release|Any CPU

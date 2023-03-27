@@ -48,10 +48,10 @@ namespace RmSolution.Data
         /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
         static string BuildColumnDefn(TAttribute ai)
         {
-            var finded = _typemapping.TryGetValue(ai.Type, out string? type);
+            var finded = _typemapping.TryGetValue(ai.CType, out string? type);
             return string.Join(" ", ai.Code.ToLower(),
                 finded ? type : "int",
-                finded ? string.Empty : ai.Type.IsValueType && !ai.Type.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
+                finded ? string.Empty : ai.CType.IsValueType && !ai.CType.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
         }
 
         /// <summary> Получает полное имя таблицы со схемой.</summary>
@@ -216,15 +216,15 @@ namespace RmSolution.Data
                                     {
                                         attrs.Remove(ai);
                                         stmt.Append(comma).Append(ai.Field);
-                                        sqlvals.Append(comma).Append(InitGetValue(ai.Type, col.Value));
+                                        sqlvals.Append(comma).Append(InitGetValue(ai.CType, col.Value));
                                         comma = ",";
                                     }
                                 }
                                 foreach (var ai in attrs)
-                                    if (ai.Type.IsValueType || !ai.Type.AssemblyQualifiedName.Contains("System.Nullable"))
+                                    if (ai.CType.IsValueType || !ai.CType.AssemblyQualifiedName.Contains("System.Nullable"))
                                     {
                                         stmt.Append(comma).Append(ai.Field);
-                                        sqlvals.Append(comma).Append(InitGetValue(ai.Type, ai.DefaultValue));
+                                        sqlvals.Append(comma).Append(InitGetValue(ai.CType, ai.DefaultValue));
                                         comma = ",";
                                     }
 

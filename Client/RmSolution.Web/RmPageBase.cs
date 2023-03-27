@@ -14,6 +14,7 @@ namespace RmSolution.Web
         #region Constants
 
         public const string CMD_NEW = "NEW";
+        public const string CMD_COPY = "COPY";
         public const string CMD_EDIT = "EDIT";
         public const string CMD_DELETE = "DELETE";
 
