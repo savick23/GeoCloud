@@ -76,7 +76,8 @@ namespace RmSolution.Server
                             Visible  = ai.Visible,
                             PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns,
                             Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns,
-                            DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY : pi.GetValue(Activator.CreateInstance(mdtype))
+                            DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
+                                : ai.Default == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.Default
                         });
                     }
             }

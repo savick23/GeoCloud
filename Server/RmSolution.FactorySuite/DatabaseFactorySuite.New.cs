@@ -78,59 +78,59 @@ namespace RmSolution.Data
             var tableName = SchemaTableName(defn.Name);
             if (!db.Tables().Any(tname => tname.Equals(tableName.Replace(LQ, string.Empty))))
             {
-                StringBuilder sqlcmd = new StringBuilder("CREATE TABLE " + tableName);
+                StringBuilder stmt = new("CREATE TABLE " + tableName);
                 string comma = " (\r\n";
                 defn.Columns.ForEach(col =>
                 {
-                    sqlcmd.Append(comma);
-                    ColumnDefinitionAdapter(sqlcmd,
+                    stmt.Append(comma);
+                    ColumnDefinitionAdapter(stmt,
                         Regex.Matches(col, @"JSON\([\w\.]*\)|NOT NULL|NULL|PRIMARY KEY|[\w_(,)]+").Cast<Match>().Select(m => m.Value).ToArray());
 
                     comma = ",\r\n";
                 });
                 defn.Constraints.Where(a => a.StartsWith("PRIMARY KEY")).ToList().ForEach(defn =>
                 {
-                    sqlcmd.Append(",\r\nPRIMARY KEY ");
-                    IndexDefinition(sqlcmd, defn.Substring(12).Trim().Split(new char[] { ',' }));
+                    stmt.Append(",\r\nPRIMARY KEY ");
+                    IndexDefinition(stmt, defn.Substring(12).Trim().Split(new char[] { ',' }));
                 });
-                sqlcmd.AppendLine(");\r\n");
+                stmt.AppendLine(");\r\n");
                 defn.Constraints.Where(a => a.StartsWith("INDEX")).ToList().ForEach(defn =>
                 {
-                    IndexDefinitionAdapter(sqlcmd, tableName, defn.Substring(6).Trim().Split(new char[] { ',' }));
+                    IndexDefinitionAdapter(stmt, tableName, defn.Substring(6).Trim().Split(new char[] { ',' }));
                 });
-                db.Exec(sqlcmd.ToString());
+                db.Exec(stmt.ToString());
                 message(string.Format(TEXT.DbTableCreated, tableName));
             }
             else message(string.Format(TEXT.DbTableExists, tableName));
         }
 
-        protected virtual void ColumnDefinitionAdapter(StringBuilder sqlcmd, string[] definition)
+        protected virtual void ColumnDefinitionAdapter(StringBuilder stmt, string[] definition)
         {
             for (int i = 0; i < definition.Length; i++)
             {
                 var defn = definition[i];
                 if (i == 0)
                 {
-                    sqlcmd.Append(LQ);
-                    sqlcmd.Append(defn);
-                    sqlcmd.Append(RQ);
+                    stmt.Append(LQ);
+                    stmt.Append(defn);
+                    stmt.Append(RQ);
                 }
                 else if (defn.StartsWith("JSON"))
                 {
                 }
                 else
                 {
-                    sqlcmd.Append(' ');
-                    sqlcmd.Append(defn.Replace("(0)", "(MAX)"));
+                    stmt.Append(' ');
+                    stmt.Append(defn.Replace("(0)", "(MAX)"));
                 }
             }
         }
 
-        protected virtual void IndexDefinitionAdapter(StringBuilder sqlcmd, string tableName, string[] columns)
+        protected virtual void IndexDefinitionAdapter(StringBuilder stmt, string tableName, string[] columns)
         {
             var indexName = string.Join("_", columns.Select(f => Regex.Match(f, @"^\w+").Value.ToUpper()));
-            sqlcmd.Append($"CREATE NONCLUSTERED INDEX idx_{Regex.Match(tableName, @"(?<=\[).*?(?=\])").Value}_{indexName} ON {tableName} ");
-            IndexDefinition(sqlcmd, columns);
+            stmt.Append($"CREATE NONCLUSTERED INDEX idx_{Regex.Match(tableName, @"(?<=\[).*?(?=\])").Value}_{indexName} ON {tableName} ");
+            IndexDefinition(stmt, columns);
         }
 
         protected void IndexDefinition(StringBuilder sqlcmd, string[] columns)
@@ -221,7 +221,7 @@ namespace RmSolution.Data
                                     }
                                 }
                                 foreach (var ai in attrs)
-                                    if (ai.Type.IsValueType && !ai.Type.AssemblyQualifiedName.Contains("System.Nullable"))
+                                    if (ai.Type.IsValueType || !ai.Type.AssemblyQualifiedName.Contains("System.Nullable"))
                                     {
                                         stmt.Append(comma).Append(ai.Field);
                                         sqlvals.Append(comma).Append(InitGetValue(ai.Type, ai.DefaultValue));

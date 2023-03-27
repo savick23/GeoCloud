@@ -19,9 +19,11 @@ namespace RmSolution.Runtime
         public string Id { get; set; }
         [Column("Группа", "group nvarchar(32) NULL")]
         public string? Parent { get; set; }
+        [Column("Тип", "type nvarchar(32) NOT NULL", Default = "string")]
+        public string Type { get; set; }
         [Column("Значение", "value nvarchar(4000) NULL")]
         public string? Value { get; set; }
-        [Column("Значение", "modified datetime NOT NULL")]
+        [Column("Изменено", "modified datetime NOT NULL")]
         public DateTime Modified { get; set; }
     }
 

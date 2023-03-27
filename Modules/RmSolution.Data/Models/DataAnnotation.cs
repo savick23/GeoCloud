@@ -62,6 +62,7 @@ namespace RmSolution.DataAnnotations
         public string? Type { get; set; }
         public bool IsKey { get; set; }
         public bool Visible { get; set; } = true;
+        public string? Default { get; set; }
 
         public ColumnAttribute(string name, string? definition = null)
         {
