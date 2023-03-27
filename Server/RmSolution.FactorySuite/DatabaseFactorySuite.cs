@@ -15,7 +15,6 @@ namespace RmSolution.Data
     using Dapper;
     using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
-    using RmSolution.Runtime.Metadata;
     #endregion Using
 
     public abstract partial class DatabaseFactorySuite : IDatabase, IDatabaseFactory, IDisposable

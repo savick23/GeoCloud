@@ -17,7 +17,7 @@ namespace RmSolution.Runtime
     {
         [Column("Идентификатор", "id nvarchar(64) PRIMARY KEY", IsKey = true)]
         public string Id { get; set; }
-        [Column("Группа", "group nvarchar(32) NULL")]
+        [Column("Группа", "parent nvarchar(32) NULL")]
         public string? Parent { get; set; }
         [Column("Тип", "type nvarchar(32) NOT NULL", Default = "string")]
         public string Type { get; set; }

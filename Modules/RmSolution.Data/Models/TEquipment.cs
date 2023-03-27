@@ -8,7 +8,7 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
-    [Table("Типы оборудования", "equiptypes", Ordinal = 101)]
+    [Table("Типы оборудования", "equiptypes", Ordinal = 102)]
     public class TEquipmentType : TCatalogRow
     {
     }

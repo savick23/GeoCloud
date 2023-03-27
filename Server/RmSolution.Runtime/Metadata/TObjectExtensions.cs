@@ -3,7 +3,7 @@
 // Описание: TObjectExtensions –
 //--------------------------------------------------------------------------------------------------
 #pragma warning disable CS8619
-namespace RmSolution.Runtime.Metadata
+namespace RmSolution.Runtime
 {
     using System;
     using System.Linq;
