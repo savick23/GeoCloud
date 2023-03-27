@@ -10,7 +10,13 @@
 }
 else
 {
-    <RadzenDataGrid TItem="object" Data="@_data" AllowColumnResize="true">
+    <RadzenMenu Click="OnMenuCick">
+        <RadzenMenuItem Text="Новый" Icon="add" Value=CMD_NEW />
+        <RadzenMenuItem Text="Изменить" Icon="edit" Value=CMD_EDIT />
+        <RadzenMenuItem Text="Удалить" Icon="delete" Value=CMD_DELETE />
+    </RadzenMenu>
+    <RadzenDataGrid @ref="_grid" TItem="object" Data="@_data" Density="Density.Compact" AllowColumnResize="true" EditMode="DataGridEditMode.Single" SelectionMode="DataGridSelectionMode.Single"
+                 RowCreate="@OnInsertRow" RowUpdate="@OnUpdateRow" @bind-Value=@_selectedRows>
         <Columns>
             @foreach (var column in _info.Attributes.Where(a => a.Visible))
             {
@@ -28,6 +34,8 @@ else
     [Parameter]
     public string? Name { get; set; }
 
+    RadzenDataGrid<object> _grid;
+    IList<object>? _selectedRows;
     TObjectDto? _info;
     IEnumerable<object>? _data;
 
@@ -36,5 +44,35 @@ else
         _info = await Client.GetObjectAsync(Name);
         _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
         StateHasChanged();
+    }
+
+    async void OnMenuCick(MenuItemEventArgs args)
+    {
+        switch ((string)args.Value)
+        {
+            case CMD_NEW:
+                await _grid.InsertRow(Activator.CreateInstance(_selectedRows?.FirstOrDefault().GetType()));
+                break;
+            case CMD_EDIT:
+                _grid.EditRow(_selectedRows?.FirstOrDefault());
+                break;
+            case CMD_DELETE:
+                break;
+        }
+    }
+
+    void OnInsertRow(object? item)
+    {
+
+    }
+
+    void OnUpdateRow(object? item)
+    {
+        
+    }
+
+    void OnDeleteRow(object? item)
+    {
+
     }
 }

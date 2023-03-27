@@ -11,6 +11,14 @@ namespace RmSolution.Web
 
     public abstract class RmPageBase : ComponentBase
     {
+        #region Constants
+
+        public const string CMD_NEW = "NEW";
+        public const string CMD_EDIT = "EDIT";
+        public const string CMD_DELETE = "DELETE";
+
+        #endregion Constants
+
         #region Properties
 
         [Inject]
