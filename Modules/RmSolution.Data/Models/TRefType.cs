@@ -11,17 +11,17 @@ namespace RmSolution.Data
     /// <summary> Ссылочный тип данных, 64-разрядный.</summary>
     public readonly struct TRefType
     {
-        private readonly long? _value;
+        public readonly long? Value;
 
         public TRefType(long? value)
         {
-            _value = value;
+            Value = value;
         }
 
-        public static implicit operator long(TRefType v) => v._value ?? 0;
-        public static implicit operator long?(TRefType v) => v._value;
+        public static implicit operator long(TRefType v) => v.Value ?? 0;
+        public static implicit operator long?(TRefType v) => v.Value;
         public static implicit operator TRefType(long? v) => new(v);
 
-        public override string ToString() => "#" + _value.ToString();
+        public override string ToString() => "#" + Value.ToString();
     }
 }

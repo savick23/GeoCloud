@@ -9,10 +9,13 @@ namespace RmSolution.Data
     using System;
     using System.Data;
     using System.Data.Common;
+    using System.Globalization;
+    using System.Text;
     using System.Text.RegularExpressions;
     using Dapper;
     using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
+    using RmSolution.Runtime.Metadata;
     #endregion Using
 
     public abstract partial class DatabaseFactorySuite : IDatabase, IDatabaseFactory, IDisposable
@@ -124,6 +127,45 @@ namespace RmSolution.Data
 
         public virtual T Scalar<T>(string statement, params object[] args) =>
             Scalar(statement, args) is T res ? res : default;
+
+        public virtual void Update(object item)
+        {
+            ((TEquipment)item).Name += "+";
+            var tab = item.GetDefinition();
+            if (tab != null)
+            {
+                var stmt = new StringBuilder("UPDATE " + tab.Source + " SET ");
+                string comma = string.Empty;
+                foreach (var col in item.GetAttributes().Where(a => !a.Value.IsKey)) {
+                    stmt.Append(comma).Append('"').Append(col.Key.ToLower()).Append('"').Append('=').Append(GetSqlValue(item, col.Key));
+                    comma = ",";
+                }
+                var key = item.GetAttributes().FirstOrDefault(a => a.Value.IsKey);
+                stmt.Append(" WHERE \"").Append(key.Key.ToLower()).Append('"').Append('=').Append(GetSqlValue(item, key.Key));
+
+                Exec(stmt.ToString());
+            }
+        }
+
+#pragma warning disable CS8603
+        static string GetSqlValue(object obj, string propertyName)
+        {
+            var val = obj.GetType().GetProperty(propertyName)?.GetValue(obj);
+            if (val != null) return "NULL";
+            return val switch
+            {
+                string => string.Concat("'", val.ToString(), "'"),
+                bool => (bool)val ? "1" : "0",
+                DateTime => string.Concat("'", ((DateTime)val).ToString("yyyy-MM-ddTHH:mm:ss.fff"), "'"),
+                TRefType => ((TRefType)val).Value.ToString() ?? "NULL",
+                float => ((float)val).ToString(CultureInfo.InvariantCulture),
+                double => ((double)val).ToString(CultureInfo.InvariantCulture),
+                decimal => ((decimal)val).ToString(CultureInfo.InvariantCulture),
+                byte[] => string.Concat("0x", string.Concat(((byte[])val).Select(n => n.ToString("x2")))),
+                _ => val.ToString()
+            };
+        }
+#pragma warning restore CS8603
 
         #endregion IDatabase implementation
 
