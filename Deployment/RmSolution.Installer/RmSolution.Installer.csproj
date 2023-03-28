@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extra\Shell.cs" />
     <Compile Include="Extra\CabReader.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

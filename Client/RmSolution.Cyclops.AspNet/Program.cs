@@ -5,13 +5,16 @@
 using RmSolution.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped(sp => new RmHttpClient
-{
-});
+builder.Host.UseWindowsService()
+    .ConfigureServices(srv =>
+    {
+        srv.AddRazorPages();
+        srv.AddServerSideBlazor();
+        srv.AddScoped(sp => new RmHttpClient
+        {
+        });
+        srv.AddHostedService<RmInformationService>();
+    });
 
 var app = builder.Build();
 
