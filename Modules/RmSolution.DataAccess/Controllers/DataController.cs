@@ -8,7 +8,6 @@ namespace RmSolution.DataAccess
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Data;
     using RmSolution.Runtime;
-    using System.Xml.Linq;
     #endregion Using
 
     public class DataController : SmartController
@@ -70,5 +69,13 @@ namespace RmSolution.DataAccess
             }
             throw new Exception("Тип " + name + " не найден!");
         });
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Update() => await UseDatabase((db, item) =>
+        {
+            if (item != null) db.Update(item);
+            return new JsonResult("{\"result\":\"ok\"}");
+        });
+
     }
 }

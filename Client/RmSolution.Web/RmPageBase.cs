@@ -17,6 +17,8 @@ namespace RmSolution.Web
         public const string CMD_COPY = "COPY";
         public const string CMD_EDIT = "EDIT";
         public const string CMD_DELETE = "DELETE";
+        public const string CMD_APPLY = "APPLY";
+        public const string CMD_CANCEL = "CANCEL";
 
         #endregion Constants
 
@@ -30,7 +32,30 @@ namespace RmSolution.Web
 
         #endregion Properties
 
+        #region Data operations
+
         protected string GetValue(object item, string name) =>
           item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? NullValue;
+
+        protected string GetValueEdit(object item, string name) =>
+          item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? string.Empty;
+
+        protected void OnValueChanged(object data, string name, object value)
+        {
+            data.GetType().GetProperty(name)?.SetValue(data, value);
+        }
+
+        protected void Cancel(object dataRow, object? originValues)
+        {
+            if (originValues != null && dataRow.GetType() == originValues.GetType())
+                dataRow.GetType().GetProperties().ToList().ForEach(p => p.SetValue(dataRow, p.GetValue(originValues)));
+        }
+
+        #endregion Data operations
+    }
+
+    public enum ActionState
+    {
+        Select, Edit, New
     }
 }

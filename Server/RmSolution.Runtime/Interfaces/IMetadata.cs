@@ -10,5 +10,8 @@ namespace RmSolution.Runtime
 
         /// <summary> Возвращает данные объекта конфигурации.</summary>
         IEnumerable<object>? GetData(string id);
+
+        /// <summary> Обновляет данные объекта конфигурации.</summary>
+        object? UpdateData(object? item);
     }
 }

@@ -24,7 +24,7 @@ namespace RmSolution.Web
             PropertyNameCaseInsensitive = true,
             Converters =
                 {
-                    new RefTypeConverter(),
+                    new TRefTypeConverter(),
                 }
         };
 
@@ -60,43 +60,33 @@ namespace RmSolution.Web
                 {
                     var type = Type.GetType(mdtype.Type);
                     if (type != null)
-                        return await this.GetFromJsonAsync(string.Concat(DataServer, "data/" + mdtype.Source), Array.CreateInstance(type, 0).GetType(), _jsonOptions);
+                        return await this.GetFromJsonAsync(string.Concat(DataServer, "data/", mdtype.Source), Array.CreateInstance(type, 0).GetType(), _jsonOptions);
                 }
             }
             throw new Exception("Не найден объект типа " + typeName);
         }
 
-        #region Nested types, JsonConverters
+        public async Task<Type> GetObjectTypeAsync(string? typeName) =>
+            Type.GetType((await GetObjectAsync(typeName)).Type);
 
-        class RefTypeConverter : JsonConverter<TRefType>
+        public async Task UpdateAsync(object? item)
         {
-            public override TRefType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            if (item != null)
             {
-                string view = null;
-                long id = 0;
-                while (reader.Read())
-                {
-                    switch(reader.TokenType)
-                    {
-                        case JsonTokenType.StartObject:
-                            break;
-                        case JsonTokenType.Number:
-                            id = reader.GetInt64();
-                            break;
-                        case JsonTokenType.String:
-                            view = reader.GetString();
-                            break;
-                        case JsonTokenType.EndObject:
-                            return new TRefType(id, view);
-                    }
-                }
-                return TRefType.Empty;
+                await PostAsync(string.Concat(DataServer, "update"), JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
             }
-
-            public override void Write(Utf8JsonWriter writer, TRefType value, JsonSerializerOptions options) =>
-                throw new NotImplementedException();
         }
 
-        #endregion Nested types, JsonConverters
+        class XItemEnvelop
+        {
+            public string Type { get; }
+            public object? Item { get; }
+
+            public XItemEnvelop(object? item)
+            {
+                Type = item.GetType().AssemblyQualifiedName;
+                Item = item;
+            }
+        }
     }
 }

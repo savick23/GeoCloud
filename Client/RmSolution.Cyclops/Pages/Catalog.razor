@@ -11,20 +11,27 @@
 else
 {
     <RadzenMenu Click="OnMenuCick">
-        <RadzenMenuItem Text="Новый" Icon="add" Value=CMD_NEW />
-        <RadzenMenuItem Text="Копировать" Icon="content_copy" Value=CMD_COPY />
-        <RadzenMenuItem Text="Изменить" Icon="edit" Value=CMD_EDIT />
-        <RadzenMenuItem Text="Удалить" Icon="delete" Value=CMD_DELETE />
+        <RadzenMenuItem Text="Новый" Icon="add" Value=CMD_NEW Visible=@(_state == ActionState.Select) />
+        <RadzenMenuItem Text="Копировать" Icon="content_copy" Value=CMD_COPY Visible=@(_state == ActionState.Select) />
+        <RadzenMenuItem Text="Изменить" Icon="edit" Value=CMD_EDIT Visible=@(_state == ActionState.Select) />
+        <RadzenMenuItem Text="Удалить" Icon="delete" Value=CMD_DELETE Visible=@(_state == ActionState.Select) />
+        <RadzenMenuItem Text="Применить" Icon="check" Value=CMD_APPLY Visible=@(_state > ActionState.Select) />
+        <RadzenMenuItem Text="Отменить" Icon="close" Value=CMD_CANCEL Visible=@(_state > ActionState.Select) />
     </RadzenMenu>
-    <RadzenDataGrid @ref="_grid" TItem="object" Data="@_data" Density="Density.Compact" AllowColumnResize="true" EditMode="DataGridEditMode.Single" SelectionMode="DataGridSelectionMode.Single"
+    <RadzenDataGrid @ref="_details" TItem="object" Data="@_data" Density="Density.Compact" AllowColumnResize="true"
+                EditMode="DataGridEditMode.Single"
+                SelectionMode="DataGridSelectionMode.Single"
                 RowCreate="@OnInsertRow" RowUpdate="@OnUpdateRow" @bind-Value=@_selectedRows>
         <Columns>
-            @foreach (var column in _info.Attributes.Where(a => a.Visible))
+            @foreach (var col in _info.Attributes.Where(a => a.Visible))
             {
-                <RadzenDataGridColumn TItem="object" Title="@column.Name" Property="@column.Field">
-                    <Template>
-                        @GetValue(@context, column.Field)
+                <RadzenDataGridColumn TItem="object" Title="@col.Name" Property="@col.Field">
+                    <Template Context="row">
+                        @GetValue(row, col.Field)
                     </Template>
+                    <EditTemplate Context="row">
+                        <RadzenTextBox Value=@(GetValueEdit(row, col.Field)) ValueChanged=@(e => OnValueChanged(row, col.Field, e)) />
+                    </EditTemplate>
                 </RadzenDataGridColumn>
             }
         </Columns>
@@ -35,10 +42,12 @@ else
     [Parameter]
     public string? Name { get; set; }
 
-    RadzenDataGrid<object> _grid;
+    ActionState _state;
+    RadzenDataGrid<object> _details;
     IList<object>? _selectedRows;
     TObjectDto? _info;
     IEnumerable<object>? _data;
+    object? _origin;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -49,31 +58,42 @@ else
 
     async void OnMenuCick(MenuItemEventArgs args)
     {
+        var item = _selectedRows?.FirstOrDefault();
         switch ((string)args.Value)
         {
             case CMD_NEW:
-                await _grid.InsertRow(Activator.CreateInstance(_selectedRows?.FirstOrDefault().GetType()));
+                _state = ActionState.New;
+                await _details.InsertRow(Activator.CreateInstance(await Client.GetObjectTypeAsync(Name)));
+                break;
+            case CMD_COPY:
                 break;
             case CMD_EDIT:
-                _grid.EditRow(_selectedRows?.FirstOrDefault());
+                _state = ActionState.Edit;
+                _origin = ((ICloneable?)item)?.Clone();
+                await _details.EditRow(item);
                 break;
             case CMD_DELETE:
+                break;
+            case CMD_APPLY:
+                _state = ActionState.Select;
+                await _details.UpdateRow(item);
+                break;
+            case CMD_CANCEL:
+                _state = ActionState.Select;
+                _details.CancelEditRow(item);
+                Cancel(item, _origin);
                 break;
         }
     }
 
     void OnInsertRow(object? item)
     {
-
     }
 
-    void OnUpdateRow(object? item)
-    {
-
-    }
+    async Task OnUpdateRow(object? item) =>
+        await Client.UpdateAsync(item);
 
     void OnDeleteRow(object? item)
     {
-
     }
 }

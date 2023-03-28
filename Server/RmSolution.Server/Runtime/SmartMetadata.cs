@@ -167,6 +167,12 @@ namespace RmSolution.Server
             return null;
         }
 
+        public object? UpdateData(object? item)
+        {
+            if (item != null) _db.Update(item);
+            return item;
+        }
+
         #endregion IMetadata implementation
     }
 }

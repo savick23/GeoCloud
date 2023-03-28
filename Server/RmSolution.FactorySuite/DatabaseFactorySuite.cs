@@ -132,7 +132,6 @@ namespace RmSolution.Data
 
         public virtual void Update(object item)
         {
-            ((TEquipment)item).Name += "+";
             var tab = item.GetDefinition();
             if (tab != null)
             {
@@ -159,7 +158,7 @@ namespace RmSolution.Data
                 string => string.Concat("'", value.ToString(), "'"),
                 bool => (bool)value ? "1" : "0",
                 DateTime => string.Concat("'", ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss.fff"), "'"),
-                TRefType => ((TRefType)value).Value.ToString() ?? "NULL",
+                TRefType => ((TRefType)value).Value?.ToString() ?? "NULL",
                 float => ((float)value).ToString(CultureInfo.InvariantCulture),
                 double => ((double)value).ToString(CultureInfo.InvariantCulture),
                 decimal => ((decimal)value).ToString(CultureInfo.InvariantCulture),

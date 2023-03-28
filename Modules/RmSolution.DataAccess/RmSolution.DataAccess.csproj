@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Modules\RmSolution.Data\RmSolution.Data.csproj" />
     <ProjectReference Include="..\..\Server\RmSolution.Runtime\RmSolution.Runtime.csproj" />
   </ItemGroup>
