@@ -8,6 +8,7 @@ namespace RmSolution.Deployment
     using System;
     using System.IO;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows.Forms;
     using System.Xml.Linq;
     #endregion Using
@@ -24,10 +25,18 @@ namespace RmSolution.Deployment
             Close();
         }
 
+        void Message(string text)
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => Message(text)));
+            else
+                txtResult.Text = text;
+        }
+
         void cmdNext_Click(object sender, EventArgs e)
         {
             if (tabControls.SelectedIndex == 2)
-                Setup();
+                Install(Message).ConfigureAwait(false);
 
             if (tabControls.SelectedIndex < tabControls.TabCount - 1)
                 tabControls.SelectedIndex++;
@@ -66,7 +75,7 @@ namespace RmSolution.Deployment
                 txtWSpath.Text = dlg.SelectedPath;
         }
 
-        void Setup()
+        async Task Install(Action<string> logger) => await Task.Run(() =>
         {
             using (var ms = Assembly.GetExecutingAssembly().GetManifestResourceStream("RmSolution.Deployment.setup.cab"))
             using (var reader = new CabReader(ms))
@@ -74,22 +83,53 @@ namespace RmSolution.Deployment
                 foreach (var app in XDocument.Parse(reader.ReadAllText("[Content_Types].xml")).Root.Element("applications").Elements())
                 {
                     var appid = app.Attribute("id").Value;
-                    int start = appid.Length + 1;
-                    var path = app.Attribute("path").Value;
-                    foreach(var file in reader.GetFiles(appid))
+                    if (appid == chkAS.Tag.ToString() && chkAS.Checked || appid == chkWIS.Tag.ToString() && chkWIS.Checked)
                     {
-                        var filename = Path.Combine(path, file.Substring(start));
-                        WriteFile(filename, reader.ReadAllBytes(file));
+                        int start = appid.Length + 1;
+                        var path = app.Attribute("path").Value;
+                        foreach (var file in reader.GetFiles(appid))
+                        {
+                            var filename = Path.Combine(path, file.Substring(start));
+                            logger.Invoke(filename);
+                            WriteFile(filename, reader.ReadAllBytes(file));
+                        }
+                        if (!path.EndsWith("\\")) path += "\\";
+                        var srvc = app.Element("service");
+                        if (srvc != null)
+                        {
+                            var srvname = srvc.Attribute("id").Value;
+                            var cmd = string.Concat("create ",
+                                srvname, " start=",
+                                srvc.Attribute("start").Value, " error=",
+                                srvc.Attribute("error").Value, " binpath=\"",
+                                srvc.Attribute("binpath").Value.Replace("%TARGET%", path), "\" obj=",
+                                srvc.Attribute("obj").Value, " displayname=\"",
+                                srvc.Attribute("displayname").Value, "\"");
+
+                            Shell.Run("sc", cmd);
+
+                            if (srvc.Attribute("description") != null)
+                            {
+                                cmd = string.Concat("description ", srvname, " \"", srvc.Attribute("description").Value, "\"");
+                                Shell.Run("sc", cmd);
+                            }
+                            if (srvc.Attribute("depend") != null)
+                            {
+                                cmd = string.Concat("config ", srvname, " depend= ", srvc.Attribute("depend").Value);
+                                Shell.Run("sc", cmd);
+                            }
+                        }
                     }
                 }
+                logger.Invoke("Успешно!");
             }
-        }
+        });
 
         void WriteFile(string filename, byte[] content)
         {
             string path = string.Empty;
             string comma = string.Empty;
-            foreach(var part in Path.GetDirectoryName(filename).Split(new char[] { '\\' }))
+            foreach (var part in Path.GetDirectoryName(filename).Split(new char[] { '\\' }))
             {
                 path += comma + part;
                 if (!Directory.Exists(path)) Directory.CreateDirectory(path);

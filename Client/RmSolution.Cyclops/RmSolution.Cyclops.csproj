@@ -5,6 +5,7 @@
     <PlatformTarget>anycpu</PlatformTarget>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <UserSecretsId>RmCyclops-5cc01d9b-589e-498e-8904-2adc4957dd7f</UserSecretsId>
+    <AssemblyName>rmgeowis</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

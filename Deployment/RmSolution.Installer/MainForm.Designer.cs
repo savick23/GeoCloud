@@ -30,9 +30,11 @@
         {
             this.tabControls = new System.Windows.Forms.TabControl();
             this.tabAppSelect = new System.Windows.Forms.TabPage();
+            this.optUninstall = new System.Windows.Forms.RadioButton();
+            this.optInstall = new System.Windows.Forms.RadioButton();
             this.grpApplications = new System.Windows.Forms.GroupBox();
-            this.rmWebClient = new System.Windows.Forms.CheckBox();
-            this.chkAppServer = new System.Windows.Forms.CheckBox();
+            this.chkWIS = new System.Windows.Forms.CheckBox();
+            this.chkAS = new System.Windows.Forms.CheckBox();
             this.tabPaths = new System.Windows.Forms.TabPage();
             this.cmdWSpath = new System.Windows.Forms.Button();
             this.cmdASpath = new System.Windows.Forms.Button();
@@ -43,6 +45,7 @@
             this.tabRunning = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabComplete = new System.Windows.Forms.TabPage();
+            this.txtResult = new System.Windows.Forms.TextBox();
             this.pnlControls = new System.Windows.Forms.Panel();
             this.cmdClose = new System.Windows.Forms.Button();
             this.cmdNext = new System.Windows.Forms.Button();
@@ -53,6 +56,7 @@
             this.grpApplications.SuspendLayout();
             this.tabPaths.SuspendLayout();
             this.tabRunning.SuspendLayout();
+            this.tabComplete.SuspendLayout();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,6 +75,8 @@
             // 
             // tabAppSelect
             // 
+            this.tabAppSelect.Controls.Add(this.optUninstall);
+            this.tabAppSelect.Controls.Add(this.optInstall);
             this.tabAppSelect.Controls.Add(this.grpApplications);
             this.tabAppSelect.Location = new System.Drawing.Point(4, 22);
             this.tabAppSelect.Name = "tabAppSelect";
@@ -79,10 +85,32 @@
             this.tabAppSelect.TabIndex = 0;
             this.tabAppSelect.Text = "1";
             // 
+            // optUninstall
+            // 
+            this.optUninstall.AutoSize = true;
+            this.optUninstall.Location = new System.Drawing.Point(15, 109);
+            this.optUninstall.Name = "optUninstall";
+            this.optUninstall.Size = new System.Drawing.Size(68, 17);
+            this.optUninstall.TabIndex = 3;
+            this.optUninstall.Text = "Удалить";
+            this.optUninstall.UseVisualStyleBackColor = true;
+            // 
+            // optInstall
+            // 
+            this.optInstall.AutoSize = true;
+            this.optInstall.Checked = true;
+            this.optInstall.Location = new System.Drawing.Point(15, 86);
+            this.optInstall.Name = "optInstall";
+            this.optInstall.Size = new System.Drawing.Size(85, 17);
+            this.optInstall.TabIndex = 2;
+            this.optInstall.TabStop = true;
+            this.optInstall.Text = "Установить";
+            this.optInstall.UseVisualStyleBackColor = true;
+            // 
             // grpApplications
             // 
-            this.grpApplications.Controls.Add(this.rmWebClient);
-            this.grpApplications.Controls.Add(this.chkAppServer);
+            this.grpApplications.Controls.Add(this.chkWIS);
+            this.grpApplications.Controls.Add(this.chkAS);
             this.grpApplications.Location = new System.Drawing.Point(8, 6);
             this.grpApplications.Name = "grpApplications";
             this.grpApplications.Size = new System.Drawing.Size(281, 74);
@@ -90,29 +118,31 @@
             this.grpApplications.TabStop = false;
             this.grpApplications.Text = "Выберите приложения";
             // 
-            // rmWebClient
+            // chkWIS
             // 
-            this.rmWebClient.AutoSize = true;
-            this.rmWebClient.Checked = true;
-            this.rmWebClient.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.rmWebClient.Location = new System.Drawing.Point(7, 44);
-            this.rmWebClient.Name = "rmWebClient";
-            this.rmWebClient.Size = new System.Drawing.Size(254, 17);
-            this.rmWebClient.TabIndex = 1;
-            this.rmWebClient.Text = "Веб-сервер РМ Гео, клиентское приложение";
-            this.rmWebClient.UseVisualStyleBackColor = true;
+            this.chkWIS.AutoSize = true;
+            this.chkWIS.Checked = true;
+            this.chkWIS.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkWIS.Location = new System.Drawing.Point(7, 44);
+            this.chkWIS.Name = "chkWIS";
+            this.chkWIS.Size = new System.Drawing.Size(254, 17);
+            this.chkWIS.TabIndex = 1;
+            this.chkWIS.Tag = "WIS";
+            this.chkWIS.Text = "Веб-сервер РМ Гео, клиентское приложение";
+            this.chkWIS.UseVisualStyleBackColor = true;
             // 
-            // chkAppServer
+            // chkAS
             // 
-            this.chkAppServer.AutoSize = true;
-            this.chkAppServer.Checked = true;
-            this.chkAppServer.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAppServer.Location = new System.Drawing.Point(7, 20);
-            this.chkAppServer.Name = "chkAppServer";
-            this.chkAppServer.Size = new System.Drawing.Size(191, 17);
-            this.chkAppServer.TabIndex = 0;
-            this.chkAppServer.Text = "Сервер приложений РМ Солюшн";
-            this.chkAppServer.UseVisualStyleBackColor = true;
+            this.chkAS.AutoSize = true;
+            this.chkAS.Checked = true;
+            this.chkAS.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAS.Location = new System.Drawing.Point(7, 20);
+            this.chkAS.Name = "chkAS";
+            this.chkAS.Size = new System.Drawing.Size(191, 17);
+            this.chkAS.TabIndex = 0;
+            this.chkAS.Tag = "AS";
+            this.chkAS.Text = "Сервер приложений РМ Солюшн";
+            this.chkAS.UseVisualStyleBackColor = true;
             // 
             // tabPaths
             // 
@@ -203,12 +233,20 @@
             // 
             // tabComplete
             // 
+            this.tabComplete.Controls.Add(this.txtResult);
             this.tabComplete.Location = new System.Drawing.Point(4, 22);
             this.tabComplete.Name = "tabComplete";
             this.tabComplete.Size = new System.Drawing.Size(616, 415);
             this.tabComplete.TabIndex = 2;
             this.tabComplete.Text = "4";
             this.tabComplete.UseVisualStyleBackColor = true;
+            // 
+            // txtResult
+            // 
+            this.txtResult.Location = new System.Drawing.Point(22, 29);
+            this.txtResult.Name = "txtResult";
+            this.txtResult.Size = new System.Drawing.Size(566, 20);
+            this.txtResult.TabIndex = 0;
             // 
             // pnlControls
             // 
@@ -279,11 +317,14 @@
             this.Text = "Установка сервера приложений РМ Солюшн";
             this.tabControls.ResumeLayout(false);
             this.tabAppSelect.ResumeLayout(false);
+            this.tabAppSelect.PerformLayout();
             this.grpApplications.ResumeLayout(false);
             this.grpApplications.PerformLayout();
             this.tabPaths.ResumeLayout(false);
             this.tabPaths.PerformLayout();
             this.tabRunning.ResumeLayout(false);
+            this.tabComplete.ResumeLayout(false);
+            this.tabComplete.PerformLayout();
             this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -294,8 +335,8 @@
         private System.Windows.Forms.TabControl tabControls;
         private System.Windows.Forms.TabPage tabAppSelect;
         private System.Windows.Forms.GroupBox grpApplications;
-        private System.Windows.Forms.CheckBox rmWebClient;
-        private System.Windows.Forms.CheckBox chkAppServer;
+        private System.Windows.Forms.CheckBox chkWIS;
+        private System.Windows.Forms.CheckBox chkAS;
         private System.Windows.Forms.TabPage tabPaths;
         private System.Windows.Forms.Panel pnlControls;
         private System.Windows.Forms.Button cmdClose;
@@ -311,6 +352,9 @@
         private System.Windows.Forms.TabPage tabComplete;
         private System.Windows.Forms.TabPage tabRunning;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox txtResult;
+        private System.Windows.Forms.RadioButton optUninstall;
+        private System.Windows.Forms.RadioButton optInstall;
     }
 }
 
