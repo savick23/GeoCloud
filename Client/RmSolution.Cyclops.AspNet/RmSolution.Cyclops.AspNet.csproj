@@ -3,6 +3,7 @@
 
   <PropertyGroup>
     <RootNamespace>RmSolution.Cyclops</RootNamespace>
+    <AssemblyName>rmgeowis</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

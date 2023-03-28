@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RmSolution filename="D:\Projects\RMGeo\Deployment\RmSolution.Installer\setup.cab">
+  <applications>
+    <aplication id="AS" name="Сервер приложений РМ Солюшн" publish="D:\Projects\RMGeo\Bin\publish" target="C:\Program Files\RmSolution\GEO\Server">
+      <service id="rmgeosrv" start="auto" error="critical" binpath="%TARGET%smgeosrv.exe" obj="LOCALSYSTEM" displayname="RmSolution GEO Application Server 3.1" description="RmSolution GEO Application Server 3.1" />
+    </aplication>
+    <aplication id="WIS" name="Веб-сервер РМ Гео" publish="D:\Projects\RMGeo\Client\RmSolution.Cyclops.AspNet\bin\publish" target="C:\Program Files\RmSolution\GEO\Cyclops">
+      <service id="rmgeowis" start="auto" error="critical" binpath="%TARGET%rmgeowis.exe" obj="LOCALSYSTEM" displayname="RmSolution GEO Information Server 3.1" description="RmSolution GEO Information Server 3.1" depend="rmgeosrv" />
+    </aplication>
+  </applications>
+</RmSolution>
