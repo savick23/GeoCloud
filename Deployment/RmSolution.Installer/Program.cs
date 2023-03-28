@@ -14,7 +14,7 @@ namespace RmSolution.Deployment
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 #if DEBUG
-            new RmPackage().CreateCabinetFile();
+         //   new RmPackage().CreateCabinetFile();
 #endif
             Application.Run(new RmSolution());
         }

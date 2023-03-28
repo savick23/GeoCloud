@@ -34,34 +34,34 @@
             this.rmWebClient = new System.Windows.Forms.CheckBox();
             this.chkAppServer = new System.Windows.Forms.CheckBox();
             this.tabPaths = new System.Windows.Forms.TabPage();
+            this.cmdWSpath = new System.Windows.Forms.Button();
+            this.cmdASpath = new System.Windows.Forms.Button();
+            this.txtWSpath = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtASpath = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tabRunning = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tabComplete = new System.Windows.Forms.TabPage();
             this.pnlControls = new System.Windows.Forms.Panel();
             this.cmdClose = new System.Windows.Forms.Button();
             this.cmdNext = new System.Windows.Forms.Button();
             this.cmdPrev = new System.Windows.Forms.Button();
             this.pnlHideTabs = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtASpath = new System.Windows.Forms.TextBox();
-            this.txtWSpath = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.cmdASpath = new System.Windows.Forms.Button();
-            this.cmdWSpath = new System.Windows.Forms.Button();
-            this.tabComplete = new System.Windows.Forms.TabPage();
-            this.tabRunning = new System.Windows.Forms.TabPage();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabControls.SuspendLayout();
             this.tabAppSelect.SuspendLayout();
             this.grpApplications.SuspendLayout();
             this.tabPaths.SuspendLayout();
-            this.pnlControls.SuspendLayout();
             this.tabRunning.SuspendLayout();
+            this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControls
             // 
             this.tabControls.Controls.Add(this.tabAppSelect);
             this.tabControls.Controls.Add(this.tabPaths);
-            this.tabControls.Controls.Add(this.tabComplete);
             this.tabControls.Controls.Add(this.tabRunning);
+            this.tabControls.Controls.Add(this.tabComplete);
             this.tabControls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControls.Location = new System.Drawing.Point(0, 0);
             this.tabControls.Name = "tabControls";
@@ -129,6 +129,87 @@
             this.tabPaths.TabIndex = 1;
             this.tabPaths.Text = "2";
             // 
+            // cmdWSpath
+            // 
+            this.cmdWSpath.Location = new System.Drawing.Point(533, 68);
+            this.cmdWSpath.Name = "cmdWSpath";
+            this.cmdWSpath.Size = new System.Drawing.Size(75, 23);
+            this.cmdWSpath.TabIndex = 5;
+            this.cmdWSpath.Text = "Выбрать";
+            this.cmdWSpath.UseVisualStyleBackColor = true;
+            this.cmdWSpath.Click += new System.EventHandler(this.cmdWSpath_Click);
+            // 
+            // cmdASpath
+            // 
+            this.cmdASpath.Location = new System.Drawing.Point(533, 26);
+            this.cmdASpath.Name = "cmdASpath";
+            this.cmdASpath.Size = new System.Drawing.Size(75, 23);
+            this.cmdASpath.TabIndex = 4;
+            this.cmdASpath.Text = "Выбрать";
+            this.cmdASpath.UseVisualStyleBackColor = true;
+            this.cmdASpath.Click += new System.EventHandler(this.cmdASpath_Click);
+            // 
+            // txtWSpath
+            // 
+            this.txtWSpath.Location = new System.Drawing.Point(11, 68);
+            this.txtWSpath.Name = "txtWSpath";
+            this.txtWSpath.Size = new System.Drawing.Size(516, 20);
+            this.txtWSpath.TabIndex = 3;
+            this.txtWSpath.Text = "C:\\Program Files\\RmSolution\\Cyclops";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 52);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(243, 13);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Выберите путь для устанвки для Веб-сервера:";
+            // 
+            // txtASpath
+            // 
+            this.txtASpath.Location = new System.Drawing.Point(11, 29);
+            this.txtASpath.Name = "txtASpath";
+            this.txtASpath.Size = new System.Drawing.Size(516, 20);
+            this.txtASpath.TabIndex = 1;
+            this.txtASpath.Text = "C:\\Program Files\\RmSolution\\Server";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(8, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(286, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Выберите путь для устанвки для сервера приложений:";
+            // 
+            // tabRunning
+            // 
+            this.tabRunning.Controls.Add(this.groupBox1);
+            this.tabRunning.Location = new System.Drawing.Point(4, 22);
+            this.tabRunning.Name = "tabRunning";
+            this.tabRunning.Size = new System.Drawing.Size(616, 415);
+            this.tabRunning.TabIndex = 3;
+            this.tabRunning.Text = "3";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Location = new System.Drawing.Point(8, 4);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(600, 366);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Выполнение установки";
+            // 
+            // tabComplete
+            // 
+            this.tabComplete.Location = new System.Drawing.Point(4, 22);
+            this.tabComplete.Name = "tabComplete";
+            this.tabComplete.Size = new System.Drawing.Size(616, 415);
+            this.tabComplete.TabIndex = 2;
+            this.tabComplete.Text = "4";
+            this.tabComplete.UseVisualStyleBackColor = true;
+            // 
             // pnlControls
             // 
             this.pnlControls.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -182,87 +263,6 @@
             this.pnlHideTabs.Size = new System.Drawing.Size(640, 20);
             this.pnlHideTabs.TabIndex = 2;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(286, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Выберите путь для устанвки для сервера приложений:";
-            // 
-            // txtASpath
-            // 
-            this.txtASpath.Location = new System.Drawing.Point(11, 29);
-            this.txtASpath.Name = "txtASpath";
-            this.txtASpath.Size = new System.Drawing.Size(516, 20);
-            this.txtASpath.TabIndex = 1;
-            this.txtASpath.Text = "C:\\Program Files\\RmSolution\\Server";
-            // 
-            // txtWSpath
-            // 
-            this.txtWSpath.Location = new System.Drawing.Point(11, 68);
-            this.txtWSpath.Name = "txtWSpath";
-            this.txtWSpath.Size = new System.Drawing.Size(516, 20);
-            this.txtWSpath.TabIndex = 3;
-            this.txtWSpath.Text = "C:\\Program Files\\RmSolution\\Cyclops";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 52);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(243, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Выберите путь для устанвки для Веб-сервера:";
-            // 
-            // cmdASpath
-            // 
-            this.cmdASpath.Location = new System.Drawing.Point(533, 26);
-            this.cmdASpath.Name = "cmdASpath";
-            this.cmdASpath.Size = new System.Drawing.Size(75, 23);
-            this.cmdASpath.TabIndex = 4;
-            this.cmdASpath.Text = "Выбрать";
-            this.cmdASpath.UseVisualStyleBackColor = true;
-            this.cmdASpath.Click += new System.EventHandler(this.cmdASpath_Click);
-            // 
-            // cmdWSpath
-            // 
-            this.cmdWSpath.Location = new System.Drawing.Point(533, 68);
-            this.cmdWSpath.Name = "cmdWSpath";
-            this.cmdWSpath.Size = new System.Drawing.Size(75, 23);
-            this.cmdWSpath.TabIndex = 5;
-            this.cmdWSpath.Text = "Выбрать";
-            this.cmdWSpath.UseVisualStyleBackColor = true;
-            this.cmdWSpath.Click += new System.EventHandler(this.cmdWSpath_Click);
-            // 
-            // tabComplete
-            // 
-            this.tabComplete.Location = new System.Drawing.Point(4, 22);
-            this.tabComplete.Name = "tabComplete";
-            this.tabComplete.Size = new System.Drawing.Size(616, 415);
-            this.tabComplete.TabIndex = 2;
-            this.tabComplete.Text = "3";
-            this.tabComplete.UseVisualStyleBackColor = true;
-            // 
-            // tabRunning
-            // 
-            this.tabRunning.Controls.Add(this.groupBox1);
-            this.tabRunning.Location = new System.Drawing.Point(4, 22);
-            this.tabRunning.Name = "tabRunning";
-            this.tabRunning.Size = new System.Drawing.Size(616, 415);
-            this.tabRunning.TabIndex = 3;
-            this.tabRunning.Text = "4";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Location = new System.Drawing.Point(8, 4);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(600, 366);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Выполнение установки";
-            // 
             // RmSolution
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -283,8 +283,8 @@
             this.grpApplications.PerformLayout();
             this.tabPaths.ResumeLayout(false);
             this.tabPaths.PerformLayout();
-            this.pnlControls.ResumeLayout(false);
             this.tabRunning.ResumeLayout(false);
+            this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
