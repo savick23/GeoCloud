@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <RmSolution filename="D:\Projects\RMGeo\Deployment\RmSolution.Installer\setup.cab">
   <applications>
-    <aplication id="AS" name="Сервер приложений РМ Солюшн" publish="D:\Projects\RMGeo\Bin\publish" target="C:\Program Files\RmSolution\GEO\Server">
+    <aplication id="AS" name="Сервер приложений РМ Солюшн" publish="D:\Projects\RMGeo\Bin\publish" target="C:\Program Files\RmSolution\GEO\Server" config="rmgeosrv.runtimeconfig.json">
       <service id="rmgeosrv" start="auto" error="critical" binpath="%TARGET%rmgeosrv.exe" obj="LOCALSYSTEM" displayname="Сервер приложений РМ Гео 3.1" description="Эта служба обеспсечивает работу служб системы РМ Гео, в том числе сбор данных с различных устройств" />
     </aplication>
     <aplication id="WIS" name="Веб-сервер РМ Гео" publish="D:\Projects\RMGeo\Client\RmSolution.Cyclops.AspNet\bin\publish" target="C:\Program Files\RmSolution\GEO\Cyclops">

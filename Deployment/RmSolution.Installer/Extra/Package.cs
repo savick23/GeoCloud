@@ -28,12 +28,18 @@ namespace RmSolution.Deployment
                 foreach (var app in xdoc.Root.Element("applications").Elements())
                 {
                     var appid = app.Attribute("id").Value;
+                    var config = app.Attribute("config")?.Value;
                     var folder = app.Attribute("publish").Value;
                     if (!folder.EndsWith("\\")) folder += "\\";
 
-                    content.Root.Elements().First().Add(
-                        new XElement("application", new XAttribute("id", appid), new XAttribute("path", app.Attribute("target").Value),
-                        XElement.Parse(app.Element("service").ToString())));
+                    var appsect = new XElement("application",
+                        new XAttribute("id", appid),
+                        new XAttribute("path", app.Attribute("target").Value),
+                        XElement.Parse(app.Element("service").ToString()));
+
+                    if (config != null) appsect.Add(new XAttribute("config", config));
+
+                    content.Root.Elements().First().Add(appsect);
 
                     foreach (var filename in Directory.GetFiles(folder, "*", SearchOption.AllDirectories))
                     {

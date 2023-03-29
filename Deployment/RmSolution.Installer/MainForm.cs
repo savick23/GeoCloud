@@ -8,16 +8,41 @@ namespace RmSolution.Deployment
     using System;
     using System.IO;
     using System.Reflection;
+    using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using System.Windows.Forms;
     using System.Xml.Linq;
+    using static System.Windows.Forms.VisualStyles.VisualStyleElement;
     #endregion Using
 
     public partial class RmSolution : Form
     {
+        const string DATASOURCE = @"(?<=""datasource"": "".*Data Source=).*?(?=;.*"")";
+        const string USERID = @"(?<=""datasource"": "".*User ID=).*?(?=;.*"")";
+        const string PASSWORD = @"(?<=""datasource"": "".*Password=).*?(?=;.*"")";
+
         public RmSolution()
         {
             InitializeComponent();
+            using (var ms = Assembly.GetExecutingAssembly().GetManifestResourceStream("RmSolution.Deployment.setup.cab"))
+            using (var reader = new CabReader(ms))
+            {
+                foreach (var app in XDocument.Parse(reader.ReadAllText("[Content_Types].xml")).Root.Element("applications").Elements())
+                    if (app.Attribute("id").Value == "AS")
+                    {
+                        var cfgfile = "AS\\" + app.Attribute("config")?.Value;
+                        if (cfgfile != null)
+                        {
+                            var cfg= reader.ReadAllText(cfgfile);
+                            var ds = Regex.Match(cfg, DATASOURCE).Value.Split(new char[] { ',' });
+                            txtDbAddress.Text = ds[0];
+                            txtDbPort.Text = ds.Length == 1 ? "1433" : ds[1];
+                            txtDbUser.Text = Regex.Match(cfg, USERID).Value;
+                            txtDbPass.Text = Regex.Match(cfg, PASSWORD).Value;
+                        }
+                    }
+            }
         }
 
         private void cmdClose_Click(object sender, EventArgs e)
@@ -86,12 +111,15 @@ namespace RmSolution.Deployment
                     if (appid == chkAS.Tag.ToString() && chkAS.Checked || appid == chkWIS.Tag.ToString() && chkWIS.Checked)
                     {
                         int start = appid.Length + 1;
+                        var cfgfile = app.Attribute("config") == null ? null : appid + "\\" + app.Attribute("config").Value;
                         var path = app.Attribute("path").Value;
                         foreach (var file in reader.GetFiles(appid))
                         {
                             var filename = Path.Combine(path, file.Substring(start));
                             logger.Invoke(filename);
-                            WriteFile(filename, reader.ReadAllBytes(file));
+                            var content = reader.ReadAllBytes(file);
+                            if (file == cfgfile) content = WriteConfig(content);
+                            WriteFile(filename, content);
                         }
                         if (!path.EndsWith("\\")) path += "\\";
                         var srvc = app.Element("service");
@@ -124,6 +152,20 @@ namespace RmSolution.Deployment
                 logger.Invoke("Успешно!");
             }
         });
+
+        byte[] WriteConfig(byte[] content)
+        {
+            string datasource = null, username = null, password = null;
+            var t = Invoke(new Action(() =>
+            {
+                datasource = txtDbAddress.Text;
+                username = txtDbUser.Text;
+                password = txtDbPass.Text;
+            }));
+            var cfg = Encoding.UTF8.GetString(content);
+            cfg = Regex.Replace(Regex.Replace(Regex.Replace(cfg, PASSWORD, password), USERID, username), DATASOURCE, datasource);
+            return Encoding.UTF8.GetBytes(cfg);
+        }
 
         void WriteFile(string filename, byte[] content)
         {

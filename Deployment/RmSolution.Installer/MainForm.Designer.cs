@@ -44,19 +44,28 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tab_3_sets = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtDbAddress = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.tab_4_complete = new System.Windows.Forms.TabPage();
+            this.lblMessage = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.pnlControls = new System.Windows.Forms.Panel();
             this.cmdClose = new System.Windows.Forms.Button();
             this.cmdNext = new System.Windows.Forms.Button();
             this.cmdPrev = new System.Windows.Forms.Button();
             this.pnlHideTabs = new System.Windows.Forms.Panel();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.lblMessage = new System.Windows.Forms.Label();
+            this.txtDbPort = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtDbUser = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtDbPass = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.tabControls.SuspendLayout();
             this.tab_1_apps.SuspendLayout();
             this.grpApplications.SuspendLayout();
             this.tab_2_paths.SuspendLayout();
             this.tab_3_sets.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.tab_4_complete.SuspendLayout();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
@@ -229,12 +238,36 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtDbPass);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.txtDbUser);
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.txtDbPort);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.txtDbAddress);
+            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Location = new System.Drawing.Point(8, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(600, 366);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Выполнение установки";
+            this.groupBox1.Text = "Настройки базы данных (SQL-сервера):";
+            // 
+            // txtDbAddress
+            // 
+            this.txtDbAddress.Location = new System.Drawing.Point(119, 20);
+            this.txtDbAddress.Name = "txtDbAddress";
+            this.txtDbAddress.Size = new System.Drawing.Size(196, 20);
+            this.txtDbAddress.TabIndex = 1;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 23);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(105, 13);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Адрес сервера БД:";
             // 
             // tab_4_complete
             // 
@@ -246,6 +279,25 @@
             this.tab_4_complete.TabIndex = 2;
             this.tab_4_complete.Text = "4";
             this.tab_4_complete.UseVisualStyleBackColor = true;
+            // 
+            // lblMessage
+            // 
+            this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblMessage.Location = new System.Drawing.Point(9, 85);
+            this.lblMessage.Name = "lblMessage";
+            this.lblMessage.Size = new System.Drawing.Size(509, 23);
+            this.lblMessage.TabIndex = 2;
+            this.lblMessage.Text = "Прогрес";
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(8, 55);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(510, 23);
+            this.progressBar.TabIndex = 1;
             // 
             // pnlControls
             // 
@@ -300,24 +352,54 @@
             this.pnlHideTabs.Size = new System.Drawing.Size(640, 20);
             this.pnlHideTabs.TabIndex = 2;
             // 
-            // progressBar
+            // txtDbPort
             // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(8, 55);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(510, 23);
-            this.progressBar.TabIndex = 1;
+            this.txtDbPort.Location = new System.Drawing.Point(378, 20);
+            this.txtDbPort.Name = "txtDbPort";
+            this.txtDbPort.Size = new System.Drawing.Size(132, 20);
+            this.txtDbPort.TabIndex = 3;
             // 
-            // lblMessage
+            // label4
             // 
-            this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblMessage.Location = new System.Drawing.Point(9, 85);
-            this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(509, 23);
-            this.lblMessage.TabIndex = 2;
-            this.lblMessage.Text = "Прогрес";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(324, 23);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "Порт:";
+            // 
+            // txtDbUser
+            // 
+            this.txtDbUser.Location = new System.Drawing.Point(119, 46);
+            this.txtDbUser.Name = "txtDbUser";
+            this.txtDbUser.Size = new System.Drawing.Size(196, 20);
+            this.txtDbUser.TabIndex = 5;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 49);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(83, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Пользователь:";
+            // 
+            // txtDbPass
+            // 
+            this.txtDbPass.Location = new System.Drawing.Point(378, 46);
+            this.txtDbPass.Name = "txtDbPass";
+            this.txtDbPass.PasswordChar = '*';
+            this.txtDbPass.Size = new System.Drawing.Size(132, 20);
+            this.txtDbPass.TabIndex = 7;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(324, 49);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(48, 13);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "Пароль:";
             // 
             // RmSolution
             // 
@@ -341,6 +423,8 @@
             this.tab_2_paths.ResumeLayout(false);
             this.tab_2_paths.PerformLayout();
             this.tab_3_sets.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.tab_4_complete.ResumeLayout(false);
             this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -373,6 +457,14 @@
         private System.Windows.Forms.RadioButton optInstall;
         private System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.TextBox txtDbAddress;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtDbPort;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtDbPass;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtDbUser;
+        private System.Windows.Forms.Label label5;
     }
 }
 
