@@ -12,18 +12,18 @@ namespace RmSolution.Runtime
     #endregion Using
 
     /// <summary> Различные настройки конфигурации.</summary>
-    [Table("Настройки конфигурации", "config.settings", Ordinal = 1, IsSystem = true)]
+    [TObject("Настройки конфигурации", "config.settings", Ordinal = 1, IsSystem = true)]
     public class TSettings
     {
-        [Column("Идентификатор", "id nvarchar(64) PRIMARY KEY", IsKey = true)]
+        [TAttribute("Идентификатор", Length = 64, IsKey = true)]
         public string Id { get; set; }
-        [Column("Группа", "parent nvarchar(32) NULL")]
+        [TAttribute("Группа", Length = 32, Nullable = true)]
         public string? Parent { get; set; }
-        [Column("Тип", "type nvarchar(32) NOT NULL", Default = "string")]
+        [TAttribute("Тип", Length = 32, DefaultValue = "string")]
         public string Type { get; set; }
-        [Column("Значение", "value nvarchar(4000) NULL")]
+        [TAttribute("Значение", Length = 4000, Nullable = true)]
         public string? Value { get; set; }
-        [Column("Изменено", "modified datetime NOT NULL")]
+        [TAttribute("Изменено")]
         public DateTime Modified { get; set; }
     }
 

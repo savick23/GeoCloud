@@ -8,19 +8,19 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
-    [Table("Типы оборудования", "equiptypes", Ordinal = 102)]
+    [TObject("Типы оборудования", "equiptypes", Ordinal = 102)]
     public class TEquipmentType : TCatalogRow
     {
     }
 
-    [Table("Оборудование", "equipments", Ordinal = 100)]
+    [TObject("Оборудование", "equipments", Ordinal = 100)]
     public class TEquipment : TCatalogGroupTreeRow
     {
-        [Column("Тип", Type = "equiptypes")]
+        [TAttribute("Тип", Binding = "equiptypes")]
         public TRefType Type { get; set; }
-        [Column("Модель", "model nvarchar(128) NULL")]
+        [TAttribute("Модель", Length = 128, Nullable = true)]
         public string? Model { get; set; }
-        [Column("Серийный номер", "serial nvarchar(32) NULL")]
+        [TAttribute("Серийный номер", Length = 32, Nullable = true)]
         public string? Serial { get; set; }
     }
 }

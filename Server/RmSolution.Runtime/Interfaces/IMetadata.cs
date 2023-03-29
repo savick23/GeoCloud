@@ -4,6 +4,8 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
+    using RmSolution.DataAnnotations;
+
     public interface IMetadata
     {
         TObjectCollection Entities { get; }

@@ -10,6 +10,7 @@ namespace RmSolution.Data
     using System.Text.RegularExpressions;
     using Microsoft.Extensions.Logging;
     using Npgsql;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 

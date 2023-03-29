@@ -8,24 +8,24 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
-    [Table("Проекты измерений", "geoprojects", Ordinal = 110)]
+    [TObject("Проекты измерений", "geoprojects", Ordinal = 110)]
     public class TGeoProjects : TCatalogRow
     {
-        [Column("Местоположение", "location nvarchar(128) NOT NULL")]
+        [TAttribute("Местоположение", Length = 128)]
         public string Location { get; set; }
     }
 
-    [Table("Группы измерений", "geogroups", Ordinal = 112)]
+    [TObject("Группы измерений", "geogroups", Ordinal = 112)]
     public class TGeoGroups : TCatalogRow
     {
-        [Column("Проект", Type = "geoprojects")]
+        [TAttribute("Проект", Binding = "geoprojects")]
         public TRefType Project { get; set; }
     }
 
-    [Table("Точки измерения", "geopoints", Ordinal = 114)]
+    [TObject("Точки измерения", "geopoints", Ordinal = 114)]
     public class TGeoPoints : TCatalogRow
     {
-        [Column("Группа", Type = "geogroups")]
+        [TAttribute("Группа", Binding = "geogroups")]
         public TRefType Group { get; set; }
     }
 }

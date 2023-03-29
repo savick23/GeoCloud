@@ -1,13 +1,12 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: DataAnnotation –
+// Описание: Классы метаданных.
 //--------------------------------------------------------------------------------------------------
 #pragma warning disable CS8618
 namespace RmSolution.DataAnnotations
 {
     #region Using
     using System;
-    using RmSolution.DataAnnotations;
     #endregion Using
 
     public abstract class TEntityAttribute : Attribute
@@ -26,7 +25,7 @@ namespace RmSolution.DataAnnotations
         [TAttribute("Наименование", Length = 64)]
         public string Name { get; set; }
         /// <summary> Описание объекта конфигурации.</summary>
-        [TAttribute("Описание", Length = 1024)]
+        [TAttribute("Описание", Length = 1024, Nullable = true)]
         public string? Descript { get; set; }
     }
 
@@ -35,7 +34,7 @@ namespace RmSolution.DataAnnotations
     {
         public string Source { get; set; }
         public bool IsView { get; }
-        public int Ordinal { get; set; }
+        public int Ordinal { get; set; } = int.MaxValue;
         public Type Type { get; set; }
         /// <summary> Признак системного объекта.</summary>
         public bool IsSystem { get; set; }
@@ -50,7 +49,11 @@ namespace RmSolution.DataAnnotations
             }
         }
 
-        public TAttributeCollection2 Attributes { get; } = new TAttributeCollection2();
+        public TAttributeCollection Attributes { get; } = new TAttributeCollection();
+
+        public TObjectAttribute()
+        {
+        }
 
         public TObjectAttribute(string name, string source, bool isView = false)
         {
@@ -63,6 +66,10 @@ namespace RmSolution.DataAnnotations
             $"{Source}";
     }
 
+    public class TObjectCollection : List<TObjectAttribute>
+    {
+    }
+
     [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2, IsSystem = true)]
     public sealed class TAttributeAttribute : TEntityAttribute
     {
@@ -73,6 +80,8 @@ namespace RmSolution.DataAnnotations
         public int Length { get; set; }
         /// <summary> Признак первичного ключа.</summary>
         public bool IsKey { get; set; }
+        /// <summary> Признак возможности пустых значений.</summary>
+        public bool Nullable { get; set; }
         /// <summary> Встроенный тип C#.</summary>
         public Type CType { get; set; }
 
@@ -82,12 +91,18 @@ namespace RmSolution.DataAnnotations
         public string[]? PrimaryKey { get; set; }
         /// <summary> Definition </summary>
         public string[]? Indexes { get; set; }
+        /// <summary> Ссылочная таблица.</summary>
+        public string? Binding { get; set; }
         /// <summary> Наименование поля БД.</summary>
         public string Field => string.Concat('"', Code.ToLower(), '"');
         /// <summary> Значение поля по умолчанию.</summary>
         public object? DefaultValue { get; set; }
         /// <summary> Видимость поля по умолчанию в клиенте.</summary>
         public bool Visible { get; set; }
+
+        public TAttributeAttribute()
+        {
+        }
 
         public TAttributeAttribute(string name)
         {
@@ -98,7 +113,7 @@ namespace RmSolution.DataAnnotations
             $"{Code} {CType.Name}";
     }
 
-    public class TAttributeCollection2 : List<TAttributeAttribute>, ICloneable
+    public class TAttributeCollection : List<TAttributeAttribute>, ICloneable
     {
         public bool TryGetAttribute(string name, out TAttributeAttribute? attribute)
         {
@@ -108,9 +123,31 @@ namespace RmSolution.DataAnnotations
 
         public object Clone()
         {
-            var res = new TAttributeCollection2();
+            var res = new TAttributeCollection();
             res.AddRange(this);
             return res;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class PrimaryKeyAttribute : Attribute
+    {
+        public string[] Columns { get; }
+
+        public PrimaryKeyAttribute(params string[] columns)
+        {
+            Columns = columns;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class IndexAttribute : Attribute
+    {
+        public string[] Columns { get; }
+
+        public IndexAttribute(params string[] columns)
+        {
+            Columns = columns;
         }
     }
 }

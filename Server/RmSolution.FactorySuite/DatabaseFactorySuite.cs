@@ -30,14 +30,15 @@ namespace RmSolution.Data
         protected DbConnection? _conn;
 
         static Dictionary<Type, string> _typemapping = new() {
-            { typeof(TRefType), "bigint NOT NULL" },
-            { typeof(TRefType?), "bigint NULL" },
-            { typeof(Int32), "int NOT NULL" },
-            { typeof(Int32?), "int NULL" },
-            { typeof(Int64), "bigint NOT NULL" },
-            { typeof(Int64?), "bigint NULL" },
-            { typeof(DateTime), "datetime NOT NULL" },
-            { typeof(DateTime?), "datetime NULL" }
+            { typeof(TRefType), "bigint" },
+            { typeof(TRefType?), "bigint" },
+            { typeof(Int32), "int" },
+            { typeof(Int32?), "int" },
+            { typeof(Int64), "bigint" },
+            { typeof(Int64?), "bigint" },
+            { typeof(DateTime), "datetime" },
+            { typeof(DateTime?), "datetime" },
+            { typeof(string), "nvarchar({0})" }
         };
 
         /// <summary> Исключаем одновременный доступ (запрос) к данным базы данных.</summary>
@@ -93,7 +94,7 @@ namespace RmSolution.Data
 
         public virtual IEnumerable<T>? Query<T>()
         {
-            var src = ((TableAttribute?)typeof(T).GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObjectAttribute?)typeof(T).GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
             if (src != null)
                 return _conn.Query<T>("SELECT * FROM " + SchemaTableName(src));
 
@@ -102,7 +103,7 @@ namespace RmSolution.Data
 
         public IEnumerable<dynamic>? Query(Type type)
         {
-            var src = ((TableAttribute?)type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObjectAttribute?)type.GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
             if (src != null)
                 return _conn.Query("SELECT * FROM " + SchemaTableName(src));
 
@@ -114,7 +115,7 @@ namespace RmSolution.Data
 
         public async Task<IEnumerable<dynamic>?> QueryAsync(Type type)
         {
-            var src = ((TableAttribute?)type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObjectAttribute?)type.GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
             if (src != null)
                 return await _conn.QueryAsync("SELECT * FROM " + SchemaTableName(src));
 

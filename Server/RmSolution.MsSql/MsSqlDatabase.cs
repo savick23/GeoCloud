@@ -9,6 +9,7 @@ namespace RmSolution.Data
     using System.Threading;
     using System.Xml.Linq;
     using Microsoft.Data.SqlClient;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 

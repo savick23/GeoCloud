@@ -10,6 +10,7 @@ namespace RmSolution.Data
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -46,12 +47,12 @@ namespace RmSolution.Data
             });
 
         /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
-        static string BuildColumnDefn(TAttribute ai)
+        string BuildColumnDefn(TAttributeAttribute ai)
         {
             var finded = _typemapping.TryGetValue(ai.CType, out string? type);
-            return string.Join(" ", ai.Code.ToLower(),
-                finded ? type : "int",
-                finded ? string.Empty : ai.CType.IsValueType && !ai.CType.AssemblyQualifiedName.Contains("System.Nullable") ? "NOT NULL" : "NULL");
+            type = finded ? string.Format(type, ai.Length) : "int";
+            return string.Join(" ", ai.Code.ToLower(), type,
+                ai.IsKey ? "PRIMARY KEY" : ai.CType.IsValueType && !ai.CType.AssemblyQualifiedName.Contains("System.Nullable") || !ai.Nullable ? "NOT NULL" : "NULL");
         }
 
         /// <summary> Получает полное имя таблицы со схемой.</summary>

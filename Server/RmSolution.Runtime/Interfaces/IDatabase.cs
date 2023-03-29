@@ -7,6 +7,7 @@ namespace RmSolution.Runtime
     #region Using
     using System.Data;
     using Microsoft.Extensions.Logging;
+    using RmSolution.DataAnnotations;
     #endregion Using
 
     public interface IDatabase

@@ -13,9 +13,9 @@ namespace RmSolution.Data
     {
         internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum
 
-        [Column("Идентификатор", "id bigint PRIMARY KEY", IsKey = true, Visible = false)]
+        [TAttribute("Идентификатор", IsKey = true, Visible = false)]
         public long Id { get; set; }
-        [Column("Состояние", Visible = false)]
+        [TAttribute("Состояние", Visible = false)]
         public int State { get; set; }
 
         public object Clone() =>
@@ -24,37 +24,37 @@ namespace RmSolution.Data
 
     public class TCatalogRow : TBaseRow
     {
-        [Column("Код", "code nvarchar(8) NOT NULL")]
-        public string? Code { get; set; }
-        [Column("Наименование", "name nvarchar(64) NOT NULL")]
-        public string? Name { get; set; }
-        [Column("Описание", "descript nvarchar(1024) NULL")]
+        [TAttribute("Код", Length = 8)]
+        public string Code { get; set; }
+        [TAttribute("Наименование", Length = 64)]
+        public string Name { get; set; }
+        [TAttribute("Описание", Length = 1024, Nullable = true)]
         public string? Descript { get; set; }
-        [Column("Создал", Visible = false)]
+        [TAttribute("Создал", Visible = false)]
         public long Creator { get; set; } = TUser.ADMINISTRATOR;
-        [Column("Создано", Visible = false)]
+        [TAttribute("Создано", Visible = false)]
         public DateTime Created { get; set; } = DateTime.Now;
-        [Column("Изменил", Visible = false)]
+        [TAttribute("Изменил", Visible = false)]
         public long? Modifier { get; set; }
-        [Column("Изменено", Visible = false)]
+        [TAttribute("Изменено", Visible = false)]
         public DateTime? Modified { get; set; }
     }
 
     public class TCatalogTreeRow : TCatalogRow
     {
-        [Column("Родитель")]
+        [TAttribute("Родитель")]
         public long Parent { get; set; }
     }
 
     public class TCatalogGroupRow : TCatalogRow
     {
-        [Column("Группа")]
+        [TAttribute("Группа")]
         public long Group { get; set; }
     }
 
     public class TCatalogGroupTreeRow : TCatalogTreeRow
     {
-        [Column("Группа")]
+        [TAttribute("Группа")]
         public long Group { get; set; }
     }
 }
