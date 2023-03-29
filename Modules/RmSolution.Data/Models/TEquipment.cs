@@ -16,11 +16,11 @@ namespace RmSolution.Data
     [TObject("Оборудование", "equipments", Ordinal = 100)]
     public class TEquipment : TCatalogGroupTreeRow
     {
-        [TAttribute("Тип", Binding = "equiptypes")]
+        [TColumn("Тип", Binding = "equiptypes")]
         public TRefType Type { get; set; }
-        [TAttribute("Модель", Length = 128, Nullable = true)]
+        [TColumn("Модель", Length = 128, Nullable = true)]
         public string? Model { get; set; }
-        [TAttribute("Серийный номер", Length = 32, Nullable = true)]
+        [TColumn("Серийный номер", Length = 32, Nullable = true)]
         public string? Serial { get; set; }
     }
 }

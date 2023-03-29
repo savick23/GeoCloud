@@ -15,15 +15,15 @@ namespace RmSolution.Runtime
     [TObject("Настройки конфигурации", "config.settings", Ordinal = 1, IsSystem = true)]
     public class TSettings
     {
-        [TAttribute("Идентификатор", Length = 64, IsKey = true)]
+        [TColumn("Идентификатор", Length = 64, IsKey = true)]
         public string Id { get; set; }
-        [TAttribute("Группа", Length = 32, Nullable = true)]
+        [TColumn("Группа", Length = 32, Nullable = true)]
         public string? Parent { get; set; }
-        [TAttribute("Тип", Length = 32, DefaultValue = "string")]
+        [TColumn("Тип", Length = 32, DefaultValue = "string")]
         public string Type { get; set; }
-        [TAttribute("Значение", Length = 4000, Nullable = true)]
+        [TColumn("Значение", Length = 4000, Nullable = true)]
         public string? Value { get; set; }
-        [TAttribute("Изменено")]
+        [TColumn("Изменено")]
         public DateTime Modified { get; set; }
     }
 

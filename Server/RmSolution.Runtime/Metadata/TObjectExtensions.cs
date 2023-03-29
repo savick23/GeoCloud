@@ -12,15 +12,15 @@ namespace RmSolution.Runtime
     public static class TObjectExtensions
     {
         /// <summary> Возвращает описание объекта на основании TableAttribute.</summary>
-        public static TObjectAttribute? GetDefinition(this object obj) =>
-            obj.GetType().GetCustomAttribute<TObjectAttribute?>(false);
+        public static TObject? GetDefinition(this object obj) =>
+            obj.GetType().GetCustomAttribute<TObject?>(false);
 
         /// <summary> Возвращает список свойств маркированных ColumnAttribute для указанного типа. Если таких колонок нет, то все свойства.</summary>
-        public static Dictionary<string, TAttributeAttribute> GetAttributes(this object obj) =>
+        public static Dictionary<string, TColumn> GetAttributes(this object obj) =>
             obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(c => c.GetCustomAttribute<TAttributeAttribute>(true) != null)
+                .Where(c => c.GetCustomAttribute<TColumn>(true) != null)
                 .OrderBy(c => c.MetadataToken)
-                .ToDictionary(k => k.Name, v => v.GetCustomAttribute<TAttributeAttribute>(true));
+                .ToDictionary(k => k.Name, v => v.GetCustomAttribute<TColumn>(true));
     }
 }
 #pragma warning restore CS8619

@@ -79,25 +79,27 @@ namespace RmSolution.Server
 
         void LoadMetadata(IDatabase? db)
         {
-            var tobjs = db?.Query<TObjectAttribute>();
-            var tattrs = db?.Query<TAttributeAttribute>();
-            foreach (var mdtype in GetTypes<TObjectAttribute>())
+            var tobjs = db?.Query<TObject>();
+            var tattrs = db?.Query<TColumn>();
+            foreach (var mdtype in GetTypes<TObject>())
             {
-                var obj = (TObjectAttribute?)mdtype.GetCustomAttribute(typeof(TObjectAttribute));
+                var obj = (TObject?)mdtype.GetCustomAttribute(typeof(TObject));
                 if (string.IsNullOrWhiteSpace(obj?.Name)) throw new Exception("Не указано наименование объекта конфигурации.");
                 if (string.IsNullOrWhiteSpace(obj?.Source)) throw new Exception("Не указан источник метаданных (таблица).");
                 obj = tobjs?.FirstOrDefault(o => o.Code == obj?.Source?.ToUpper()) ?? obj;
+                obj.CType = mdtype;
                 var attrs = tattrs?.Where(a => a.Parent == obj?.Id).ToList();
                 foreach (var pi in mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken)
-                    .Where(d => d.IsDefined(typeof(TAttributeAttribute))))
+                    .Where(d => d.IsDefined(typeof(TColumn))))
                 {
-                    var ai = (TAttributeAttribute?)pi.GetCustomAttributes(typeof(TAttributeAttribute)).First();
+                    var ai = (TColumn?)pi.GetCustomAttributes(typeof(TColumn)).First();
                     var dbai = attrs?.FirstOrDefault(a => a.Name == ai.Name);
                     ai.Code = pi.Name;
                     ai.Type = dbai?.Type ?? 0;
                     ai.CType = pi.PropertyType;
                     ai.PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns;
                     ai.Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns;
+                    ai.Nullable |= ai.CType.AssemblyQualifiedName.Contains("System.Nullable");
                     ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
                             : ai.DefaultValue == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.DefaultValue;
 
@@ -139,7 +141,7 @@ namespace RmSolution.Server
                 var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
                 stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
                 {
-                    if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObjectAttribute refobj)
+                    if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObject refobj)
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
                         stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
@@ -148,7 +150,7 @@ namespace RmSolution.Server
                     return string.Concat(alias, ".", ai.Field);
                 }
                 )));
-                return _db.Query(mdtype.Type, stmt_select.Append(stmt_from).ToString());
+                return _db.Query(mdtype.CType, stmt_select.Append(stmt_from).ToString());
             }
             return null;
         }

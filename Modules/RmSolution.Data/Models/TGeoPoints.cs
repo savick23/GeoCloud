@@ -11,21 +11,21 @@ namespace RmSolution.Data
     [TObject("Проекты измерений", "geoprojects", Ordinal = 110)]
     public class TGeoProjects : TCatalogRow
     {
-        [TAttribute("Местоположение", Length = 128)]
+        [TColumn("Местоположение", Length = 128)]
         public string Location { get; set; }
     }
 
     [TObject("Группы измерений", "geogroups", Ordinal = 112)]
     public class TGeoGroups : TCatalogRow
     {
-        [TAttribute("Проект", Binding = "geoprojects")]
+        [TColumn("Проект", Binding = "geoprojects")]
         public TRefType Project { get; set; }
     }
 
     [TObject("Точки измерения", "geopoints", Ordinal = 114)]
     public class TGeoPoints : TCatalogRow
     {
-        [TAttribute("Группа", Binding = "geogroups")]
+        [TColumn("Группа", Binding = "geogroups")]
         public TRefType Group { get; set; }
     }
 }

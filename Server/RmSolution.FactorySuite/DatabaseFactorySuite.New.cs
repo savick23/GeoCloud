@@ -47,7 +47,7 @@ namespace RmSolution.Data
             });
 
         /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
-        string BuildColumnDefn(TAttributeAttribute ai)
+        string BuildColumnDefn(TColumn ai)
         {
             var finded = _typemapping.TryGetValue(ai.CType, out string? type);
             type = finded ? string.Format(type, ai.Length) : "int";
@@ -200,14 +200,14 @@ namespace RmSolution.Data
                 var oi = entities.FirstOrDefault(oi => oi.Source.Equals(src));
                 if (oi != null)
                 {
-                    db.Exec($"INSERT INTO config.\"objects\" (\"id\",\"parent\",\"code\",\"name\",\"descript\") VALUES ({item.Attribute("id")?.Value},{TType.Catalog},{GetSqlValue(item.Attribute("code")?.Value)},{GetSqlValue(item.Attribute("name")?.Value)},{GetSqlValue(item.Attribute("descript")?.Value)})");
+                    db.Exec($"INSERT INTO config.\"objects\" (\"id\",\"parent\",\"code\",\"name\",\"descript\",\"source\",\"ordinal\") VALUES ({item.Attribute("id")?.Value},{TType.Catalog},{GetSqlValue(item.Attribute("code")?.Value)},{GetSqlValue(item.Attribute("name")?.Value)},{GetSqlValue(item.Attribute("descript")?.Value)},{GetSqlValue(item.Attribute("source")?.Value)},{GetSqlValue(item.Attribute("ordinal")?.Value ?? int.MaxValue.ToString())})");
                     var stmt = new StringBuilder();
                     foreach (var sect in item.Elements())
                     {
                         if (sect.Name == "attributes")
                         {
                             foreach (var attr in sect.Elements())
-                                db.Exec($"INSERT INTO config.\"attributes\" (\"id\",\"parent\",\"code\",\"name\",\"type\") VALUES ({attr.Attribute("id")?.Value},{sect.Parent?.Attribute("id")?.Value},{GetSqlValue(attr.Attribute("code")?.Value)},{GetSqlValue(attr.Attribute("name")?.Value)},{GetSqlValue(attr.Attribute("type")?.Value ?? "0")})");
+                                db.Exec($"INSERT INTO config.\"attributes\" (\"id\",\"parent\",\"code\",\"name\",\"type\",\"length\") VALUES ({attr.Attribute("id")?.Value},{sect.Parent?.Attribute("id")?.Value},{GetSqlValue(attr.Attribute("code")?.Value)},{GetSqlValue(attr.Attribute("name")?.Value)},{GetSqlValue(attr.Attribute("type")?.Value ?? "0")},{GetSqlValue(attr.Attribute("length")?.Value ?? "0")})");
                         }    
                         else if (sect.Name == "data")
                         {
@@ -228,7 +228,7 @@ namespace RmSolution.Data
                                     }
                                 }
                                 foreach (var ai in attrs)
-                                    if (ai.CType.IsValueType || !ai.CType.AssemblyQualifiedName.Contains("System.Nullable"))
+                                    if (!ai.Nullable)
                                     {
                                         stmt.Append(comma).Append(ai.Field);
                                         sqlvals.Append(comma).Append(InitGetValue(ai.CType, ai.DefaultValue));

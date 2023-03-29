@@ -24,7 +24,7 @@ namespace RmSolution.DataAccess
             {
                 Name = entity.Name,
                 Source = entity.Source,
-                Type = entity.Type.AssemblyQualifiedName ?? entity.Type.Name,
+                Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
                 Attributes = entity.Attributes.Select(a => new TAttributeDto()
                 {
                     Name = a.Name,
@@ -45,7 +45,7 @@ namespace RmSolution.DataAccess
                 {
                     Name = entity.Name,
                     Source = entity.Source,
-                    Type = entity.Type.AssemblyQualifiedName ?? entity.Type.Name,
+                    Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
                     Attributes = entity.Attributes.Select(a => new TAttributeDto()
                     {
                         Name = a.Name,
@@ -61,7 +61,7 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Data(string name) => await UseDatabase(db =>
         {
-            var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.Type;
+            var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.CType;
             if (mdtype != null)
             {
                 var data = Runtime.Metadata.GetData(name);

@@ -94,7 +94,7 @@ namespace RmSolution.Data
 
         public virtual IEnumerable<T>? Query<T>()
         {
-            var src = ((TObjectAttribute?)typeof(T).GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObject?)typeof(T).GetCustomAttributes(typeof(TObject), true).FirstOrDefault())?.Source;
             if (src != null)
                 return _conn.Query<T>("SELECT * FROM " + SchemaTableName(src));
 
@@ -103,7 +103,7 @@ namespace RmSolution.Data
 
         public IEnumerable<dynamic>? Query(Type type)
         {
-            var src = ((TObjectAttribute?)type.GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObject?)type.GetCustomAttributes(typeof(TObject), true).FirstOrDefault())?.Source;
             if (src != null)
                 return _conn.Query("SELECT * FROM " + SchemaTableName(src));
 
@@ -115,7 +115,7 @@ namespace RmSolution.Data
 
         public async Task<IEnumerable<dynamic>?> QueryAsync(Type type)
         {
-            var src = ((TObjectAttribute?)type.GetCustomAttributes(typeof(TObjectAttribute), true).FirstOrDefault())?.Source;
+            var src = ((TObject?)type.GetCustomAttributes(typeof(TObject), true).FirstOrDefault())?.Source;
             if (src != null)
                 return await _conn.QueryAsync("SELECT * FROM " + SchemaTableName(src));
 

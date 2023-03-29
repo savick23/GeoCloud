@@ -9,33 +9,36 @@ namespace RmSolution.DataAnnotations
     using System;
     #endregion Using
 
-    public abstract class TEntityAttribute : Attribute
+    public abstract class TEntity : Attribute
     {
         /// <summary> Уникальный 64-разрядный идентификатор в Системе.</summary>
-        [TAttribute("Идентификатор", IsKey = true)]
+        [TColumn("Идентификатор", IsKey = true)]
         public long Id { get; set; }
         /// <summary> Родитель, тип.</summary>
         /// <remarks> 1 - конфигурация; 2 - системный; 3 - перечисление; 4 - справочник; </remarks>
-        [TAttribute("Код")]
+        [TColumn("Код")]
         public long Parent { get; set; }
         /// <summary> Код объекта конфигурации.</summary>
-        [TAttribute("Код", Length = 32)]
+        [TColumn("Код", Length = 32)]
         public string Code { get; set; }
         /// <summary> Наимменование объекта конфигурации.</summary>
-        [TAttribute("Наименование", Length = 64)]
+        [TColumn("Наименование", Length = 64)]
         public string Name { get; set; }
         /// <summary> Описание объекта конфигурации.</summary>
-        [TAttribute("Описание", Length = 1024, Nullable = true)]
+        [TColumn("Описание", Length = 1024, Nullable = true)]
         public string? Descript { get; set; }
     }
 
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     [TObject("Объекты конфигурации", "config.objects", Ordinal = 1, IsSystem = true)]
-    public sealed class TObjectAttribute : TEntityAttribute
+    public sealed class TObject : TEntity
     {
-        public string Source { get; set; }
+        [TColumn("Источник", Length = 64, Nullable = true)]
+        public string? Source { get; set; }
         public bool IsView { get; }
+        [TColumn("Порядок")]
         public int Ordinal { get; set; } = int.MaxValue;
-        public Type Type { get; set; }
+        public Type CType { get; set; }
         /// <summary> Признак системного объекта.</summary>
         public bool IsSystem { get; set; }
 
@@ -51,11 +54,11 @@ namespace RmSolution.DataAnnotations
 
         public TAttributeCollection Attributes { get; } = new TAttributeCollection();
 
-        public TObjectAttribute()
+        public TObject()
         {
         }
 
-        public TObjectAttribute(string name, string source, bool isView = false)
+        public TObject(string name, string source, bool isView = false)
         {
             Name = name;
             Source = source;
@@ -66,17 +69,18 @@ namespace RmSolution.DataAnnotations
             $"{Source}";
     }
 
-    public class TObjectCollection : List<TObjectAttribute>
+    public sealed class TObjectCollection : List<TObject>
     {
     }
 
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2, IsSystem = true)]
-    public sealed class TAttributeAttribute : TEntityAttribute
+    public sealed class TColumn : TEntity
     {
         /// <summary> Тип данных.</summary>
-        [TAttribute("Тип")]
+        [TColumn("Тип")]
         public long Type { get; set; }
-        [TAttribute("Длинна")]
+        [TColumn("Длинна")]
         public int Length { get; set; }
         /// <summary> Признак первичного ключа.</summary>
         public bool IsKey { get; set; }
@@ -100,11 +104,11 @@ namespace RmSolution.DataAnnotations
         /// <summary> Видимость поля по умолчанию в клиенте.</summary>
         public bool Visible { get; set; }
 
-        public TAttributeAttribute()
+        public TColumn()
         {
         }
 
-        public TAttributeAttribute(string name)
+        public TColumn(string name)
         {
             Name = name;
         }
@@ -113,9 +117,9 @@ namespace RmSolution.DataAnnotations
             $"{Code} {CType.Name}";
     }
 
-    public class TAttributeCollection : List<TAttributeAttribute>, ICloneable
+    public sealed class TAttributeCollection : List<TColumn>, ICloneable
     {
-        public bool TryGetAttribute(string name, out TAttributeAttribute? attribute)
+        public bool TryGetAttribute(string name, out TColumn? attribute)
         {
             attribute = this.FirstOrDefault(ai => ai.Code.ToUpper() == name.ToUpper());
             return attribute != null;
