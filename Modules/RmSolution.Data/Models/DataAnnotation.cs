@@ -70,15 +70,4 @@ namespace RmSolution.DataAnnotations
             Definition = definition;
         }
     }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class TObjectAttribute : Attribute
-    {
-        public long Type { get; }
-
-        public TObjectAttribute(long type)
-        {
-            Type = type;
-        }
-    }
 }
