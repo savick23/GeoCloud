@@ -29,61 +29,62 @@
         private void InitializeComponent()
         {
             this.tabControls = new System.Windows.Forms.TabControl();
-            this.tabAppSelect = new System.Windows.Forms.TabPage();
+            this.tab_1_apps = new System.Windows.Forms.TabPage();
             this.optUninstall = new System.Windows.Forms.RadioButton();
             this.optInstall = new System.Windows.Forms.RadioButton();
             this.grpApplications = new System.Windows.Forms.GroupBox();
             this.chkWIS = new System.Windows.Forms.CheckBox();
             this.chkAS = new System.Windows.Forms.CheckBox();
-            this.tabPaths = new System.Windows.Forms.TabPage();
+            this.tab_2_paths = new System.Windows.Forms.TabPage();
             this.cmdWSpath = new System.Windows.Forms.Button();
             this.cmdASpath = new System.Windows.Forms.Button();
             this.txtWSpath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtASpath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.tabRunning = new System.Windows.Forms.TabPage();
+            this.tab_3_sets = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tabComplete = new System.Windows.Forms.TabPage();
-            this.txtResult = new System.Windows.Forms.TextBox();
+            this.tab_4_complete = new System.Windows.Forms.TabPage();
             this.pnlControls = new System.Windows.Forms.Panel();
             this.cmdClose = new System.Windows.Forms.Button();
             this.cmdNext = new System.Windows.Forms.Button();
             this.cmdPrev = new System.Windows.Forms.Button();
             this.pnlHideTabs = new System.Windows.Forms.Panel();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.lblMessage = new System.Windows.Forms.Label();
             this.tabControls.SuspendLayout();
-            this.tabAppSelect.SuspendLayout();
+            this.tab_1_apps.SuspendLayout();
             this.grpApplications.SuspendLayout();
-            this.tabPaths.SuspendLayout();
-            this.tabRunning.SuspendLayout();
-            this.tabComplete.SuspendLayout();
+            this.tab_2_paths.SuspendLayout();
+            this.tab_3_sets.SuspendLayout();
+            this.tab_4_complete.SuspendLayout();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControls
             // 
-            this.tabControls.Controls.Add(this.tabAppSelect);
-            this.tabControls.Controls.Add(this.tabPaths);
-            this.tabControls.Controls.Add(this.tabRunning);
-            this.tabControls.Controls.Add(this.tabComplete);
+            this.tabControls.Controls.Add(this.tab_1_apps);
+            this.tabControls.Controls.Add(this.tab_2_paths);
+            this.tabControls.Controls.Add(this.tab_3_sets);
+            this.tabControls.Controls.Add(this.tab_4_complete);
             this.tabControls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControls.Location = new System.Drawing.Point(0, 0);
             this.tabControls.Name = "tabControls";
             this.tabControls.SelectedIndex = 0;
-            this.tabControls.Size = new System.Drawing.Size(624, 441);
+            this.tabControls.Size = new System.Drawing.Size(534, 361);
             this.tabControls.TabIndex = 1;
             // 
-            // tabAppSelect
+            // tab_1_apps
             // 
-            this.tabAppSelect.Controls.Add(this.optUninstall);
-            this.tabAppSelect.Controls.Add(this.optInstall);
-            this.tabAppSelect.Controls.Add(this.grpApplications);
-            this.tabAppSelect.Location = new System.Drawing.Point(4, 22);
-            this.tabAppSelect.Name = "tabAppSelect";
-            this.tabAppSelect.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAppSelect.Size = new System.Drawing.Size(616, 415);
-            this.tabAppSelect.TabIndex = 0;
-            this.tabAppSelect.Text = "1";
+            this.tab_1_apps.Controls.Add(this.optUninstall);
+            this.tab_1_apps.Controls.Add(this.optInstall);
+            this.tab_1_apps.Controls.Add(this.grpApplications);
+            this.tab_1_apps.Location = new System.Drawing.Point(4, 22);
+            this.tab_1_apps.Name = "tab_1_apps";
+            this.tab_1_apps.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_1_apps.Size = new System.Drawing.Size(526, 335);
+            this.tab_1_apps.TabIndex = 0;
+            this.tab_1_apps.Text = "1";
             // 
             // optUninstall
             // 
@@ -144,20 +145,20 @@
             this.chkAS.Text = "Сервер приложений РМ Солюшн";
             this.chkAS.UseVisualStyleBackColor = true;
             // 
-            // tabPaths
+            // tab_2_paths
             // 
-            this.tabPaths.Controls.Add(this.cmdWSpath);
-            this.tabPaths.Controls.Add(this.cmdASpath);
-            this.tabPaths.Controls.Add(this.txtWSpath);
-            this.tabPaths.Controls.Add(this.label2);
-            this.tabPaths.Controls.Add(this.txtASpath);
-            this.tabPaths.Controls.Add(this.label1);
-            this.tabPaths.Location = new System.Drawing.Point(4, 22);
-            this.tabPaths.Name = "tabPaths";
-            this.tabPaths.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPaths.Size = new System.Drawing.Size(616, 415);
-            this.tabPaths.TabIndex = 1;
-            this.tabPaths.Text = "2";
+            this.tab_2_paths.Controls.Add(this.cmdWSpath);
+            this.tab_2_paths.Controls.Add(this.cmdASpath);
+            this.tab_2_paths.Controls.Add(this.txtWSpath);
+            this.tab_2_paths.Controls.Add(this.label2);
+            this.tab_2_paths.Controls.Add(this.txtASpath);
+            this.tab_2_paths.Controls.Add(this.label1);
+            this.tab_2_paths.Location = new System.Drawing.Point(4, 22);
+            this.tab_2_paths.Name = "tab_2_paths";
+            this.tab_2_paths.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_2_paths.Size = new System.Drawing.Size(526, 335);
+            this.tab_2_paths.TabIndex = 1;
+            this.tab_2_paths.Text = "2";
             // 
             // cmdWSpath
             // 
@@ -181,9 +182,11 @@
             // 
             // txtWSpath
             // 
+            this.txtWSpath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtWSpath.Location = new System.Drawing.Point(11, 68);
             this.txtWSpath.Name = "txtWSpath";
-            this.txtWSpath.Size = new System.Drawing.Size(516, 20);
+            this.txtWSpath.Size = new System.Drawing.Size(507, 20);
             this.txtWSpath.TabIndex = 3;
             this.txtWSpath.Text = "C:\\Program Files\\RmSolution\\Cyclops";
             // 
@@ -198,9 +201,11 @@
             // 
             // txtASpath
             // 
-            this.txtASpath.Location = new System.Drawing.Point(11, 29);
+            this.txtASpath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtASpath.Location = new System.Drawing.Point(11, 28);
             this.txtASpath.Name = "txtASpath";
-            this.txtASpath.Size = new System.Drawing.Size(516, 20);
+            this.txtASpath.Size = new System.Drawing.Size(507, 20);
             this.txtASpath.TabIndex = 1;
             this.txtASpath.Text = "C:\\Program Files\\RmSolution\\Server";
             // 
@@ -213,14 +218,14 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Выберите путь для устанвки для сервера приложений:";
             // 
-            // tabRunning
+            // tab_3_sets
             // 
-            this.tabRunning.Controls.Add(this.groupBox1);
-            this.tabRunning.Location = new System.Drawing.Point(4, 22);
-            this.tabRunning.Name = "tabRunning";
-            this.tabRunning.Size = new System.Drawing.Size(616, 415);
-            this.tabRunning.TabIndex = 3;
-            this.tabRunning.Text = "3";
+            this.tab_3_sets.Controls.Add(this.groupBox1);
+            this.tab_3_sets.Location = new System.Drawing.Point(4, 22);
+            this.tab_3_sets.Name = "tab_3_sets";
+            this.tab_3_sets.Size = new System.Drawing.Size(526, 335);
+            this.tab_3_sets.TabIndex = 3;
+            this.tab_3_sets.Text = "3";
             // 
             // groupBox1
             // 
@@ -231,22 +236,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Выполнение установки";
             // 
-            // tabComplete
+            // tab_4_complete
             // 
-            this.tabComplete.Controls.Add(this.txtResult);
-            this.tabComplete.Location = new System.Drawing.Point(4, 22);
-            this.tabComplete.Name = "tabComplete";
-            this.tabComplete.Size = new System.Drawing.Size(616, 415);
-            this.tabComplete.TabIndex = 2;
-            this.tabComplete.Text = "4";
-            this.tabComplete.UseVisualStyleBackColor = true;
-            // 
-            // txtResult
-            // 
-            this.txtResult.Location = new System.Drawing.Point(22, 29);
-            this.txtResult.Name = "txtResult";
-            this.txtResult.Size = new System.Drawing.Size(566, 20);
-            this.txtResult.TabIndex = 0;
+            this.tab_4_complete.Controls.Add(this.lblMessage);
+            this.tab_4_complete.Controls.Add(this.progressBar);
+            this.tab_4_complete.Location = new System.Drawing.Point(4, 22);
+            this.tab_4_complete.Name = "tab_4_complete";
+            this.tab_4_complete.Size = new System.Drawing.Size(526, 335);
+            this.tab_4_complete.TabIndex = 2;
+            this.tab_4_complete.Text = "4";
+            this.tab_4_complete.UseVisualStyleBackColor = true;
             // 
             // pnlControls
             // 
@@ -254,7 +253,7 @@
             this.pnlControls.Controls.Add(this.cmdClose);
             this.pnlControls.Controls.Add(this.cmdNext);
             this.pnlControls.Controls.Add(this.cmdPrev);
-            this.pnlControls.Location = new System.Drawing.Point(213, 398);
+            this.pnlControls.Location = new System.Drawing.Point(123, 318);
             this.pnlControls.Name = "pnlControls";
             this.pnlControls.Size = new System.Drawing.Size(399, 31);
             this.pnlControls.TabIndex = 4;
@@ -301,11 +300,30 @@
             this.pnlHideTabs.Size = new System.Drawing.Size(640, 20);
             this.pnlHideTabs.TabIndex = 2;
             // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(8, 55);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(510, 23);
+            this.progressBar.TabIndex = 1;
+            // 
+            // lblMessage
+            // 
+            this.lblMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblMessage.Location = new System.Drawing.Point(9, 85);
+            this.lblMessage.Name = "lblMessage";
+            this.lblMessage.Size = new System.Drawing.Size(509, 23);
+            this.lblMessage.TabIndex = 2;
+            this.lblMessage.Text = "Прогрес";
+            // 
             // RmSolution
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 441);
+            this.ClientSize = new System.Drawing.Size(534, 361);
             this.Controls.Add(this.pnlHideTabs);
             this.Controls.Add(this.pnlControls);
             this.Controls.Add(this.tabControls);
@@ -316,15 +334,14 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Установка сервера приложений РМ Солюшн";
             this.tabControls.ResumeLayout(false);
-            this.tabAppSelect.ResumeLayout(false);
-            this.tabAppSelect.PerformLayout();
+            this.tab_1_apps.ResumeLayout(false);
+            this.tab_1_apps.PerformLayout();
             this.grpApplications.ResumeLayout(false);
             this.grpApplications.PerformLayout();
-            this.tabPaths.ResumeLayout(false);
-            this.tabPaths.PerformLayout();
-            this.tabRunning.ResumeLayout(false);
-            this.tabComplete.ResumeLayout(false);
-            this.tabComplete.PerformLayout();
+            this.tab_2_paths.ResumeLayout(false);
+            this.tab_2_paths.PerformLayout();
+            this.tab_3_sets.ResumeLayout(false);
+            this.tab_4_complete.ResumeLayout(false);
             this.pnlControls.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -333,11 +350,11 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControls;
-        private System.Windows.Forms.TabPage tabAppSelect;
+        private System.Windows.Forms.TabPage tab_1_apps;
         private System.Windows.Forms.GroupBox grpApplications;
         private System.Windows.Forms.CheckBox chkWIS;
         private System.Windows.Forms.CheckBox chkAS;
-        private System.Windows.Forms.TabPage tabPaths;
+        private System.Windows.Forms.TabPage tab_2_paths;
         private System.Windows.Forms.Panel pnlControls;
         private System.Windows.Forms.Button cmdClose;
         private System.Windows.Forms.Button cmdNext;
@@ -349,12 +366,13 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtASpath;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TabPage tabComplete;
-        private System.Windows.Forms.TabPage tabRunning;
+        private System.Windows.Forms.TabPage tab_4_complete;
+        private System.Windows.Forms.TabPage tab_3_sets;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox txtResult;
         private System.Windows.Forms.RadioButton optUninstall;
         private System.Windows.Forms.RadioButton optInstall;
+        private System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 

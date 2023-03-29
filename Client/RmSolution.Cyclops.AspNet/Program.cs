@@ -3,8 +3,14 @@
 // Описание:
 //--------------------------------------------------------------------------------------------------
 using RmSolution.Web;
+using System.Reflection;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+{
+    Args = args,
+    ContentRootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+    WebRootPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "wwwroot")
+});
 builder.Host.UseWindowsService()
     .ConfigureServices(srv =>
     {

@@ -30,7 +30,7 @@ namespace RmSolution.Deployment
             if (InvokeRequired)
                 Invoke(new Action(() => Message(text)));
             else
-                txtResult.Text = text;
+                lblMessage.Text = text;
         }
 
         void cmdNext_Click(object sender, EventArgs e)
