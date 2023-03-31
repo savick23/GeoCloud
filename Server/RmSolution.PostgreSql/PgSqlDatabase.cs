@@ -143,13 +143,14 @@ namespace RmSolution.Data
 
         #region Database objects
 
-        public override IEnumerable<string> Schemata() =>
+        public override List<string> Schemata() =>
             Query("SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY 1")
                 .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
 
-        public override IEnumerable<string> Tables() =>
-            Query("SELECT table_schema||'.'||table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema NOT IN('pg_catalog','information_schema') AND table_type='BASE TABLE' ORDER BY 1")
-                .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
+        public override List<DbTable> Tables() =>
+            Query("SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema NOT IN('pg_catalog','information_schema') AND table_type='BASE TABLE' ORDER BY 1")
+                .Rows.Cast<DataRow>().Select(r => new DbTable(string.Concat(r[0], ".", r[1]),
+                    new List<DbColumn>())).ToList();
 
         protected override void ColumnDefinitionAdapter(StringBuilder sqlcmd, string[] definition)
         {

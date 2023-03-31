@@ -28,7 +28,7 @@ namespace RmSolution.Server
         #region Properties
 
         /// <summary> Минимальная необходимая версия базы данных.</summary>
-        public static readonly Version DbVersionRequirements = Version.Parse("3.0.0.2");
+        public static readonly Version DbVersionRequirements = Version.Parse("3.0.0.3");
         public string DatabaseName => _db.DatabaseName ?? "RMGEO01";
         public TObjectCollection Entities { get; } = new();
         /// <summary> Настройки, параметры конфигурации.</summary>

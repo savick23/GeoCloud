@@ -101,13 +101,16 @@ namespace RmSolution.Data
 
         #region Database objects
 
-        public override IEnumerable<string> Schemata() =>
+        public override List<string> Schemata() =>
             Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY 1")
                 .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
 
-        public override IEnumerable<string> Tables() =>
-            Query("SELECT TABLE_SCHEMA+'.'+TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY 1")
-                .Rows.Cast<DataRow>().Select(r => r[0]?.ToString() ?? string.Empty).ToList();
+        public override List<DbTable> Tables() =>
+            Query("SELECT TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY 1")
+                .Rows.Cast<DataRow>().Select(r => new DbTable(string.Concat(r[0], ".", r[1]),
+                    Query(string.Concat("SELECT COLUMN_NAME,DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='", r[0], "' AND TABLE_NAME='", r[1], "' ORDER BY ORDINAL_POSITION"))
+                        .Rows.Cast<DataRow>().Select(r => new DbColumn((string)r[0], (string)r[1]))
+            .ToList())).ToList();
 
         #endregion Database objects
 

@@ -49,9 +49,9 @@ namespace RmSolution.Runtime
         object? Update(object item);
 
         /// <summary> Возвращает список схем данных в текущей базе данных.</summary>
-        IEnumerable<string> Schemata();
+        List<string> Schemata();
         /// <summary> Возвращает список таблиц в текущей базе данных.</summary>
-        IEnumerable<string> Tables();
+        List<DbTable> Tables();
     }
 
     public interface IDatabaseFactory // For isolation
@@ -60,5 +60,31 @@ namespace RmSolution.Runtime
         void CreateDatabase(TObjectCollection entities, Action<string> message);
         /// <summary> Временно.</summary>
         void UpdateDatabase(TObjectCollection entities, Action<string> message);
+    }
+
+    /// <summary> Описание таблицы базы данных.</summary>
+    public class DbTable
+    {
+        public string Name { get; }
+        public List<DbColumn> Columns { get; }
+
+        public DbTable(string name, List<DbColumn> columns)
+        {
+            Name = name;
+            Columns = columns;
+        }
+    }
+
+    /// <summary> Описание колонки таблицы базы данных.</summary>
+    public class DbColumn
+    {
+        public string Name { get; }
+        public string Type { get; }
+
+        public DbColumn(string name, string type)
+        {
+            Name = name;
+            Type = type;
+        }
     }
 }

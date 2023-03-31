@@ -29,36 +29,36 @@
           <row id="23" parent="1" type="23" code="Инструменты" name="Панели инструментов"/>
           <row id="32" parent="3" type="32" code="Тэги" name="Словарь тэгов"/>
           <datatypes>
-            <row Id="64" parent="4" type="4" code="treftype" name="Ссылочный тип" source="bigint"/>
-            <row Id="65" parent="4" type="4" code="byte" name="Байт" source="tinyint"/>
-            <row Id="66" parent="4" type="4" code="int16" name="Целое(16)" source="smallint"/>
-            <row Id="67" parent="4" type="4" code="int32" name="Целое(32)" source="int"/>
-            <row Id="68" parent="4" type="4" code="int64" name="Целое(64)" source="bigint"/>
-            <row Id="69" parent="4" type="4" code="float" name="Вещественное(32)" source="real"/>
-            <row Id="70" parent="4" type="4" code="double" name="Вещественное(64)" source="float"/>
-            <row Id="71" parent="4" type="4" code="decimal" name="Число" source="decimal"/>
-            <row Id="72" parent="4" type="4" code="numeric" name="Число(19,4)" source="decimal(19,4)"/>
-            <row Id="73" parent="4" type="4" code="char" name="Символьная" source="char"/>
-            <row Id="74" parent="4" type="4" code="nchar" name="Символьная Unicode" source="nchar"/>
-            <row Id="75" parent="4" type="4" code="varchar" name="Строка" source="varchar"/>
-            <row Id="76" parent="4" type="4" code="nvarchar" name="Строка Unicode" source="nvarchar"/>
-            <row Id="77" parent="4" type="4" code="datetime" name="ДатаВремя" source="datetime"/>
-            <row Id="78" parent="4" type="4" code="date" name="Дата" source="date"/>
-            <row Id="79" parent="4" type="4" code="time" name="Время" source="time"/>
-            <row Id="80" parent="4" type="4" code="bool" name="Логическое" source="bit"/>
-            <row Id="81" parent="4" type="4" code="vinary" name="Двоичные фиксированной длинны" source="binary"/>
-            <row Id="82" parent="4" type="4" code="varbinary" name="Двоичные" source="varbinary"/>
-            <row Id="83" parent="4" type="4" code="guid" name="GUID" source="uniqueidentifier"/>
-            <row Id="84" parent="4" type="4" code="timestamp" name="Timestamp" source="rowversion"/>
-            <row Id="85" parent="4" type="4" code="array" name="Список" source="array"/>
-            <row Id="86" parent="4" type="4" code="xml" name="XML" source="xml"/>
-            <row Id="87" parent="4" type="4" code="json" name="JSON" source="json"/>
+            <row id="64" parent="4" type="4" code="treftype" name="Ссылочный тип" source="bigint"/>
+            <row id="65" parent="4" type="4" code="byte" name="Байт" source="tinyint"/>
+            <row id="66" parent="4" type="4" code="int16" name="Целое(16)" source="smallint"/>
+            <row id="67" parent="4" type="4" code="int32" name="Целое(32)" source="int"/>
+            <row id="68" parent="4" type="4" code="int64" name="Целое(64)" source="bigint"/>
+            <row id="69" parent="4" type="4" code="float" name="Вещественное(32)" source="real"/>
+            <row id="70" parent="4" type="4" code="double" name="Вещественное(64)" source="float"/>
+            <row id="71" parent="4" type="4" code="decimal" name="Число" source="decimal"/>
+            <row id="72" parent="4" type="4" code="numeric" name="Число(19,4)" source="decimal(19,4)"/>
+            <row id="73" parent="4" type="4" code="char" name="Символьная" source="char"/>
+            <row id="74" parent="4" type="4" code="nchar" name="Символьная Unicode" source="nchar"/>
+            <row id="75" parent="4" type="4" code="varchar" name="Строка" source="varchar"/>
+            <row id="76" parent="4" type="4" code="nvarchar" name="Строка Unicode" source="nvarchar"/>
+            <row id="77" parent="4" type="4" code="datetime" name="ДатаВремя" source="datetime"/>
+            <row id="78" parent="4" type="4" code="date" name="Дата" source="date"/>
+            <row id="79" parent="4" type="4" code="time" name="Время" source="time"/>
+            <row id="80" parent="4" type="4" code="bool" name="Логическое" source="bit"/>
+            <row id="81" parent="4" type="4" code="vinary" name="Двоичные фиксированной длинны" source="binary"/>
+            <row id="82" parent="4" type="4" code="varbinary" name="Двоичные" source="varbinary"/>
+            <row id="83" parent="4" type="4" code="guid" name="GUID" source="uniqueidentifier"/>
+            <row id="84" parent="4" type="4" code="timestamp" name="Timestamp" source="rowversion"/>
+            <row id="85" parent="4" type="4" code="array" name="Список" source="array"/>
+            <row id="86" parent="4" type="4" code="xml" name="XML" source="xml"/>
+            <row id="87" parent="4" type="4" code="json" name="JSON" source="json"/>
           </datatypes>
         </data>
       </item>
       <item id="9" parent="1" type="9" code="SETTINGS" name="Настройки" source="config.settings">
         <data>
-          <row id="DBVersion" value="3.0.0.2"/>
+          <row id="DBVersion" value="3.0.0.3"/>
         </data>
       </item>
       <item id="281474976710656" parent="12" type="12" code="NODES" name="Узлы БД" source="config.nodes">

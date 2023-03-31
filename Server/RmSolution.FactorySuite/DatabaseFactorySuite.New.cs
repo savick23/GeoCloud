@@ -7,6 +7,7 @@ namespace RmSolution.Data
     #region Using
     using System;
     using System.Data;
+    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
@@ -151,14 +152,15 @@ namespace RmSolution.Data
         #region Database initialization
 
         /// <summary> Инициализировать БД данными из файлов инициализации dbinit.smx.</summary>
-        protected void InitDatabase(IDatabase db, TObjectCollection entities, Action<string> message)
+        protected void InitDatabase(IDatabase db, TObjectCollection entities, Action<string> logger)
         {
             // Загрузим пользовательские объекты конфигурации -->
             var init_db_filename = Path.Combine(CONFIG, INITFILE);
             if (File.Exists(init_db_filename))
             {
-                using var init_db = new ArchiveReader(init_db_filename);
-                var init_files = XDocument.Parse(init_db.ReadAllText("[Content_Types].xml"))?
+                var db_tables = db.Tables();
+                using var db_init = new ArchiveReader(init_db_filename);
+                var init_files = XDocument.Parse(db_init.ReadAllText("[Content_Types].xml"))?
                     .Root?.Elements().Where(e => e.Attribute("Type")?.Value == "rmgeo")
                     .First().Attribute("PartNames")?.Value;
 
@@ -169,105 +171,122 @@ namespace RmSolution.Data
                         path = Path.GetDirectoryName(name),
                         mask = name.Split(new char[] { '\\' }).Last() + ".xml"
                     })
-                    .SelectMany(p => init_db.GetFiles(p.path, p.mask))
+                    .SelectMany(p => db_init.GetFiles(p.path, p.mask))
                     .ToList()
                     .ForEach(filename =>
                      {
-                         var sect = XDocument.Parse(init_db.ReadAllText(filename))?.Root?.Elements().FirstOrDefault();
+                         var sect = XDocument.Parse(db_init.ReadAllText(filename))?.Root?.Elements().FirstOrDefault();
                          if (sect != null)
-                             LoadInitConfig(db, entities, sect, sect.Name.LocalName);
+                             LoadInitConfig(db, entities, db_tables, sect);
                      });
             }
         }
 
-        void LoadInitConfig(IDatabase db, TObjectCollection entities, XElement items, string section)
+        void LoadInitConfig(IDatabase db, TObjectCollection entities, List<DbTable> tables, XElement items)
         {
             foreach (var item in items.Elements())
             {
                 if (item.Name == "item")
-                    CreateObjectFrom(db, entities, item, section);
+                    CreateObjectFrom(db, entities, tables, item);
                 else
-                    LoadInitConfig(db, entities, item, section);
+                    LoadInitConfig(db, entities, tables, item);
             }
         }
 
-        /// <summary> Создаём структуру и физические объекты в БД.</summary>
-        void CreateObjectFrom(IDatabase db, TObjectCollection entities, XElement item, string section)
+        /// <summary> Создаём структуру и физические объекты в БД при первом запуске и отсутствии БД.</summary>
+        void CreateObjectFrom(IDatabase db, TObjectCollection entities, List<DbTable> tables, XElement item)
         {
             var src = item.Attribute(WellKnownAttributes.Source.ToLower())?.Value;
             if (src != null)
             {
-                var oi = entities.FirstOrDefault(oi => oi.Source.Equals(src));
-                if (oi != null)
+                var entity = entities.FirstOrDefault(e => e.Source == src);
+                if (!src.Contains(".")) src = string.Concat(DefaultScheme, ".", src);
+                var table = tables.FirstOrDefault(t => t.Name == src);
+                Dictionary<string, object?>? entity_defaults = null;
+                if (entity != null)
                 {
-                    oi.Id = long.TryParse(item.Attribute("id")?.Value, out var id_) ? id_ : throw new Exception("Не указан идентификатор объекта конфигурации.");
-                    oi.Type = long.TryParse(item.Attribute("type")?.Value, out var type_) ? type_ : throw new Exception("Не указан тип объекта конфигурации.");
-                    oi.Code = item.Attribute("code")?.Value ?? throw new Exception("Не указан код объекта конфигурации.");
-                    oi.Name = item.Attribute("name")?.Value ?? throw new Exception("Не указан наименование объекта конфигурации.");
-                    oi.Description = item.Attribute("description")?.Value;
-                    oi.Source ??= item.Attribute("source")?.Value;
-                    oi.Ordinal = int.TryParse(item.Attribute("ordinal")?.Value, out var ordinal_) ? ordinal_ : int.MaxValue;
-                    db.Insert(oi);
-
-                    var stmt = new StringBuilder();
-                    foreach (var sect in item.Elements())
+                    object entity_inst = Activator.CreateInstance(entity.CType);
+                    entity_defaults = entity.CType.GetProperties()
+                        .Where(p => table.Columns.Any(c => c.Name == p.Name.ToLower()))
+                        .ToDictionary(k => k.Name.ToLower(), v => v.GetCustomAttribute<TColumn>()?.DefaultValue ?? v.GetValue(entity_inst));
+                }
+                var stmt = new StringBuilder();
+                foreach (var sect in item.Elements())
+                {
+                    if (sect.Name == "attributes")
                     {
-                        if (sect.Name == "attributes")
+                        foreach (var attr in sect.Elements())
+                            db.Exec($"INSERT INTO config.\"attributes\" (\"id\",\"parent\",\"code\",\"name\",\"type\",\"length\") VALUES ({attr.Attribute("id")?.Value},{sect.Parent?.Attribute("id")?.Value},{GetSqlValue(attr.Attribute("code")?.Value)},{GetSqlValue(attr.Attribute("name")?.Value)},{GetSqlValue(attr.Attribute("type")?.Value ?? "0")},{GetSqlValue(attr.Attribute("length")?.Value ?? "0")})");
+                    }
+                    else if (sect.Name == "data")
+                    {
+                        foreach (var row in GetRows(sect, new List<XElement>()))
                         {
-                            foreach (var attr in sect.Elements())
-                                db.Exec($"INSERT INTO config.\"attributes\" (\"id\",\"parent\",\"code\",\"name\",\"type\",\"length\") VALUES ({attr.Attribute("id")?.Value},{sect.Parent?.Attribute("id")?.Value},{GetSqlValue(attr.Attribute("code")?.Value)},{GetSqlValue(attr.Attribute("name")?.Value)},{GetSqlValue(attr.Attribute("type")?.Value ?? "0")},{GetSqlValue(attr.Attribute("length")?.Value ?? "0")})");
-                        }    
-                        else if (sect.Name == "data")
-                        {
-                            foreach (var row in sect.Elements())
+                            stmt.Append("INSERT INTO " + SchemaTableName(src) + " (");
+                            StringBuilder sqlvals = new();
+                            string comma = string.Empty;
+                            foreach (var col in table.Columns)
                             {
-                                stmt.Append("INSERT INTO " + SchemaTableName(src) + " (");
-                                StringBuilder sqlvals = new();
-                                string comma = string.Empty;
-                                var attrs = (TAttributeCollection)oi.Attributes.Clone();
-                                foreach (var col in row.Attributes())
+                                var key = col.Name.ToLower();
+                                if (row.Attribute(col.Name)?.Value is string val)
                                 {
-                                    if (oi.Attributes.TryGetAttribute(col.Name.LocalName, out var ai))
-                                    {
-                                        attrs.Remove(ai);
-                                        stmt.Append(comma).Append(ai.Field);
-                                        sqlvals.Append(comma).Append(InitGetValue(ai.CType, col.Value));
-                                        comma = ",";
-                                    }
+                                    stmt.Append(comma).Append(LQ).Append(col.Name).Append(RQ);
+                                    sqlvals.Append(comma).Append(InitGetValue(col.Type, val));
+                                    comma = ",";
                                 }
-                                foreach (var ai in attrs)
-                                    if (!ai.Nullable)
-                                    {
-                                        stmt.Append(comma).Append(ai.Field);
-                                        sqlvals.Append(comma).Append(InitGetValue(ai.CType, ai.DefaultValue));
-                                        comma = ",";
-                                    }
-
-                                stmt.Append(") VALUES (").Append(sqlvals).Append(");\n");
+                                else if (entity_defaults != null && entity_defaults.TryGetValue(key, out var valdef) && valdef != null)
+                                {
+                                    stmt.Append(comma).Append(LQ).Append(col.Name).Append(RQ);
+                                    sqlvals.Append(comma).Append(InitGetValue(col.Type, valdef is DateTime dt && dt.Year < 1970 ? new DateTime(1970, 1, 1) : valdef));
+                                    comma = ",";
+                                }
                             }
+                            stmt.Append(") VALUES (").Append(sqlvals).Append(");\n");
                         }
                     }
-                    db.Exec(stmt.ToString());
                 }
+                db.Exec(stmt.ToString());
             }
         }
 
-        static string InitGetValue(Type type, object? value)
+        List<XElement> GetRows(XElement xe, List<XElement> result)
+        {
+            foreach (var e in xe.Elements())
+                if (e.Name.LocalName == "row")
+                    result.Add(e);
+                else
+                    GetRows(e, result);
+
+            return result;
+        }
+
+        static string InitGetValue(string type, object? value)
         {
             if (value == null)
                 return "NULL";
 
-            var val = value.ToString();
-            if (type == typeof(short) || type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double) || type == typeof(decimal))
-                return val;
+            var val = value.ToString() ?? string.Empty;
+            switch (type.ToUpper())
+            {
+                case "SMALLINT":
+                case "INT":
+                case "BIGINT":
+                case "REAL":
+                case "FLOAT":
+                case "DOUBLE":
+                case "DECIMAL":
+                case "NUMERIC":
+                    return val;
 
-            if (type == typeof(bool))
-                return val.ToLower() == "true" || val.ToLower() == "1" ? "1" : "0";
+                case "BIT":
+                    return val.ToLower() == "true" || val == "1" ? "1" : "0";
 
-            if (type == typeof(DateTime))
-                return "'" + DateTime.Parse(val).ToString("yyyy-MM-ddTHH:mm:ss.fff") + "'";
+                case "DATETIME":
+                    return string.Concat("'", DateTime.Parse(val).ToString("yyyy-MM-ddTHH:mm:ss.fff"), "'");
 
-            return "'" + val + "'";
+                default:
+                    return string.Concat("'", val, "'");
+            }
         }
 
         #endregion Database initialization

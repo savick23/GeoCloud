@@ -72,8 +72,8 @@ namespace RmSolution.Data
         public virtual IDatabase Open() => throw new NotImplementedException();
         public virtual DataTable Query(string statement, params object[] args) => throw new NotImplementedException();
         public virtual void Exec(string statement, params object[] args) => throw new NotImplementedException();
-        public virtual IEnumerable<string> Schemata() => throw new NotImplementedException();
-        public virtual IEnumerable<string> Tables() => throw new NotImplementedException();
+        public virtual List<string> Schemata() => throw new NotImplementedException();
+        public virtual List<DbTable> Tables() => throw new NotImplementedException();
 
         /// <summary> Создать базу данных с кодовой страницой UTF8.</summary>
         public virtual void CreateDatabase(TObjectCollection entities, Action<string> message) => throw new NotImplementedException();

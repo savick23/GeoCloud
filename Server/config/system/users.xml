@@ -4,8 +4,8 @@
     <system>
       <item id="1688849860263936" parent="12" type="12" code="ROLES" name="Роли пользователей" source="config.roles">
         <data>
-          <row Id="1688849860264960" state="1" code="0001" name="Все" description="Встроенная группа для всех"/>
-          <row Id="1688849860265984" state="1" code="0002" name="Только чтение" description="Встроенная группа только для чтения"/>
+          <row id="1688849860264960" state="1" code="0001" name="Все" description="Встроенная группа для всех"/>
+          <row id="1688849860265984" state="1" code="0002" name="Только чтение" description="Встроенная группа только для чтения"/>
           <row id="1688849860267008" state="1" code="0003" name="Разработчики" description="Встроенная группа разработчиков"/>
           <row id="1688849860268032" state="1" code="0004" name="Администраторы" description="Встроенная группа администраторов"/>
         </data>

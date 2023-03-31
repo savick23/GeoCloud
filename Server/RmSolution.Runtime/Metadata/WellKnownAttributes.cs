@@ -8,31 +8,31 @@ namespace RmSolution.Runtime
     using System;
     #endregion Using
 
-    /// <summary> Известные наименования атрибутов (полей).</summary>
+    /// <summary> Известные наименования атрибутов (полей) в базе данных.</summary>
     public static class WellKnownAttributes
     {
-        public static readonly string Code = "Code";
-        public static readonly string View = "View";
-        public static readonly string DatabaseId = "DatabaseId";
-        public static readonly string DataType = "DataType";
-        public static readonly string DateTime = "Datetime";
-        public static readonly string Description = "Descript";
-        public static readonly string Dimension = "Dimension";
-        public static readonly string Expression = "Expression";
-        public static readonly string Definition = "Definition";
-        public static readonly string Flags = "Flags";
-        public static readonly string Id = "Id";
-        public static readonly string Name = "Name";
-        public static readonly string Label = "Label";
-        public static readonly string Ordinal = "Ordinal";
-        public static readonly string Parent = "Parent";
-        public static readonly string Picket = "Picket";
-        public static readonly string Site = "Site";
-        public static readonly string Source = "Source";
-        public static readonly string Model = "Model";
-        public static readonly string State = "State";
-        public static readonly string Type = "Type";
+        public static readonly string Id = "id";
+        public static readonly string Parent = "parent";
+        public static readonly string Type = "type";
+        public static readonly string Code = "code";
+        public static readonly string Name = "name";
+        public static readonly string View = "view";
+        public static readonly string DatabaseId = "databaseid";
+        public static readonly string DataType = "datatype";
+        public static readonly string DateTime = "datetime";
+        public static readonly string Description = "descript";
+        public static readonly string Dimension = "dimension";
+        public static readonly string Expression = "expression";
+        public static readonly string Definition = "definition";
+        public static readonly string Flags = "flags";
+        public static readonly string Label = "label";
+        public static readonly string Ordinal = "ordinal";
+        public static readonly string Picket = "picket";
+        public static readonly string Site = "site";
+        public static readonly string Source = "source";
+        public static readonly string Model = "model";
+        public static readonly string State = "state";
         /// <summary> Row version.</summary>
-        public static readonly string Timestamp = "Version";
+        public static readonly string Timestamp = "version";
     }
 }
