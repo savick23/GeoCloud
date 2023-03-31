@@ -54,6 +54,7 @@ else
     {
         _info = await Client.GetObjectAsync(Name);
         _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        if (_data?.Count() > 0) _selectedRows = new List<object>() { _data.First() };
         StateHasChanged();
     }
 
@@ -67,13 +68,22 @@ else
                 await _details.InsertRow(Activator.CreateInstance(await Client.GetObjectTypeAsync(Name)));
                 break;
             case CMD_COPY:
+                if (item != null)
+                {
+                }
                 break;
             case CMD_EDIT:
-                _state = ActionState.Edit;
-                _origin = ((ICloneable?)item)?.Clone();
-                await _details.EditRow(item);
+                if (item != null)
+                {
+                    _state = ActionState.Edit;
+                    _origin = ((ICloneable?)item)?.Clone();
+                    await _details.EditRow(item);
+                }
                 break;
             case CMD_DELETE:
+                if (item != null)
+                {
+                }
                 break;
             case CMD_APPLY:
                 _state = ActionState.Select;

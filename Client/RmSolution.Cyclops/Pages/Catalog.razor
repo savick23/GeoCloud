@@ -53,6 +53,7 @@ else
     {
         _info = await Client.GetObjectAsync(Name);
         _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        if (_data?.Count() > 0) _selectedRows = new List<object>() { _data.First() };
         StateHasChanged();
     }
 
