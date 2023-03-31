@@ -85,26 +85,29 @@ namespace RmSolution.Server
             foreach (var mdtype in GetTypes<TObject>())
             {
                 var model = mdtype.GetCustomAttribute<TObject>();
-                var obj = db_objects?.FirstOrDefault(o => o.Code == model?.Source?.ToUpper()) ?? model;
-                obj.CType = mdtype;
-                var attrs = db_columns?.Where(a => a.Parent == model?.Id).ToList();
-                foreach (var pi in mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken)
-                    .Where(d => d.IsDefined(typeof(TColumn))))
+                var obj = db_objects?.FirstOrDefault(o => o.Source == model?.Source) ?? model;
+                if (obj != null)
                 {
-                    var ai = (TColumn?)pi.GetCustomAttributes(typeof(TColumn)).First();
-                    var dbai = attrs?.FirstOrDefault(a => a.Name == ai.Name);
-                    ai.Code = pi.Name;
-                    ai.Type = dbai?.Type ?? 0;
-                    ai.CType = pi.PropertyType;
-                    ai.PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns;
-                    ai.Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns;
-                    ai.Nullable |= ai.CType.AssemblyQualifiedName.Contains("System.Nullable");
-                    ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
-                            : ai.DefaultValue == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.DefaultValue;
+                    obj.CType = mdtype;
+                    var attrs = db_columns?.Where(a => a.Parent == obj?.Id).ToList();
+                    foreach (var pi in mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken)
+                        .Where(d => d.IsDefined(typeof(TColumn))))
+                    {
+                        var ai = (TColumn?)pi.GetCustomAttributes(typeof(TColumn)).First();
+                        var dbai = attrs?.FirstOrDefault(a => a.Name == ai.Name);
+                        ai.Code = pi.Name;
+                        ai.Type = dbai?.Type ?? 0;
+                        ai.CType = pi.PropertyType;
+                        ai.PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns;
+                        ai.Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns;
+                        ai.Nullable |= ai.CType.AssemblyQualifiedName.Contains("System.Nullable");
+                        ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
+                                : ai.DefaultValue == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.DefaultValue;
 
-                    model.Attributes.Add(ai);
+                        obj.Attributes.Add(ai);
+                    }
+                    Entities.Add(obj);
                 }
-                Entities.Add(model);
             }
         }
 

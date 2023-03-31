@@ -204,7 +204,7 @@ namespace RmSolution.Data
             if (src != null)
             {
                 var entity = entities.FirstOrDefault(e => e.Source == src);
-                if (!src.Contains(".")) src = string.Concat(DefaultScheme, ".", src);
+                if (!src.Contains('.')) src = string.Concat(DefaultScheme, ".", src);
                 var table = tables.FirstOrDefault(t => t.Name == src);
                 Dictionary<string, object?>? entity_defaults = null;
                 if (entity != null)
@@ -216,11 +216,11 @@ namespace RmSolution.Data
                 }
                 if (item.Attribute(WellKnownAttributes.Source)?.Value != "config.objects")
                 {
-                    var obj = new TObject();
+                    var record = new TObject();
                     typeof(TObject).GetProperties().Where(p => item.Attribute(p.Name.ToLower()) != null).ToList()
-                        .ForEach(p => p.SetValue(obj, InitGetValue(p.PropertyType, item.Attribute(p.Name.ToLower())?.Value)));
+                        .ForEach(p => p.SetValue(record, InitGetValue(p.PropertyType, item.Attribute(p.Name.ToLower())?.Value)));
 
-                    db.InsertOrUpdate(obj);
+                    db.InsertOrUpdate(record);
                 }
                 var stmt = new StringBuilder();
                 foreach (var sect in item.Elements())
@@ -228,7 +228,15 @@ namespace RmSolution.Data
                     if (sect.Name == "attributes")
                     {
                         foreach (var attr in sect.Elements())
-                            db.Exec($"INSERT INTO config.\"attributes\" (\"id\",\"parent\",\"code\",\"name\",\"type\",\"length\") VALUES ({attr.Attribute("id")?.Value},{sect.Parent?.Attribute("id")?.Value},{GetSqlValue(attr.Attribute("code")?.Value)},{GetSqlValue(attr.Attribute("name")?.Value)},{GetSqlValue(attr.Attribute("type")?.Value ?? "0")},{GetSqlValue(attr.Attribute("length")?.Value ?? "0")})");
+                        {
+                            var record = new TColumn();
+                            typeof(TColumn).GetProperties().Where(p => item.Attribute(p.Name.ToLower()) != null).ToList()
+                                .ForEach(p => p.SetValue(record, InitGetValue(p.PropertyType, item.Attribute(p.Name.ToLower())?.Value)));
+
+                            db.InsertOrUpdate(record);
+                        }
+                        var attrs = new TColumn();
+
                     }
                     else if (sect.Name == "data")
                     {

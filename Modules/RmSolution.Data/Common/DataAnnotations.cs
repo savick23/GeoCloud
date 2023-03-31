@@ -103,7 +103,8 @@ namespace RmSolution.DataAnnotations
         /// <summary> Значение поля по умолчанию.</summary>
         public object? DefaultValue { get; set; }
         /// <summary> Видимость поля по умолчанию в клиенте.</summary>
-        public bool Visible { get; set; }
+        [TColumn("Видимость по умолчанию")]
+        public bool Visible { get; set; } = true;
 
         public TColumn()
         {
