@@ -11,6 +11,7 @@ namespace RmSolution.Data
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
+    using System.Xml.Serialization;
     using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
@@ -213,6 +214,14 @@ namespace RmSolution.Data
                         .Where(p => table.Columns.Any(c => c.Name == p.Name.ToLower()))
                         .ToDictionary(k => k.Name.ToLower(), v => v.GetCustomAttribute<TColumn>()?.DefaultValue ?? v.GetValue(entity_inst));
                 }
+                if (item.Attribute(WellKnownAttributes.Source)?.Value != "config.objects")
+                {
+                    var obj = new TObject();
+                    typeof(TObject).GetProperties().Where(p => item.Attribute(p.Name.ToLower()) != null).ToList()
+                        .ForEach(p => p.SetValue(obj, InitGetValue(p.PropertyType, item.Attribute(p.Name.ToLower())?.Value)));
+
+                    db.InsertOrUpdate(obj);
+                }
                 var stmt = new StringBuilder();
                 foreach (var sect in item.Elements())
                 {
@@ -290,6 +299,19 @@ namespace RmSolution.Data
                 default:
                     return string.Concat("'", val, "'");
             }
+        }
+
+        static object? InitGetValue(Type type, string? value)
+        {
+            if (value == null) return null;
+            if (type == typeof(int)) return int.Parse(value);
+            if (type == typeof(long)) return long.Parse(value);
+            if (type == typeof(float)) return float.Parse(value);
+            if (type == typeof(double)) return double.Parse(value);
+            if (type == typeof(decimal)) return decimal.Parse(value);
+            if (type == typeof(DateTime)) return DateTime.Parse(value);
+            if (type == typeof(bool)) return value.ToString().ToLower() == "true" || value == "1";
+            return value.ToString();
         }
 
         #endregion Database initialization

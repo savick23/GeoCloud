@@ -133,19 +133,10 @@ namespace RmSolution.Data
 
         public object? Insert(object item)
         {
-            var tab = item.GetDefinition();
-            if (tab != null)
+            var obj = item.GetDefinition();
+            if (obj != null)
             {
-                var stmt = new StringBuilder("INSERT " + tab.TableName + " (");
-                var vals = new StringBuilder(") VALUES (");
-                string comma = string.Empty;
-                foreach (var col in item.GetAttributes())
-                {
-                    stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ);
-                    vals.Append(comma).Append(GetSqlValue(item, col.Key));
-                    comma = ",";
-                }
-                Exec(string.Concat(stmt, vals.Append(')')));
+                Exec(BuildInsertCommand(obj, item));
                 return item;
             }
             return null;
@@ -153,22 +144,56 @@ namespace RmSolution.Data
 
         public virtual object? Update(object item)
         {
-            var tab = item.GetDefinition();
-            if (tab != null)
+            var obj = item.GetDefinition();
+            if (obj != null)
             {
-                var stmt = new StringBuilder("UPDATE " + tab.TableName + " SET ");
-                string comma = string.Empty;
-                foreach (var col in item.GetAttributes().Where(a => !a.Value.IsKey)) {
-                    stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, col.Key));
-                    comma = ",";
-                }
-                var key = item.GetAttributes().FirstOrDefault(a => a.Value.IsKey);
-                stmt.Append(" WHERE ").Append(LQ).Append(key.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, key.Key));
-
-                Exec(stmt.ToString());
+                Exec(BuildUpdateCommand(obj, item));
                 return item;
             }
             return null;
+        }
+
+        public object? InsertOrUpdate(object item)
+        {
+            var obj = item.GetDefinition();
+            if (obj != null)
+            {
+                var pkey = item.GetAttributes().First(a => a.Value.IsKey);
+                Exec(string.Concat("IF EXISTS(SELECT 1 FROM " + obj.TableName + " WHERE \"" + pkey.Key + "\"=" + GetSqlValue(item, pkey.Key) + ") ",
+                    BuildUpdateCommand(obj, item), " ELSE ", BuildInsertCommand(obj, item)));
+
+                return item;
+            }
+            return null;
+        }
+
+        string BuildInsertCommand(TObject obj, object item)
+        {
+            var stmt = new StringBuilder("INSERT " + obj.TableName + " (");
+            var vals = new StringBuilder(") VALUES (");
+            string comma = string.Empty;
+            foreach (var col in item.GetAttributes())
+            {
+                stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ);
+                vals.Append(comma).Append(GetSqlValue(item, col.Key));
+                comma = ",";
+            }
+            return string.Concat(stmt, vals.Append(')'));
+        }
+
+        string BuildUpdateCommand(TObject obj, object item)
+        {
+            var stmt = new StringBuilder("UPDATE " + obj.TableName + " SET ");
+            string comma = string.Empty;
+            foreach (var col in item.GetAttributes().Where(a => !a.Value.IsKey))
+            {
+                stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, col.Key));
+                comma = ",";
+            }
+            var key = item.GetAttributes().FirstOrDefault(a => a.Value.IsKey);
+            stmt.Append(" WHERE ").Append(LQ).Append(key.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, key.Key));
+
+            return stmt.ToString();
         }
 
 #pragma warning disable CS8603

@@ -19,7 +19,7 @@ namespace RmSolution.DataAccess
         /// <summary> http://localhost:8087/api/objects </summary>
         [HttpGet("[action]")]
         public async Task<IActionResult> Objects() => await UseDatabase(db =>
-            new JsonResult(Runtime.Metadata.Entities.Where(e => e.Parent == TType.Catalog).OrderBy(e => e.Ordinal).Select(entity =>
+            new JsonResult(Runtime.Metadata.Entities.Where(e => e.Type == TType.Catalog).OrderBy(e => e.Ordinal).Select(entity =>
             new TObjectDto()
             {
                 Name = entity.Name,

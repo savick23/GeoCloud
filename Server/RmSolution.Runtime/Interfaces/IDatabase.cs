@@ -47,6 +47,8 @@ namespace RmSolution.Runtime
         object? Insert(object item);
         /// <summary> Обновить данные в БД.</summary>
         object? Update(object item);
+        /// <summary> Вставить или обновить данные в БД.</summary>
+        object? InsertOrUpdate(object item);
 
         /// <summary> Возвращает список схем данных в текущей базе данных.</summary>
         List<string> Schemata();

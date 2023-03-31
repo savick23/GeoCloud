@@ -80,16 +80,14 @@ namespace RmSolution.Server
 
         void LoadMetadata(IDatabase? db)
         {
-            var tobjs = db?.Query<TObject>();
-            var tattrs = db?.Query<TColumn>();
+            var db_objects = db?.Query<TObject>();
+            var db_columns = db?.Query<TColumn>();
             foreach (var mdtype in GetTypes<TObject>())
             {
-                var obj = (TObject?)mdtype.GetCustomAttribute(typeof(TObject));
-                if (string.IsNullOrWhiteSpace(obj?.Name)) throw new Exception("Не указано наименование объекта конфигурации.");
-                if (string.IsNullOrWhiteSpace(obj?.Source)) throw new Exception("Не указан источник метаданных (таблица).");
-                obj = tobjs?.FirstOrDefault(o => o.Code == obj?.Source?.ToUpper()) ?? obj;
+                var model = mdtype.GetCustomAttribute<TObject>();
+                var obj = db_objects?.FirstOrDefault(o => o.Code == model?.Source?.ToUpper()) ?? model;
                 obj.CType = mdtype;
-                var attrs = tattrs?.Where(a => a.Parent == obj?.Id).ToList();
+                var attrs = db_columns?.Where(a => a.Parent == model?.Id).ToList();
                 foreach (var pi in mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken)
                     .Where(d => d.IsDefined(typeof(TColumn))))
                 {
@@ -104,9 +102,9 @@ namespace RmSolution.Server
                     ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
                             : ai.DefaultValue == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.DefaultValue;
 
-                    obj.Attributes.Add(ai);
+                    model.Attributes.Add(ai);
                 }
-                Entities.Add(obj);
+                Entities.Add(model);
             }
         }
 
