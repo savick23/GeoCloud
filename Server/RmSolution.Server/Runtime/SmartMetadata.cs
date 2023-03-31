@@ -53,7 +53,7 @@ namespace RmSolution.Server
                 {
                     _db.Open();
                     LoadMetadata(_db);
-                    if (!isnewdb) ((IDatabaseFactory)_db).UpdateDatabase(Entities, (msg) => _logger.LogInformation(msg));
+                    if (!isnewdb) ((IDatabaseFactory)_db).UpdateDatabase(this, (msg) => _logger.LogInformation(msg));
                     Settings = new TSettingsWrapper(_db.Query<TSettings>());
                     break;
                 }
@@ -63,7 +63,8 @@ namespace RmSolution.Server
                     if (attempt-- > 0)
                     {
                         _logger.LogWarning(string.Format(TEXT.CreateDatabaseTitle, DatabaseName));
-                        ((IDatabaseFactory)_db).CreateDatabase(Entities, (msg) => _logger.LogInformation(msg));
+                        ((IDatabaseFactory)_db).CreateDatabase(this, (msg) => _logger.LogInformation(msg));
+                        Entities.Clear();
                         isnewdb = true;
                         _logger.LogInformation(string.Format(TEXT.CreateDatabaseSuccessfully, DatabaseName));
                         continue;

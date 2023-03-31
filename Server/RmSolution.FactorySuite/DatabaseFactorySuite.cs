@@ -76,7 +76,7 @@ namespace RmSolution.Data
         public virtual List<DbTable> Tables() => throw new NotImplementedException();
 
         /// <summary> Создать базу данных с кодовой страницой UTF8.</summary>
-        public virtual void CreateDatabase(TObjectCollection entities, Action<string> message) => throw new NotImplementedException();
+        public virtual void CreateDatabase(IMetadata metadata, Action<string> message) => throw new NotImplementedException();
 
         public virtual void Close()
         {

@@ -17,12 +17,12 @@ namespace RmSolution.Data
 
     public partial class DatabaseFactorySuite
     {
-        public void UpdateDatabase(TObjectCollection entities, Action<string> message)
+        public void UpdateDatabase(IMetadata metadata, Action<string> message)
         {
             try
             {
                 Open();
-                CreateEnvironment(this, entities, message);
+                CreateEnvironment(this, metadata.Entities, message);
             }
             finally
             {
@@ -31,10 +31,12 @@ namespace RmSolution.Data
         }
 
         /// <summary> Создать системные таблицы на основании атрибутов классов.</summary>
-        protected void CreateEnvironment(IDatabase db, TObjectCollection entities, Action<string> message) =>
+        protected void CreateEnvironment(IDatabase db, TObjectCollection entities, Action<string> message)
+        {
+            var tables = db.Tables();
             entities.ForEach(oi =>
             {
-                if (!oi.IsView)
+                if (!tables.Any(t => t.Name == (oi.Source.Contains('.') ? oi.Source : string.Concat(db.DefaultScheme, '.', oi.Source))) && !oi.IsView)
                 {
                     var tdefn = new TableDefinition(oi.Source);
                     foreach (var ai in oi.Attributes)
@@ -46,6 +48,7 @@ namespace RmSolution.Data
                     CreateTable(db, tdefn, message);
                 }
             });
+        }
 
         /// <summary> Построение описания поля на основании метаданных свойства .NET.</summary>
         string BuildColumnDefn(TColumn ai)

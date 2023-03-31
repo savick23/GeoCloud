@@ -70,7 +70,7 @@ namespace RmSolution.Data
 
         #region IDatabaseFactory implementation
 
-        public override void CreateDatabase(TObjectCollection entities, Action<string> message)
+        public override void CreateDatabase(IMetadata metadata, Action<string> message)
         {
             var dbname = DatabaseName;
             var newdb = new MsSqlDatabase(Regex.Replace(_connstr, @"INITIAL CATALOG=.*?[;$]", "Initial Catalog=master;", RegexOptions.IgnoreCase));
@@ -87,8 +87,8 @@ namespace RmSolution.Data
                     newdb = new MsSqlDatabase(_connstr);
                     newdb.Open();
 
-                    CreateEnvironment(newdb, entities, message);
-                    InitDatabase(newdb, entities, message);
+                    CreateEnvironment(newdb, metadata.Entities, message);
+                    InitDatabase(newdb, metadata.Entities, message);
                 }
             }
             finally
