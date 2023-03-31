@@ -200,7 +200,15 @@ namespace RmSolution.Data
                 var oi = entities.FirstOrDefault(oi => oi.Source.Equals(src));
                 if (oi != null)
                 {
-                    db.Exec($"INSERT INTO config.\"objects\" (\"id\",\"parent\",\"code\",\"name\",\"descript\",\"source\",\"ordinal\") VALUES ({item.Attribute("id")?.Value},{TType.Catalog},{GetSqlValue(item.Attribute("code")?.Value)},{GetSqlValue(item.Attribute("name")?.Value)},{GetSqlValue(item.Attribute("descript")?.Value)},{GetSqlValue(item.Attribute("source")?.Value)},{GetSqlValue(item.Attribute("ordinal")?.Value ?? int.MaxValue.ToString())})");
+                    oi.Id = long.TryParse(item.Attribute("id")?.Value, out var id_) ? id_ : throw new Exception("Не указан идентификатор объекта конфигурации.");
+                    oi.Type = long.TryParse(item.Attribute("type")?.Value, out var type_) ? type_ : throw new Exception("Не указан тип объекта конфигурации.");
+                    oi.Code = item.Attribute("code")?.Value ?? throw new Exception("Не указан код объекта конфигурации.");
+                    oi.Name = item.Attribute("name")?.Value ?? throw new Exception("Не указан наименование объекта конфигурации.");
+                    oi.Description = item.Attribute("description")?.Value;
+                    oi.Source ??= item.Attribute("source")?.Value;
+                    oi.Ordinal = int.TryParse(item.Attribute("ordinal")?.Value, out var ordinal_) ? ordinal_ : int.MaxValue;
+                    db.Insert(oi);
+
                     var stmt = new StringBuilder();
                     foreach (var sect in item.Elements())
                     {

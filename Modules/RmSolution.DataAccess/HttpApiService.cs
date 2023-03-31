@@ -10,7 +10,7 @@ namespace RmSolution.DataAccess
     using System.Threading.Tasks;
     #endregion Using
 
-    public class HttpApiService : ModuleBase
+    public class HttpApiService : TModule
     {
         #region Declarations
 

@@ -2,7 +2,7 @@
 <rmgeo>
   <objects>
     <catalogs>
-      <item id="844424930131968" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects">
+      <item id="844424930131968" parent="12" type="12" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects">
         <attributes>
           <item id="844424930132992" code="ИД" name="Идентификатор" source="id" />
           <item id="844424930134016" code="Состояние" name="Состояние" source="state" />
@@ -14,7 +14,7 @@
           <row id="844424930132992" state="1" code="000001" name="Площадь Конституции" location="Санкт-Петербург, 59.851977, 30.304702"/>
         </data>
       </item>
-      <item id="1125899906842624" code="GEOGROUPS" name="Группы измерений" source="geogroups">
+      <item id="1125899906842624" parent="12" type="12" code="GEOGROUPS" name="Группы измерений" source="geogroups">
         <attributes>
           <item id="1125899906843648" code="ИД" name="Идентификатор" source="id" />
           <item id="1125899906844672" code="Состояние" name="Состояние" source="state" />
@@ -26,7 +26,7 @@
           <row id="1125899906843648" state="1" code="000001" name="Пиццерия Pizza Hut" project="844424930132992"/>
         </data>
       </item>
-      <item id="1407374883553280" code="GEOPOINTS" name="Точки измерения" source="geopoints">
+      <item id="1407374883553280" parent="12" type="12" code="GEOPOINTS" name="Точки измерения" source="geopoints">
         <attributes>
           <item id="1407374883554304" code="ИД" name="Идентификатор" source="id" />
           <item id="1407374883555328" code="Состояние" name="Состояние" source="state" />

@@ -14,7 +14,7 @@ namespace RmSolution.Runtime
     #endregion Using
 
     /// <summary> [Системный модуль] Терминальная клиентская сессия Telnet.</summary>
-    sealed partial class TelnetSession : ModuleBase
+    sealed partial class TelnetSession : TModule
     {
         #region Declarations
 

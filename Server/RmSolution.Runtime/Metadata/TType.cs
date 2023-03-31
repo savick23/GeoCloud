@@ -9,13 +9,77 @@ namespace RmSolution.Runtime
     {
         /// <summary> Конфигурация.</summary>
         public static readonly long Solution = 1;
+        /// <summary> Компоненты.</summary>
+        public static readonly long Component = 2;
+        /// <summary> Объекты конфигурации (метаданных).</summary>
+        public static readonly long Object = 3;
+        /// <summary> Простой тип.</summary>
+        public static readonly long SimpleType = 4;
+        /// <summary> Обработчик.</summary>
+        public static readonly long Handler = 5;
+        /// <summary> Приложение.</summary>
+        public static readonly long Application = 6;
+        /// <summary> Модуль.</summary>
+        public static readonly long Module = 7;
+        /// <summary> Системный.</summary>
+        public static readonly long System = 8;
         /// <summary> Настройки.</summary>
-        public static readonly long Settings = 2;
-        /// <summary> Системный объект.</summary>
-        public static readonly long System = 3;
+        public static readonly long Settings = 9;
+        /// <summary> Константа.</summary>
+        public static readonly long Constant = 10;
         /// <summary> Перечисление.</summary>
-        public static readonly long Enum = 4;
+        public static readonly long Enum = 11;
         /// <summary> Справочник.</summary>
-        public static readonly long Catalog = 5;
+        public static readonly long Catalog = 12;
+        /// <summary> Документ.</summary>
+        public static readonly long Document = 13;
+        /// <summary> Журнал.</summary>
+        public static readonly long Journal = 14;
+        /// <summary> Отчёт.</summary>
+        public static readonly long Report = 15;
+        /// <summary> Регистр.</summary>
+        public static readonly long Register = 16;
+        /// <summary> Регистр учётный.</summary>
+        public static readonly long Account = 17;
+        /// <summary> Измерения для регистров.</summary>
+        public static readonly long Dimension = 18;
+        /// <summary> Табличная часть, детали.</summary>
+        public static readonly long Details = 19;
+        /// <summary> Запрос.</summary>
+        /// <remarks> Заранее продготовленные запросы данных, представления.</remarks>
+        public static readonly long Query = 20;
+        /// <summary> Реквизит.</summary>
+        public static readonly long Attribute = 21;
+        /// <summary> Меню.</summary>
+        public static readonly long Menu = 22;
+        /// <summary> Панели инструментов.</summary>
+        public static readonly long Tool = 22;
+        /// <summary> Словарь тэгов.</summary>
+        public static readonly long Tag = 32;
+
+        public static readonly long RefType = 65;
+        public static readonly long Byte = 65;
+        public static readonly long Int16 = 66;
+        public static readonly long Int32 = 67;
+        public static readonly long Int64 = 68;
+        public static readonly long Float = 69;
+        public static readonly long Double = 70;
+        public static readonly long Decimal = 71;
+        public static readonly long Numeric = 72;
+        public static readonly long Char = 73;
+        public static readonly long NChar = 74;
+        public static readonly long Varchar = 75;
+        public static readonly long NVarchar = 76;
+        public static readonly long DateTime = 77;
+        public static readonly long Date = 78;
+        public static readonly long Time = 79;
+        public static readonly long Boolean = 80;
+        public static readonly long Binary = 81;
+        public static readonly long VarBinary = 82;
+        public static readonly long Guid = 83;
+        public static readonly long TimeStamp = 84;
+        public static readonly long Array = 85;
+        public static readonly long Xml = 86;
+        public static readonly long Json = 87;
     }
 }

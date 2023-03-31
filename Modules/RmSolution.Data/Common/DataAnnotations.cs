@@ -9,16 +9,20 @@ namespace RmSolution.DataAnnotations
     using System;
     #endregion Using
 
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
     public abstract class TEntity : Attribute
     {
         /// <summary> Уникальный 64-разрядный идентификатор в Системе.</summary>
         [TColumn("Идентификатор", IsKey = true)]
         public long Id { get; set; }
         /// <summary> Родитель, тип.</summary>
-        /// <remarks> 1 - конфигурация; 2 - системный; 3 - перечисление; 4 - справочник; </remarks>
-        [TColumn("Код")]
+        [TColumn("Родитель")]
         public long Parent { get; set; }
-        /// <summary> Код объекта конфигурации.</summary>
+        /// <summary> Родитель, тип.</summary>
+        /// <remarks> TType </remarks>
+        [TColumn("Тип")]
+        public long Type { get; set; }
+        /// <summary> Уникальный код объекта конфигурации.</summary>
         [TColumn("Код", Length = 32)]
         public string Code { get; set; }
         /// <summary> Наимменование объекта конфигурации.</summary>
@@ -26,7 +30,7 @@ namespace RmSolution.DataAnnotations
         public string Name { get; set; }
         /// <summary> Описание объекта конфигурации.</summary>
         [TColumn("Описание", Length = 1024, Nullable = true)]
-        public string? Descript { get; set; }
+        public string? Description { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -77,9 +81,6 @@ namespace RmSolution.DataAnnotations
     [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2, IsSystem = true)]
     public sealed class TColumn : TEntity
     {
-        /// <summary> Тип данных.</summary>
-        [TColumn("Тип")]
-        public long Type { get; set; }
         [TColumn("Длинна")]
         public int Length { get; set; }
         /// <summary> Признак первичного ключа.</summary>

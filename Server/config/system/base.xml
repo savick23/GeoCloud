@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rmgeo>
+  <objects>
+    <system>
+      <item id="3" parent="1" type="3" code="Объект" name="Объекты конфигурации" source="config.objects">
+        <data>
+          <row id="1" parent="0" type="1" code="Конфигурация" name="РМ Гео"/>
+          <row id="2" parent="1" type="2" code="Компонент" name="Компоненты"/>
+          <row id="3" parent="1" type="3" code="Объект" name="Объекты конфигурации (типы)" source="config.objects"/>
+          <row id="4" parent="1" type="4" code="Тип" name="Простые типы"/>
+          <row id="5" parent="1" type="5" code="Обработчик" name="Обработчики"/>
+          <row id="6" parent="1" type="6" code="Приложение" name="Приложения" desciption="Приложения (группировка микросервисов, модулей по функциональным признакам)"/>
+          <row id="7" parent="1" type="7" code="Модуль" name="Модули" desciption="Микросервисы, модули, службы" source="RmSolution.Runtime.TModule, RmSolution.Runtime"/>
+          <row id="8" parent="6" type="8" code="Системный" name="Системные объекты" source="config.objects"/>
+          <row id="9" parent="1" type="9" code="Настройки" name="Настройки" source="config.settings"/>
+          <row id="10" parent="3" type="10" code="Константа" name="Константы"/>
+          <row id="11" parent="3" type="11" code="Перечисление" name="Перечисления" source="config.enums"/>
+          <row id="12" parent="3" type="12" code="Справочник" name="Справочники"/>
+          <row id="13" parent="3" type="13" code="Документ" name="Документы"/>
+          <row id="14" parent="3" type="14" code="Журнал" name="Журналы"/>
+          <row id="15" parent="3" type="15" code="Отчёт" name="Отчёты"/>
+          <row id="16" parent="3" type="16" code="Регистр" name="Регистры"/>
+          <row id="17" parent="3" type="17" code="Учётный" name="Учётный регистр"/>
+          <row id="18" parent="1" type="18" code="Измерение" name="Измерение"/>
+          <row id="19" parent="1" type="19" code="Детали" name="Табличная часть"/>
+          <row id="20" parent="3" type="20" code="Запрос" name="Запросы" desciption="Заранее продготовленные запросы данных, представления"/>
+          <row id="21" parent="1" type="21" code="Реквизит" name="Реквизиты" description="Реквизиты, поля классов, свойства и т.д."/>
+          <row id="22" parent="1" type="22" code="Меню" name="Меню"/>
+          <row id="23" parent="1" type="23" code="Инструменты" name="Панели инструментов"/>
+          <row id="32" parent="3" type="32" code="Тэги" name="Словарь тэгов"/>
+          <datatypes>
+            <row Id="64" parent="4" type="4" code="treftype" name="Ссылочный тип" source="bigint"/>
+            <row Id="65" parent="4" type="4" code="byte" name="Байт" source="tinyint"/>
+            <row Id="66" parent="4" type="4" code="int16" name="Целое(16)" source="smallint"/>
+            <row Id="67" parent="4" type="4" code="int32" name="Целое(32)" source="int"/>
+            <row Id="68" parent="4" type="4" code="int64" name="Целое(64)" source="bigint"/>
+            <row Id="69" parent="4" type="4" code="float" name="Вещественное(32)" source="real"/>
+            <row Id="70" parent="4" type="4" code="double" name="Вещественное(64)" source="float"/>
+            <row Id="71" parent="4" type="4" code="decimal" name="Число" source="decimal"/>
+            <row Id="72" parent="4" type="4" code="numeric" name="Число(19,4)" source="decimal(19,4)"/>
+            <row Id="73" parent="4" type="4" code="char" name="Символьная" source="char"/>
+            <row Id="74" parent="4" type="4" code="nchar" name="Символьная Unicode" source="nchar"/>
+            <row Id="75" parent="4" type="4" code="varchar" name="Строка" source="varchar"/>
+            <row Id="76" parent="4" type="4" code="nvarchar" name="Строка Unicode" source="nvarchar"/>
+            <row Id="77" parent="4" type="4" code="datetime" name="ДатаВремя" source="datetime"/>
+            <row Id="78" parent="4" type="4" code="date" name="Дата" source="date"/>
+            <row Id="79" parent="4" type="4" code="time" name="Время" source="time"/>
+            <row Id="80" parent="4" type="4" code="bool" name="Логическое" source="bit"/>
+            <row Id="81" parent="4" type="4" code="vinary" name="Двоичные фиксированной длинны" source="binary"/>
+            <row Id="82" parent="4" type="4" code="varbinary" name="Двоичные" source="varbinary"/>
+            <row Id="83" parent="4" type="4" code="guid" name="GUID" source="uniqueidentifier"/>
+            <row Id="84" parent="4" type="4" code="timestamp" name="Timestamp" source="rowversion"/>
+            <row Id="85" parent="4" type="4" code="array" name="Список" source="array"/>
+            <row Id="86" parent="4" type="4" code="xml" name="XML" source="xml"/>
+            <row Id="87" parent="4" type="4" code="json" name="JSON" source="json"/>
+          </datatypes>
+        </data>
+      </item>
+      <item id="9" parent="1" type="9" code="SETTINGS" name="Настройки" source="config.settings">
+        <data>
+          <row id="DBVersion" value="3.0.0.2"/>
+        </data>
+      </item>
+      <item id="281474976710656" parent="12" type="12" code="NODES" name="Узлы БД" source="config.nodes">
+        <data>
+          <row id="281474976711680" state="1" code="0001" name="Центральный узел" index="1"/>
+        </data>
+      </item>
+      <item id="562949953421312" parent="12" type="12" code="SITES" name="Площадки" source="config.sites">
+        <data>
+          <row id="562949953422336" state="1" code="0001" name="Строительная площадка 1"/>
+        </data>
+      </item>
+    </system>
+  </objects>
+</rmgeo>

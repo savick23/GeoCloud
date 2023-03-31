@@ -12,7 +12,7 @@ namespace RmSolution.GeoCom
     using RmSolution.Runtime;
     #endregion Using
 
-    public class GeoComService : ModuleBase, IOServer
+    public class GeoComService : TModule, IOServer
     {
         #region Properties
 

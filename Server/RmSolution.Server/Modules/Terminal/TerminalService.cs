@@ -10,7 +10,7 @@ namespace RmSolution.Runtime
     #endregion Using
 
     /// <summary> [Системный модуль] Терминальный сервер telnet. Консольный доступ к Системе.</summary>
-    sealed class TerminalService : ModuleBase, IStartup
+    sealed class TerminalService : TModule, IStartup
     {
         #region Properties
 

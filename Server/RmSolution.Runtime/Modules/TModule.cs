@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: ModuleBase – Базовый модуль.
+// Описание: TModule – Базовый модуль.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
@@ -9,7 +9,7 @@ namespace RmSolution.Runtime
     using System.Collections.Concurrent;
     #endregion Using
 
-    public class ModuleBase : IModule
+    public class TModule : IModule
     {
         #region Declarations
 
@@ -34,7 +34,7 @@ namespace RmSolution.Runtime
 
         #endregion Properties
 
-        public ModuleBase(IRuntime runtime)
+        public TModule(IRuntime runtime)
         {
             Runtime = runtime;
             Version = System.Reflection.Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();

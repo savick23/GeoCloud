@@ -131,22 +131,44 @@ namespace RmSolution.Data
         public virtual T Scalar<T>(string statement, params object[] args) =>
             Scalar(statement, args) is T res ? res : default;
 
-        public virtual void Update(object item)
+        public object? Insert(object item)
         {
             var tab = item.GetDefinition();
             if (tab != null)
             {
-                var stmt = new StringBuilder("UPDATE " + tab.Source + " SET ");
+                var stmt = new StringBuilder("INSERT " + tab.TableName + " (");
+                var vals = new StringBuilder(") VALUES (");
+                string comma = string.Empty;
+                foreach (var col in item.GetAttributes())
+                {
+                    stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ);
+                    vals.Append(comma).Append(GetSqlValue(item, col.Key));
+                    comma = ",";
+                }
+                Exec(string.Concat(stmt, vals.Append(')')));
+                return item;
+            }
+            return null;
+        }
+
+        public virtual object? Update(object item)
+        {
+            var tab = item.GetDefinition();
+            if (tab != null)
+            {
+                var stmt = new StringBuilder("UPDATE " + tab.TableName + " SET ");
                 string comma = string.Empty;
                 foreach (var col in item.GetAttributes().Where(a => !a.Value.IsKey)) {
-                    stmt.Append(comma).Append('"').Append(col.Key.ToLower()).Append('"').Append('=').Append(GetSqlValue(item, col.Key));
+                    stmt.Append(comma).Append(LQ).Append(col.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, col.Key));
                     comma = ",";
                 }
                 var key = item.GetAttributes().FirstOrDefault(a => a.Value.IsKey);
-                stmt.Append(" WHERE \"").Append(key.Key.ToLower()).Append('"').Append('=').Append(GetSqlValue(item, key.Key));
+                stmt.Append(" WHERE ").Append(LQ).Append(key.Key.ToLower()).Append(RQ).Append('=').Append(GetSqlValue(item, key.Key));
 
                 Exec(stmt.ToString());
+                return item;
             }
+            return null;
         }
 
 #pragma warning disable CS8603

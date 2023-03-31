@@ -15,7 +15,7 @@ namespace Inforser.Runtime
     #endregion Using
 
     /// <summary> [Системный модуль] Диспетчер задач. Сервис управления модулями (микросервисами).</summary>
-    sealed class TaskManager : ModuleBase, IStartup
+    sealed class TaskManager : TModule, IStartup
     {
         #region Declarations
 

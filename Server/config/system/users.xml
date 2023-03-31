@@ -2,17 +2,17 @@
 <rmgeo>
   <objects>
     <system>
-      <item id="1688849860263936" code="ROLES" name="Роли пользователей" source="config.roles">
+      <item id="1688849860263936" parent="12" type="12" code="ROLES" name="Роли пользователей" source="config.roles">
         <data>
-          <row Id="1688849860264960" state="1" code="0001" name="Все" descript="Встроенная группа для всех"/>
-          <row Id="1688849860265984" state="1" code="0002" name="Только чтение" descript="Встроенная группа только для чтения"/>
-          <row id="1688849860267008" state="1" code="0003" name="Разработчики" descript="Встроенная группа разработчиков"/>
-          <row id="1688849860268032" state="1" code="0004" name="Администраторы" descript="Встроенная группа администраторов"/>
+          <row Id="1688849860264960" state="1" code="0001" name="Все" description="Встроенная группа для всех"/>
+          <row Id="1688849860265984" state="1" code="0002" name="Только чтение" description="Встроенная группа только для чтения"/>
+          <row id="1688849860267008" state="1" code="0003" name="Разработчики" description="Встроенная группа разработчиков"/>
+          <row id="1688849860268032" state="1" code="0004" name="Администраторы" description="Встроенная группа администраторов"/>
         </data>
       </item>
-      <item id="1970324836974592" code="USERS" name="Пользователи" source="config.users">
+      <item id="1970324836974592" parent="12" type="12" code="USERS" name="Пользователи" source="config.users">
         <data>
-          <row id="1970324836975616" state="1" code="000001" name="Администратор" login="admin" descript="Встроенная учётная запись администратора"/>
+          <row id="1970324836975616" state="1" code="000001" name="Администратор" login="admin" description="Встроенная учётная запись администратора"/>
           <row id="1970324836976640" state="1" code="000002" name="Тестировщик" login="tester"/>
         </data>
       </item>

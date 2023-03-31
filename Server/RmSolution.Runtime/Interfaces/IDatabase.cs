@@ -43,8 +43,10 @@ namespace RmSolution.Runtime
         T Scalar<T>(string statement, params object[] args);
         /// <summary> Выполнить инструкцию базы данных.</summary>
         void Exec(string statement, params object[] args);
+        /// <summary> Вставить данные в БД.</summary>
+        object? Insert(object item);
         /// <summary> Обновить данные в БД.</summary>
-        void Update(object item);
+        object? Update(object item);
 
         /// <summary> Возвращает список схем данных в текущей базе данных.</summary>
         IEnumerable<string> Schemata();
