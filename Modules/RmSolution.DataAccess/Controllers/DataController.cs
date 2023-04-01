@@ -5,10 +5,11 @@
 namespace RmSolution.DataAccess
 {
     #region Using
+    using System.Data;
+    using System.Net.Http.Headers;
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Data;
     using RmSolution.Runtime;
-    using System.Data;
     #endregion Using
 
     public class DataController : SmartController
@@ -65,19 +66,21 @@ namespace RmSolution.DataAccess
         {
             if (Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name) != null)
             {
-                return new JsonResult(Runtime.Metadata.GetData(name));
+                return new JsonResult(await Runtime.Metadata.GetDataAsync(name));
             }
             throw new Exception("Тип " + name + " не найден!");
         }
 
         /// <summary> http://localhost:8087/api/datatable/equipments </summary>
         [HttpGet("[action]/{name}")]
-        public async Task<DataTable> DataTable(string name)
+        public async Task<HttpContent> DataTable(string name)
         {
             if (Runtime.Metadata.GetObject(name) != null)
             {
-                var data = Runtime.Metadata.GetDataTable(name);
-                return data;
+                var data = await Runtime.Metadata.GetDataTableAsync(name);
+                var res = new StreamContent(null);
+                res.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                return res;
             }
             throw new Exception("Тип " + name + " не найден!");
         }

@@ -15,10 +15,10 @@ namespace RmSolution.Runtime
         TObject? GetObject(string id);
 
         /// <summary> Возвращает данные объекта конфигурации.</summary>
-        IEnumerable<object>? GetData(string id);
+        Task<IEnumerable<object>?> GetDataAsync(string id);
 
         /// <summary> Возвращает табличные данные объекта конфигурации.</summary>
-        DataTable? GetDataTable(string id);
+        Task<DataTable?> GetDataTableAsync(string id);
 
         /// <summary> Обновляет данные объекта конфигурации.</summary>
         object? UpdateData(object? item);

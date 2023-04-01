@@ -139,7 +139,7 @@ namespace RmSolution.Server
         public TObject? GetObject(string id) =>
             Entities.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
 
-        public IEnumerable<object>? GetData(string id) => UseDatabase(db =>
+        public async Task<IEnumerable<object>?> GetDataAsync(string id) => await UseDatabase(db =>
         {
             var obj = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
             if (obj != null)
@@ -164,7 +164,7 @@ namespace RmSolution.Server
             return null;
         });
 
-        public DataTable? GetDataTable(string id) => UseDatabase(db =>
+        public async Task<DataTable?> GetDataTableAsync(string id) => await UseDatabase(db =>
         {
             var obj = GetObject(id);
             if (obj != null)
@@ -196,7 +196,7 @@ namespace RmSolution.Server
         }
 
         /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
-        T UseDatabase<T>(Func<IDatabase, T> operation)
+        async Task<T> UseDatabase<T>(Func<IDatabase, T> operation) => await Task.Run(() =>
         {
             var db = _connectionf();
             try
@@ -208,7 +208,7 @@ namespace RmSolution.Server
             {
                 db.Close();
             }
-        }
+        });
 
         #endregion IMetadata implementation
     }
