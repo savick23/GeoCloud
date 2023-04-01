@@ -22,6 +22,7 @@ namespace RmSolution.Server
     {
         #region Declarations
 
+        Func<IDatabase> _connectionf;
         ILogger _logger;
         IDatabase _db;
 
@@ -40,10 +41,11 @@ namespace RmSolution.Server
 
         #region Constuctors, Initialization
 
-        public SmartMetadata(ILogger logger, IDatabase connection)
+        public SmartMetadata(ILogger logger, Func<IDatabase> connectionf)
         {
+            _connectionf = connectionf;
             _logger = logger;
-            _db = connection;
+            _db = _connectionf();
         }
 
         public void Open()
@@ -149,9 +151,9 @@ namespace RmSolution.Server
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
                         stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
-                        return string.Concat("cast(", alias, ".", ai.Field, " as nvarchar(19))+';'+", ajoin, ".\"name\" \"", ai.Field[1..^1], '"');
+                        return string.Concat("cast(", alias, '.', ai.Field, " as char(19))+", ajoin, '.', mdtype.Attributes.ViewField, ' ', ai.Field);
                     }
-                    return string.Concat(alias, ".", ai.Field);
+                    return string.Concat(alias, '.', ai.Field);
                 }
                 )));
                 return _db.Query(mdtype.CType, stmt_select.Append(stmt_from).ToString());
@@ -159,15 +161,49 @@ namespace RmSolution.Server
             return null;
         }
 
-        public DataTable? GetDataTable(string id)
+        public DataTable? GetDataTable(string id) => UseDatabase(db =>
         {
-            return _db.Query("");
-        }
+        var mdtype = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
+            if (mdtype != null)
+            {
+                string alias = "a";
+                string ajoin = "a";
+                var stmt_select = new StringBuilder("SELECT ");
+                var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
+                stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
+                {
+                    if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObject refobj)
+                    {
+                        ajoin = ((char)(ajoin[0] + 1)).ToString();
+                        stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
+                        return string.Concat(alias, '.', ai.Field, ',', ajoin, '.', mdtype.Attributes.ViewField, ' ', ai.DisplayField);
+                    }
+                    return string.Concat(alias, '.', ai.Field);
+                }
+                )));
+                return db.Query(stmt_select.Append(stmt_from).ToString());
+            }
+            return null;
+        });
 
         public object? UpdateData(object? item)
         {
             if (item != null) _db.Update(item);
             return item;
+        }
+
+        T UseDatabase<T>(Func<IDatabase, T> operation)
+        {
+            var db = _connectionf();
+            try
+            {
+                db.Open();
+                return operation.Invoke(db);
+            }
+            finally
+            {
+                db.Close();
+            }
         }
 
         #endregion IMetadata implementation

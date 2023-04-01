@@ -28,7 +28,8 @@ namespace RmSolution.DataAccess
                 Attributes = entity.Attributes.Select(a => new TAttributeDto()
                 {
                     Name = a.Name,
-                    Field = a.Code,
+                    Field = a.Field[1..^1],
+                    DisplayField = a.DisplayField[1..^1],
                     Visible = a.Visible
                 }).ToArray()
             }).ToArray())
@@ -77,7 +78,7 @@ namespace RmSolution.DataAccess
             var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.CType;
             if (mdtype != null)
             {
-                var data = Runtime.Metadata.GetData(name);
+                var data = Runtime.Metadata.GetDataTable(name);
                 return new JsonResult(data);
             }
             throw new Exception("Тип " + name + " не найден!");

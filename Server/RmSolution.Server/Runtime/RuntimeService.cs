@@ -121,7 +121,7 @@ namespace RmSolution.Server
             Name = "Сервер приложений " + Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
-            Metadata = _md = new SmartMetadata(logger, databaseF());
+            Metadata = _md = new SmartMetadata(logger, databaseF);
             try
             {
                 _md.Open();

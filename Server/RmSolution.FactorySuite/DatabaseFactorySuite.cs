@@ -229,9 +229,12 @@ namespace RmSolution.Data
             public override void SetValue(IDbDataParameter parameter, TRefType value) =>
                 parameter.Value = value.ToString();
 
-            public override TRefType Parse(object value) => new TRefType(
-                long.Parse(Regex.Match(value.ToString(), "\\d+").Value),
-                Regex.Match(value.ToString(), @"(?<=\d+;).*?(?=$)").Value);
+            public override TRefType Parse(object value) =>
+                value is long val
+                ? new TRefType(val, null)
+                : value == null
+                ? TRefType.Empty
+                : new TRefType(long.Parse(((string)value)[0..19]), ((string)value)[19..]);
         }
 
         #endregion Nested types

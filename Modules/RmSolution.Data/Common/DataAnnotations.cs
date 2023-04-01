@@ -25,7 +25,7 @@ namespace RmSolution.DataAnnotations
         /// <summary> Уникальный код объекта конфигурации.</summary>
         [TColumn("Код", Length = 32)]
         public string Code { get; set; }
-        /// <summary> Наимменование объекта конфигурации.</summary>
+        /// <summary> Наименование объекта конфигурации.</summary>
         [TColumn("Наименование", Length = 64)]
         public string Name { get; set; }
         /// <summary> Описание объекта конфигурации.</summary>
@@ -100,6 +100,8 @@ namespace RmSolution.DataAnnotations
         public string? Binding { get; set; }
         /// <summary> Наименование поля БД.</summary>
         public string Field => string.Concat('"', Code.ToLower(), '"');
+        /// <summary> Наименование поля БД для отображения.</summary>
+        public string DisplayField => Type > 10000000 ? string.Concat('"', Code.ToLower(), "_view", '"') : Field;
         /// <summary> Значение поля по умолчанию.</summary>
         public object? DefaultValue { get; set; }
         /// <summary> Видимость поля по умолчанию в клиенте.</summary>
@@ -121,6 +123,8 @@ namespace RmSolution.DataAnnotations
 
     public sealed class TAttributeCollection : List<TColumn>, ICloneable
     {
+        public string ViewField => "\"name\"";
+
         public bool TryGetAttribute(string name, out TColumn? attribute)
         {
             attribute = this.FirstOrDefault(ai => ai.Code.ToUpper() == name.ToUpper());
