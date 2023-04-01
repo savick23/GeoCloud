@@ -11,6 +11,9 @@ namespace RmSolution.Runtime
     {
         TObjectCollection Entities { get; }
 
+        /// <summary> Возвращает сведения об объекте конфигурации.</summary>
+        TObject? GetObject(string id);
+
         /// <summary> Возвращает данные объекта конфигурации.</summary>
         IEnumerable<object>? GetData(string id);
 

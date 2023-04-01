@@ -136,47 +136,50 @@ namespace RmSolution.Server
 
         #region IMetadata implementation
 
-        public IEnumerable<object>? GetData(string id)
+        public TObject? GetObject(string id) =>
+            Entities.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
+
+        public IEnumerable<object>? GetData(string id) => UseDatabase(db =>
         {
-            var mdtype = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
-            if (mdtype != null)
+            var obj = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
+            if (obj != null)
             {
                 string alias = "a";
                 string ajoin = "a";
                 var stmt_select = new StringBuilder("SELECT ");
-                var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
-                stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
+                var stmt_from = new StringBuilder(" FROM ").Append(obj.TableName).Append(' ').Append(alias);
+                stmt_select.Append(string.Join(",", obj.Attributes.Select(ai =>
                 {
                     if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObject refobj)
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
                         stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
-                        return string.Concat("cast(", alias, '.', ai.Field, " as char(19))+", ajoin, '.', mdtype.Attributes.ViewField, ' ', ai.Field);
+                        return string.Concat("cast(", alias, '.', ai.Field, " as char(19))+", ajoin, '.', obj.Attributes.ViewField, ' ', ai.Field);
                     }
                     return string.Concat(alias, '.', ai.Field);
                 }
                 )));
-                return _db.Query(mdtype.CType, stmt_select.Append(stmt_from).ToString());
+                return db.Query(obj.CType, stmt_select.Append(stmt_from).ToString());
             }
             return null;
-        }
+        });
 
         public DataTable? GetDataTable(string id) => UseDatabase(db =>
         {
-        var mdtype = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
-            if (mdtype != null)
+            var obj = GetObject(id);
+            if (obj != null)
             {
                 string alias = "a";
                 string ajoin = "a";
                 var stmt_select = new StringBuilder("SELECT ");
-                var stmt_from = new StringBuilder(" FROM ").Append(mdtype.TableName).Append(' ').Append(alias);
-                stmt_select.Append(string.Join(",", mdtype.Attributes.Select(ai =>
+                var stmt_from = new StringBuilder(" FROM ").Append(obj.TableName).Append(' ').Append(alias);
+                stmt_select.Append(string.Join(",", obj.Attributes.Select(ai =>
                 {
                     if (ai.CType == typeof(TRefType) && ai.Type > 0 && Entities.FirstOrDefault(e => e.Id == ai.Type) is TObject refobj)
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
                         stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
-                        return string.Concat(alias, '.', ai.Field, ',', ajoin, '.', mdtype.Attributes.ViewField, ' ', ai.DisplayField);
+                        return string.Concat(alias, '.', ai.Field, ',', ajoin, '.', obj.Attributes.ViewField, ' ', ai.DisplayField);
                     }
                     return string.Concat(alias, '.', ai.Field);
                 }
@@ -192,6 +195,7 @@ namespace RmSolution.Server
             return item;
         }
 
+        /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
         T UseDatabase<T>(Func<IDatabase, T> operation)
         {
             var db = _connectionf();
