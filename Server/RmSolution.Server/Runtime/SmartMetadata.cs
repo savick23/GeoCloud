@@ -14,6 +14,8 @@ namespace RmSolution.Server
     using System.Dynamic;
     using System.Text;
     using Microsoft.Extensions.Logging;
+    using System.Data;
+    using System.Runtime.InteropServices.JavaScript;
     #endregion Using
 
     internal class SmartMetadata : IMetadata
@@ -147,7 +149,7 @@ namespace RmSolution.Server
                     {
                         ajoin = ((char)(ajoin[0] + 1)).ToString();
                         stmt_from.Append(" LEFT JOIN ").Append(refobj.TableName).Append(' ').Append(ajoin).Append(" ON ").Append(ajoin).Append('.').Append("id=").Append("a." + ai.Field);
-                        return string.Concat("cast(", alias, ".", ai.Field, " as nvarchar(32))+';'+", ajoin, ".\"name\" \"", ai.Field[1..^1], '"');
+                        return string.Concat("cast(", alias, ".", ai.Field, " as nvarchar(19))+';'+", ajoin, ".\"name\" \"", ai.Field[1..^1], '"');
                     }
                     return string.Concat(alias, ".", ai.Field);
                 }
@@ -155,6 +157,11 @@ namespace RmSolution.Server
                 return _db.Query(mdtype.CType, stmt_select.Append(stmt_from).ToString());
             }
             return null;
+        }
+
+        public DataTable? GetDataTable(string id)
+        {
+            return _db.Query("");
         }
 
         public object? UpdateData(object? item)

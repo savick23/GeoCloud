@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
+    using System.Data;
     using RmSolution.DataAnnotations;
 
     public interface IMetadata
@@ -12,6 +13,9 @@ namespace RmSolution.Runtime
 
         /// <summary> Возвращает данные объекта конфигурации.</summary>
         IEnumerable<object>? GetData(string id);
+
+        /// <summary> Возвращает табличные данные объекта конфигурации.</summary>
+        DataTable? GetDataTable(string id);
 
         /// <summary> Обновляет данные объекта конфигурации.</summary>
         object? UpdateData(object? item);

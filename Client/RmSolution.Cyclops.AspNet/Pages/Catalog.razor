@@ -97,8 +97,9 @@ else
         }
     }
 
-    void OnInsertRow(object? item)
+    async Task OnInsertRow(object? item)
     {
+        await Client.UpdateAsync(item);
     }
 
     async Task OnUpdateRow(object? item) =>

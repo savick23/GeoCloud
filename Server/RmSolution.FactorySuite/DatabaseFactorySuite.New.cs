@@ -214,7 +214,7 @@ namespace RmSolution.Data
                         .Where(p => table.Columns.Any(c => c.Name == p.Name.ToLower()))
                         .ToDictionary(k => k.Name.ToLower(), v => v.GetCustomAttribute<TColumn>()?.DefaultValue ?? v.GetValue(entity_inst));
                 }
-                if (item.Attribute(WellKnownAttributes.Source)?.Value != "config.objects")
+                if (src != "config.objects")
                 {
                     var record = new TObject();
                     typeof(TObject).GetProperties().Where(p => item.Attribute(p.Name.ToLower()) != null).ToList()
@@ -229,9 +229,12 @@ namespace RmSolution.Data
                     {
                         foreach (var attr in sect.Elements())
                         {
-                            var record = new TColumn();
-                            typeof(TColumn).GetProperties().Where(p => item.Attribute(p.Name.ToLower()) != null).ToList()
-                                .ForEach(p => p.SetValue(record, InitGetValue(p.PropertyType, item.Attribute(p.Name.ToLower())?.Value)));
+                            var record = new TColumn()
+                            {
+                                Parent = long.Parse(sect.Parent.Attribute(WellKnownAttributes.Id).Value)
+                            };
+                            typeof(TColumn).GetProperties().Where(p => attr.Attribute(p.Name.ToLower()) != null).ToList()
+                                .ForEach(p => p.SetValue(record, InitGetValue(p.PropertyType, attr.Attribute(p.Name.ToLower())?.Value)));
 
                             db.InsertOrUpdate(record);
                         }

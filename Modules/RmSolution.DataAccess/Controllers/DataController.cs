@@ -70,6 +70,19 @@ namespace RmSolution.DataAccess
             throw new Exception("Тип " + name + " не найден!");
         });
 
+        /// <summary> http://localhost:8087/api/datatable/equipments </summary>
+        [HttpGet("[action]/{name}")]
+        public async Task<IActionResult> DataTable(string name) => await UseDatabase(db =>
+        {
+            var mdtype = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name)?.CType;
+            if (mdtype != null)
+            {
+                var data = Runtime.Metadata.GetData(name);
+                return new JsonResult(data);
+            }
+            throw new Exception("Тип " + name + " не найден!");
+        });
+
         [HttpPost("[action]")]
         public async Task<IActionResult> Update() => await UseDatabase((db, item) =>
         {
