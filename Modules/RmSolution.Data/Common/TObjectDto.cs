@@ -4,10 +4,9 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Data
 {
+    #region Using
     using System.Text.Json.Serialization;
     using System.Text.Json;
-    #region Using
-    using System.Text.RegularExpressions;
     #endregion Using
 
     /// <summary> Класс обмена метаданными.</summary>

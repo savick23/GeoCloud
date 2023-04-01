@@ -3,6 +3,7 @@
 
   <PropertyGroup>
     <BaseOutputPath>..\..\Bin</BaseOutputPath>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   
   <ItemGroup>

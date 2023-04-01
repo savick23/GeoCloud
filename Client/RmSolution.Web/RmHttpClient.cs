@@ -36,6 +36,7 @@ namespace RmSolution.Web
 
         public RmHttpClient()
         {
+            BaseAddress = new Uri(DataServer);
         }
 
         public async Task<TObjectDto[]?> GetObjectsAsync()

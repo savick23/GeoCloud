@@ -73,14 +73,15 @@ namespace RmSolution.DataAccess
 
         /// <summary> http://localhost:8087/api/datatable/equipments </summary>
         [HttpGet("[action]/{name}")]
-        public async Task<HttpContent> DataTable(string name)
+        public async Task<IActionResult> DataTable(string name)
         {
             if (Runtime.Metadata.GetObject(name) != null)
             {
                 var data = await Runtime.Metadata.GetDataTableAsync(name);
-                var res = new StreamContent(null);
-                res.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                return res;
+                if (data != null)
+                    return File(TSerializer.Serialize(data), "application/octet-stream", false);
+
+                throw new Exception("Ошибка запроса данных объекта " + name);
             }
             throw new Exception("Тип " + name + " не найден!");
         }
