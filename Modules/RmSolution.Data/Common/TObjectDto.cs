@@ -12,6 +12,7 @@ namespace RmSolution.Data
     /// <summary> Класс обмена метаданными.</summary>
     public class TObjectDto
     {
+        public string Code { get; set; }
         public string Name { get; set; }
         public string Source { get; set; }
         public string Type { get; set; }

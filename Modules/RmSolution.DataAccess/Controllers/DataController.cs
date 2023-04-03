@@ -24,6 +24,7 @@ namespace RmSolution.DataAccess
             new JsonResult(Runtime.Metadata.Entities.Where(e => e.Type == TType.Catalog).OrderBy(e => e.Ordinal).Select(entity =>
             new TObjectDto()
             {
+                Code = entity.Code,
                 Name = entity.Name,
                 Source = entity.Source,
                 Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
@@ -41,11 +42,12 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Object(string name) => await UseDatabase(db =>
         {
-            var entity = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name);
+            var entity = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Code == name || oi.Name == name || oi.Source == name);
             if (entity != null)
             {
                 return new JsonResult(new TObjectDto()
                 {
+                    Code = entity.Code,
                     Name = entity.Name,
                     Source = entity.Source,
                     Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,

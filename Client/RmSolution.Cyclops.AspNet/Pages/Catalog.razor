@@ -65,7 +65,7 @@ else
         {
             case CMD_NEW:
                 _state = ActionState.New;
-                await _details.InsertRow(Activator.CreateInstance(await Client.GetObjectTypeAsync(Name)));
+                await _details.InsertRow(await Client.NewItem(_info));
                 break;
             case CMD_COPY:
                 if (item != null)

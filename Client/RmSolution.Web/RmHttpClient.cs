@@ -12,6 +12,8 @@ namespace RmSolution.Web
     using System.Text.Json;
     using RmSolution.Data;
     using System.ComponentModel;
+    using RmSolution.DataAnnotations;
+    using System.Xml.Linq;
     #endregion Using
 
     public class RmHttpClient : HttpClient
@@ -76,6 +78,15 @@ namespace RmSolution.Web
             {
                 await PostAsync(string.Concat(DataServer, "update"), JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
             }
+        }
+
+        public async Task<object?> NewItem(TObjectDto? mdtype)
+        {
+            if (mdtype != null)
+            {
+                return Activator.CreateInstance(await GetObjectTypeAsync(mdtype.Code));
+            }
+            throw new Exception("Объект не указан!");
         }
 
         class XItemEnvelop
