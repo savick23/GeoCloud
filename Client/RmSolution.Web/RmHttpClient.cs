@@ -80,10 +80,11 @@ namespace RmSolution.Web
             }
         }
 
-        public async Task<object?> NewItem(TObjectDto? mdtype)
+        public async Task<object?> New(TObjectDto? mdtype)
         {
             if (mdtype != null)
             {
+                //return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "new/" + mdtype.Code));
                 return Activator.CreateInstance(await GetObjectTypeAsync(mdtype.Code));
             }
             throw new Exception("Объект не указан!");

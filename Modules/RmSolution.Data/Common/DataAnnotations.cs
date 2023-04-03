@@ -75,6 +75,8 @@ namespace RmSolution.DataAnnotations
 
     public sealed class TObjectCollection : List<TObject>
     {
+        public TObject? this[string id] =>
+            this.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]

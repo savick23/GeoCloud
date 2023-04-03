@@ -42,7 +42,7 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Object(string name) => await UseDatabase(db =>
         {
-            var entity = Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Code == name || oi.Name == name || oi.Source == name);
+            var entity = Runtime.Metadata.Entities[name];
             if (entity != null)
             {
                 return new JsonResult(new TObjectDto()
@@ -66,7 +66,7 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Data(string name)
         {
-            if (Runtime.Metadata.Entities.FirstOrDefault(oi => oi.Source == name) != null)
+            if (Runtime.Metadata.Entities[name] != null)
             {
                 return new JsonResult(await Runtime.Metadata.GetDataAsync(name));
             }
@@ -95,5 +95,11 @@ namespace RmSolution.DataAccess
             return new JsonResult("{\"result\":\"ok\"}");
         });
 
+        [HttpPost("[action]")]
+        public async Task<IActionResult> New() => await UseDatabase((db, item) =>
+        {
+            if (item != null) db.Update(item);
+            return new JsonResult("{\"result\":\"ok\"}");
+        });
     }
 }
