@@ -14,7 +14,7 @@ namespace RmSolution.Testing
 
         async Task TestData<T>(string id)
         {
-            var resp = await _client?.QueryAsync(id);
+            var resp = await _client?.GetDataAsync(id);
             Assert.IsNotNull(resp);
             Assert.IsTrue(((IEnumerable<object?>)resp).Any());
             Assert.IsTrue(((IEnumerable<object?>)resp).FirstOrDefault() is T);

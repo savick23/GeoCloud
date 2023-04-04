@@ -52,7 +52,7 @@ else
     protected override async Task OnParametersSetAsync()
     {
         _info = await Client.GetObjectAsync(Name);
-        _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        _data = (IEnumerable<object>?)await Client.GetDataAsync(Name);
         if (_data?.Count() > 0) _selectedRows = new List<object>() { _data.First() };
         StateHasChanged();
     }

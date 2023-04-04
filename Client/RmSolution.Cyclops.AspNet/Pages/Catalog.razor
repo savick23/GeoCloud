@@ -53,7 +53,7 @@ else
     protected override async Task OnParametersSetAsync()
     {
         _info = await Client.GetObjectAsync(Name);
-        _data = (IEnumerable<object>?)await Client.QueryAsync(Name);
+        _data = (IEnumerable<object>?)await Client.GetDataAsync(Name);
         if (_data?.Count() > 0) _selectedRows = new List<object>() { _data.First() };
         StateHasChanged();
     }
@@ -65,7 +65,7 @@ else
         {
             case CMD_NEW:
                 _state = ActionState.New;
-                await _details.InsertRow(await Client.New(_info));
+                await _details.InsertRow(await Client.NewItemAsync(_info));
                 break;
             case CMD_COPY:
                 if (item != null)

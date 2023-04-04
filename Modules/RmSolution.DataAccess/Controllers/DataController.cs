@@ -75,7 +75,7 @@ namespace RmSolution.DataAccess
 
         /// <summary> http://localhost:8087/api/datatable/equipments </summary>
         [HttpGet("[action]/{name}")]
-        public async Task<IActionResult> DataTable(string name)
+        public async Task<IActionResult> Rows(string name)
         {
             if (Runtime.Metadata.GetObject(name) != null)
             {

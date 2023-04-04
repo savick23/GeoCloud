@@ -8,5 +8,14 @@
         public static readonly string User = "config.users";
         public static readonly string EquipmentType = "equiptypes";
         public static readonly string Equipment = "equipments";
+
+        public static class Api
+        {
+            public static readonly string GetObjects = "objects";
+            public static readonly string GetObject = "object/";
+            public static readonly string GetData = "data/";
+            public static readonly string GetDataTable = "rows/";
+            public static readonly string PostUpdate = "update";
+        }
     }
 }

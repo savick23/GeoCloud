@@ -41,20 +41,25 @@ namespace RmSolution.Web
             BaseAddress = new Uri(DataServer);
         }
 
+        #region API Data operations
+
+        /// <summary> Возвращает список метаданных всех объектов в Системе.</summary>
         public async Task<TObjectDto[]?> GetObjectsAsync()
         {
-            return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(DataServer, "objects"));
+            return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(WellKnownObjects.Api.GetObjects));
         }
 
+        /// <summary> Возвращает метаданные объекта конфигурации.</summary>
         public async Task<TObjectDto?> GetObjectAsync(string? typeName)
         {
             if (typeName != null)
-                return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "object/" + typeName));
+                return await this.GetFromJsonAsync<TObjectDto>(string.Concat(WellKnownObjects.Api.GetObject + typeName));
 
             throw new Exception("Не найден объект типа " + typeName);
         }
 
-        public async Task<object?> QueryAsync(string? typeName)
+        /// <summary> Возвращает данные объекта конфигурации в виде классов (модели).</summary>
+        public async Task<object?> GetDataAsync(string? typeName)
         {
             if (typeName != null)
             {
@@ -63,24 +68,23 @@ namespace RmSolution.Web
                 {
                     var type = Type.GetType(mdtype.Type);
                     if (type != null)
-                        return await this.GetFromJsonAsync(string.Concat(DataServer, "data/", mdtype.Source), Array.CreateInstance(type, 0).GetType(), _jsonOptions);
+                        return await this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetData + mdtype.Source), Array.CreateInstance(type, 0).GetType(), _jsonOptions);
                 }
             }
             throw new Exception("Не найден объект типа " + typeName);
         }
 
-        public async Task<Type> GetObjectTypeAsync(string? typeName) =>
-            Type.GetType((await GetObjectAsync(typeName)).Type);
-
+        /// <summary> Обновляет данные записи на сервере.</summary>
         public async Task UpdateAsync(object? item)
         {
             if (item != null)
             {
-                await PostAsync(string.Concat(DataServer, "update"), JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
+                await PostAsync(WellKnownObjects.Api.PostUpdate, JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
             }
         }
 
-        public async Task<object?> New(TObjectDto? mdtype)
+        /// <summary> Возвращает новую запись объекта конфигурации.</summary>
+        public async Task<object?> NewItemAsync(TObjectDto? mdtype)
         {
             if (mdtype != null)
             {
@@ -90,16 +94,25 @@ namespace RmSolution.Web
             throw new Exception("Объект не указан!");
         }
 
+        #endregion API Data operations
+
+        public async Task<Type> GetObjectTypeAsync(string? typeName) =>
+            Type.GetType((await GetObjectAsync(typeName)).Type);
+
+        #region Nested types
+
         class XItemEnvelop
         {
-            public string Type { get; }
+            public string? Type { get; }
             public object? Item { get; }
 
             public XItemEnvelop(object? item)
             {
-                Type = item.GetType().AssemblyQualifiedName;
+                Type = item?.GetType().AssemblyQualifiedName;
                 Item = item;
             }
         }
+
+        #endregion Nested types
     }
 }
