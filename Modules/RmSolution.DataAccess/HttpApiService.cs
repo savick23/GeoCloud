@@ -23,9 +23,9 @@ namespace RmSolution.DataAccess
 
         #endregion Declarations
 
-        public HttpApiService(IRuntime runtime, int? port) : base(runtime)
+        public HttpApiService(IRuntime runtime, int? port, string scheme, SslCertificate certificate) : base(runtime)
         {
-            _port = port ?? 80;
+            _port = port ?? (scheme.ToLower() == "https" ? 443 : 80);
         }
 
         void Init()
