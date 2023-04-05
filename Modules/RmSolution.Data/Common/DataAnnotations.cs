@@ -87,7 +87,9 @@ namespace RmSolution.DataAnnotations
             {
                 Name = a.Name,
                 Field = a.Source ?? a.Code,
-                Visible = a.Visible
+                Type = a.Type,
+                Visible = a.Visible,
+                IsReference = a.IsReference
             }).ToArray()
         };
 
@@ -128,6 +130,8 @@ namespace RmSolution.DataAnnotations
         public bool IsCode => (Flags & TAttributeFlags.Code) > 0;
         public bool IsName => (Flags & TAttributeFlags.Name) > 0;
         public bool IsParent => (Flags & TAttributeFlags.Parent) > 0;
+        /// <summary> Признак ссылочного типа.</summary>
+        public bool IsReference => Type >= TType.TypeIterator;
 
         #endregion Properties
 

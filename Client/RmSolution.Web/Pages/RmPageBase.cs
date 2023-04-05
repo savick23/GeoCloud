@@ -58,11 +58,26 @@ namespace RmSolution.Web
                 dataRow.GetType().GetProperties().ToList().ForEach(p => p.SetValue(dataRow, p.GetValue(originValues)));
         }
 
+        protected List<TItem> RefData(TAttributeDto ai) =>
+            Client.GetReferenceData(ai.Type);
+
         #endregion Data operations
     }
 
     public enum ActionState
     {
         Select, Edit, New
+    }
+
+    public struct TItem
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+
+        public TItem(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

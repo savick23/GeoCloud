@@ -28,8 +28,11 @@ namespace RmSolution.Data
         public string Name { get; set; }
         public string Field { get; set; }
         public string DisplayField { get; set; }
+        public long Type { get; set; }
         public bool Visible { get; set; }
         public TAttributeFlags Flags { get; set; }
+
+        public bool IsReference { get; set; }
     }
 
     /// <summary> JsonConverters </summary>

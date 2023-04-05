@@ -31,7 +31,16 @@ else
                         @GetValue(row, col.Field)
                     </Template>
                     <EditTemplate Context="row">
-                        <RadzenTextBox Value=@(GetValueEdit(row, col.Field)) ValueChanged=@(e => OnValueChanged(row, col.Field, e)) />
+                        @if (col.IsReference)
+                        {
+                            <RadzenDropDown TValue="long" Data=@RefData(col) Value=@(GetValueEdit(row, col.Field))
+                                ValueProperty="Id" TextProperty="Name" Multiple="true" SelectedItemsText="выбрано"
+                                ValueChanged=@(e => OnValueChanged(row, col.Field, e)) />
+                        }
+                        else
+                        {
+                            <RadzenTextBox Value=@(GetValueEdit(row, col.Field)) ValueChanged=@(e => OnValueChanged(row, col.Field, e)) />
+                        }
                     </EditTemplate>
                 </RadzenDataGridColumn>
             }

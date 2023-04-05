@@ -115,6 +115,15 @@ namespace RmSolution.Web
             throw new Exception("Объект не указан!");
         }
 
+        public List<TItem> GetReferenceData(long objid)
+        {
+            Task.Run( async () =>
+            {
+                var t = await this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetData + "equiptypes"), typeof(TItem), _jsonOptions);
+            });
+            return new List<TItem>() { new TItem(123456798, "QWERTY") };
+        }
+
         #endregion API Data operations
 
         #region Nested types

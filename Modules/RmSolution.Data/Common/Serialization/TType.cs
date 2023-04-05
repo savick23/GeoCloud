@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: TType – Типы.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Runtime
+namespace RmSolution.Data
 {
     /// <summary> Типы.</summary>
     public static class TType
