@@ -115,9 +115,20 @@ namespace RmSolution.Web
             throw new Exception("Объект не указан!");
         }
 
-        public List<TRefType>? GetReferenceData(long objid) =>
-            AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TRefType>), _jsonOptions))
+        public List<TRefType>? GetReferenceData(long objid)
+        {
+            /*var resp = AsyncHelper.RunSync(() => GetStreamAsync(string.Concat(WellKnownObjects.Api.GetReference + objid)));
+            var ms = new TMemoryStream();
+            resp.CopyTo(ms);
+            ms.Position = 0;
+            var cnt = ms.ReadInt32();
+            var res = new List<TRefType>(cnt);
+            for (int i = 0; i < cnt; i++)
+                res.Add(new TRefType(ms.ReadInt32(), ms.ReadString()));*/
+
+            return AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TRefType>), _jsonOptions))
                 is List<TRefType> values ? values : null;
+        }
 
         #endregion API Data operations
 

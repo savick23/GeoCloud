@@ -12,6 +12,7 @@ namespace RmSolution.DataAccess
     using RmSolution.Data;
     using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     public class DataController : SmartController
@@ -56,6 +57,18 @@ namespace RmSolution.DataAccess
             var obj = Runtime.Metadata.GetObject(objid);
             if (obj != null)
             {
+                /*using var dt = await Runtime.Metadata.GetReferenceData(objid);
+                if (dt != null)
+                {
+                    using var ms = new TMemoryStream();
+                    ms.Write(dt.Rows.Count);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        ms.Write((long)row[0]);
+                        ms.Write((string)row[1]);
+                    }
+                    return File(ms.ToArray(), "application/octet-stream", false);
+                }*/
                 return new JsonResult((await Runtime.Metadata.GetReferenceData(objid)).Rows.Cast<DataRow>().Select(r => new TRefType((long)r[0], (string)r[1])).ToArray());
             }
             throw new Exception("Тип не найден!");

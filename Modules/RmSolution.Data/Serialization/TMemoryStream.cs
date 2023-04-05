@@ -236,8 +236,9 @@ namespace RmSolution.Data
                 Write(BitConverter.GetBytes(-1), 0, 4);
             else
             {
-                WriteLength7Bit(value.Length);
-                Write(_encoding.GetBytes(value), 0, value.Length);
+                var buf = _encoding.GetBytes(value);
+                WriteLength7Bit(buf.Length);
+                Write(buf, 0, buf.Length);
             }
         }
 
