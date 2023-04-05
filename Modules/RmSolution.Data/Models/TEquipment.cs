@@ -8,12 +8,19 @@ namespace RmSolution.Data
     using RmSolution.DataAnnotations;
     #endregion Using
 
-    [TObject("Типы оборудования", "equiptypes", Ordinal = 102)]
+    [TObject("Единицы измерений", "engunits", Ordinal = 100)]
+    public class TEngUnit : TCatalogGroupRow
+    {
+        [TColumn("Условное обозначение", Length = 8, Nullable = true)]
+        public string? Symbol { get; set; }
+    }
+
+    [TObject("Типы оборудования", "equiptypes", Ordinal = 101)]
     public class TEquipmentType : TCatalogRow
     {
     }
 
-    [TObject("Оборудование", "equipments", Ordinal = 100)]
+    [TObject("Оборудование", "equipments", Ordinal = 102)]
     public class TEquipment : TCatalogGroupTreeRow
     {
         [TColumn("Тип", Binding = "equiptypes")]

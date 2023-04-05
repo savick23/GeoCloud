@@ -2,41 +2,41 @@
 <rmgeo>
   <objects>
     <catalogs>
-      <item id="844424930131968" parent="11" type="11" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects" autoinc="Common">
+      <item id="5348024557502464" parent="11" type="11" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects" autoinc="Common">
         <attributes>
-          <item id="844424930132992" code="ИД" name="Идентификатор" source="id" flags="Key"/>
-          <item id="844424930134016" code="Состояние" name="Состояние" source="state" />
-          <item id="844424930135040" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
-          <item id="844424930136064" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
-          <item id="844424930137088" code="Местоположение" name="Местоположение" source="location"/>
+          <item id="5348024557503488" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="5348024557504512" code="Состояние" name="Состояние" source="state" />
+          <item id="5348024557505536" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="5348024557506560" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+          <item id="5348024557507584" code="Местоположение" name="Местоположение" source="location"/>
         </attributes>
         <data>
-          <row id="844424930132992" state="1" code="000001" name="Площадь Конституции" location="Санкт-Петербург, 59.851977, 30.304702"/>
+          <row id="5348024557503488" code="000001" name="Площадь Конституции" location="Санкт-Петербург, 59.851977, 30.304702"/>
         </data>
       </item>
-      <item id="1125899906842624" parent="11" type="11" code="GEOGROUPS" name="Группы измерений" source="geogroups" autoinc="Common">
+      <item id="5629499534213120" parent="11" type="11" code="GEOGROUPS" name="Группы измерений" source="geogroups" autoinc="Common">
         <attributes>
-          <item id="1125899906843648" code="ИД" name="Идентификатор" source="id" flags="Key"/>
-          <item id="1125899906844672" code="Состояние" name="Состояние" source="state" />
-          <item id="1125899906845696" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
-          <item id="1125899906846720" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
-          <item id="1125899906847744" code="Проект" name="Проект" source="project" type="844424930131968"/>
+          <item id="5629499534214144" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="5629499534215168" code="Состояние" name="Состояние" source="state" />
+          <item id="5629499534216192" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="5629499534217216" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+          <item id="5629499534218240" code="Проект" name="Проект" source="project" type="5348024557502464"/>
         </attributes>
         <data>
-          <row id="1125899906843648" state="1" code="000001" name="Пиццерия Pizza Hut" project="844424930132992"/>
+          <row id="5629499534214144" code="000001" name="Пиццерия Pizza Hut" project="5348024557503488"/>
         </data>
       </item>
-      <item id="1407374883553280" parent="11" type="11" code="GEOPOINTS" name="Точки измерения" source="geopoints" autoinc="Common">
+      <item id="5910974510923776" parent="11" type="11" code="GEOPOINTS" name="Точки измерения" source="geopoints" autoinc="Common">
         <attributes>
-          <item id="1407374883554304" code="ИД" name="Идентификатор" source="id" flags="Key"/>
-          <item id="1407374883555328" code="Состояние" name="Состояние" source="state" />
-          <item id="1407374883556352" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
-          <item id="1407374883557376" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
-          <item id="1407374883558400" code="Группа" name="Группа" source="group" type="1125899906842624"/>
+          <item id="5910974510924800" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="5910974510925824" code="Состояние" name="Состояние" source="state" />
+          <item id="5910974510926848" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="5910974510927872" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+          <item id="5910974510928896" code="Группа" name="Группа" source="group" type="5629499534213120"/>
         </attributes>
         <data>
-          <row id="1407374883554304" state="1" code="000001" name="Фасад 1" group="1125899906843648"/>
-          <row id="1407374883555328" state="1" code="000002" name="Фасад 2" group="1125899906843648"/>
+          <row id="5910974510924800" code="000001" name="Фасад 1" group="5629499534214144"/>
+          <row id="5910974510925824" code="000002" name="Фасад 2" group="5629499534214144"/>
         </data>
       </item>
     </catalogs>

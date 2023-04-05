@@ -55,7 +55,7 @@ namespace RmSolution.Data
 
         public override IDatabase Open()
         {
-            _conn = new NpgsqlConnection(string.Concat(_connstr, string.IsNullOrWhiteSpace(ApplicationName) ? string.Empty : "Application Name=" + ApplicationName));
+            _conn = new NpgsqlConnection(string.Concat(_connstr, string.IsNullOrWhiteSpace(ApplicationName) ? string.Empty : "Application name=" + ApplicationName));
             try
             {
                 _conn.Open();
