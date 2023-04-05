@@ -45,6 +45,9 @@ namespace RmSolution.DataAnnotations
         public Type CType { get; set; }
         /// <summary> Признак системного объекта.</summary>
         public bool IsSystem { get; set; }
+        /// <summary> Различные флаги объекта конфигурации.</summary>
+        [TColumn("Флаги")]
+        public TObjectFlags Flags { get; set; }
 
         /// <summary> Полное имя таблицы в базе данных.</summary>
         public string TableName
@@ -75,6 +78,9 @@ namespace RmSolution.DataAnnotations
 
     public sealed class TObjectCollection : List<TObject>
     {
+        public TObject? this[long id] =>
+            this.FirstOrDefault(oi => oi.Id == id);
+
         public TObject? this[string id] =>
             this.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
     }
@@ -91,6 +97,9 @@ namespace RmSolution.DataAnnotations
         public bool Nullable { get; set; }
         /// <summary> Встроенный тип C#.</summary>
         public Type CType { get; set; }
+        /// <summary> Различные флаги реквизита объекта конфигурации.</summary>
+        [TColumn("Флаги")]
+        public TAttributeFlags Flags { get; set; }
 
         /// <summary> Definition </summary>
         public string? Source { get; set; }
@@ -161,6 +170,16 @@ namespace RmSolution.DataAnnotations
         {
             Columns = columns;
         }
+    }
+
+    public enum TObjectFlags
+    {
+        None = 0
+    }
+
+    public enum TAttributeFlags
+    {
+        None = 0
     }
 }
 #pragma warning restore CS8618

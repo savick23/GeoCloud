@@ -6,6 +6,7 @@ namespace RmSolution.Web
 {
     #region Using
     using Microsoft.AspNetCore.Components;
+    using RmSolution.Data;
     using RmSolution.Web;
     #endregion Using
 
@@ -33,6 +34,9 @@ namespace RmSolution.Web
         #endregion Properties
 
         #region Data operations
+
+        protected async Task<object?> NewItem(TObjectDto mdtype) =>
+            await Client.NewItemAsync(mdtype);
 
         protected string GetValue(object item, string name) =>
           item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? NullValue;

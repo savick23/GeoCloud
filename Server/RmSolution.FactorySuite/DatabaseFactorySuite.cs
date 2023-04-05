@@ -200,7 +200,12 @@ namespace RmSolution.Data
 
         static string GetSqlValue(object? value)
         {
-            if (value == null) return "NULL";
+            if (value == null)
+                return "NULL";
+
+            if (value.GetType().IsEnum)
+                return ((int)value).ToString();
+
             return value switch
             {
                 string => string.Concat("'", value.ToString(), "'"),

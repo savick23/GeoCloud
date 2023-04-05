@@ -76,11 +76,16 @@ namespace RmSolution.DataAccess
             var envelop = (JObject?)JsonConvert.DeserializeObject(jsonValue);
             if (envelop != null)
             {
-                var item = ((JObject?)envelop["Item"])?.ToString();
-                if (item != null)
+                if (envelop["Item"] is JValue val)
+                    return val.Value;
+                else
                 {
-                    var type = Type.GetType(((JValue?)envelop["Type"]).Value.ToString());
-                    return JsonConvert.DeserializeObject(item, type, _jsonOptions);
+                    var item = ((JObject?)envelop["Item"])?.ToString();
+                    if (item != null)
+                    {
+                        var type = Type.GetType(((JValue?)envelop["Type"]).Value.ToString());
+                        return JsonConvert.DeserializeObject(item, type, _jsonOptions);
+                    }
                 }
             }
             return null;

@@ -100,7 +100,7 @@ namespace RmSolution.Web
         {
             if (item != null)
             {
-                await PostAsync(WellKnownObjects.Api.PostUpdate, JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
+                await PostAsync(WellKnownObjects.Api.PostUpdateItem, JsonContent.Create(new XItemEnvelop(item), typeof(XItemEnvelop), null, _jsonOptions));
             }
         }
 
@@ -109,8 +109,7 @@ namespace RmSolution.Web
         {
             if (mdtype != null)
             {
-                //return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "new/" + mdtype.Code));
-                return Activator.CreateInstance(Type.GetType(mdtype.Type));
+                return await PostAsync(WellKnownObjects.Api.PostNewItem, JsonContent.Create(new XItemEnvelop(mdtype.Id), typeof(XItemEnvelop), null, _jsonOptions));
             }
             throw new Exception("Объект не указан!");
         }

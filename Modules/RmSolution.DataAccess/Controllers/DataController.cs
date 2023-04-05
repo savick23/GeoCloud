@@ -7,8 +7,10 @@ namespace RmSolution.DataAccess
     #region Using
     using System.Data;
     using System.Net.Http.Headers;
+    using System.Xml.Linq;
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Data;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -47,6 +49,7 @@ namespace RmSolution.DataAccess
             {
                 return new JsonResult(new TObjectDto()
                 {
+                    Id = entity.Id,
                     Code = entity.Code,
                     Name = entity.Name,
                     Source = entity.Source,
@@ -96,10 +99,18 @@ namespace RmSolution.DataAccess
         });
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> New() => await UseDatabase((db, item) =>
+        public async Task<IActionResult> New() => await UseDatabase((db, objid) =>
         {
-            if (item != null) db.Update(item);
-            return new JsonResult("{\"result\":\"ok\"}");
+            if (objid is long id)
+            {
+                var obj =  Runtime.Metadata.Entities[id];
+                if (obj != null)
+                {
+                    var newitem = Activator.CreateInstance(obj.CType);
+                    return new JsonResult(newitem);
+                }
+            }
+            throw new Exception("Ошибка получения новой записи.");
         });
     }
 }

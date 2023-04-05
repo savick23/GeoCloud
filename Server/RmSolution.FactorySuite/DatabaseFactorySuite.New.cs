@@ -286,7 +286,10 @@ namespace RmSolution.Data
         static string InitGetValue(string type, object? value)
         {
             if (value == null)
-                return "NULL";
+                return "NULL"; 
+
+            if (value.GetType().IsEnum)
+                return ((int)value).ToString();
 
             var val = value.ToString() ?? string.Empty;
             switch (type.ToUpper())
@@ -315,6 +318,7 @@ namespace RmSolution.Data
         static object? InitGetValue(Type type, string? value)
         {
             if (value == null) return null;
+            if (type.IsEnum) return Enum.TryParse(type, value, true, out var eval) ? eval : 0;
             if (type == typeof(int)) return int.Parse(value);
             if (type == typeof(long)) return long.Parse(value);
             if (type == typeof(float)) return float.Parse(value);
