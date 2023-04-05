@@ -13,24 +13,24 @@ namespace RmSolution.Data
     {
         public static readonly TRefType Empty = new();
 
-        public readonly long? Value;
-        public readonly string? View;
+        public readonly long? Id;
+        public readonly string? Name;
 
-        public TRefType(long? value)
+        public TRefType(long? id)
         {
-            Value = value;
+            Id = id;
         }
 
-        public TRefType(long? value, string? view)
+        public TRefType(long? id, string? name)
         {
-            Value = value;
-            View = view;
+            Id = id;
+            Name = name;
         }
 
-        public static implicit operator long(TRefType v) => v.Value ?? 0;
-        public static implicit operator long?(TRefType v) => v.Value;
+        public static implicit operator long(TRefType v) => v.Id ?? 0;
+        public static implicit operator long?(TRefType v) => v.Id;
         public static implicit operator TRefType(long? v) => new(v);
 
-        public override string ToString() => View?.ToString();
+        public override string ToString() => Name?.ToString();
     }
 }

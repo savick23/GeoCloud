@@ -64,8 +64,8 @@ namespace RmSolution.Data
         public override void Write(Utf8JsonWriter writer, TRefType value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WriteNumber("value", value.Value ?? -1);
-            writer.WriteString("view", value.View ?? null);
+            writer.WriteNumber("value", value.Id ?? -1);
+            writer.WriteString("view", value.Name ?? null);
             writer.WriteEndObject();
         }
     }
