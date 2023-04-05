@@ -31,11 +31,18 @@ namespace RmSolution.Web
                 }
         };
 
+        /// <summary> Кэш метаданных.</summary>
+        List<TObjectDto> _objects = new();
+
         #endregion Declarations
+
+        #region Properties
 
         public static string Title => Assembly.GetExecutingAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product ?? "RmSolution.RmGeo";
         public static string Version => Assembly.GetExecutingAssembly().GetName()?.Version?.ToString(2) ?? "0.0.0.0";
         public static string DataServer => "http://localhost:8087/api/";
+
+        #endregion Properties
 
         public RmHttpClient()
         {
@@ -60,14 +67,7 @@ namespace RmSolution.Web
         /// <summary> Возвращает список метаданных всех объектов в Системе.</summary>
         public async Task<TObjectDto[]?> GetObjectsAsync()
         {
-            try
-            {
-                return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(WellKnownObjects.Api.GetObjects));
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(WellKnownObjects.Api.GetObjects));
         }
 
         /// <summary> Возвращает метаданные объекта конфигурации.</summary>
@@ -110,15 +110,12 @@ namespace RmSolution.Web
             if (mdtype != null)
             {
                 //return await this.GetFromJsonAsync<TObjectDto>(string.Concat(DataServer, "new/" + mdtype.Code));
-                return Activator.CreateInstance(await GetObjectTypeAsync(mdtype.Code));
+                return Activator.CreateInstance(Type.GetType(mdtype.Type));
             }
             throw new Exception("Объект не указан!");
         }
 
         #endregion API Data operations
-
-        public async Task<Type> GetObjectTypeAsync(string? typeName) =>
-            Type.GetType((await GetObjectAsync(typeName)).Type);
 
         #region Nested types
 
