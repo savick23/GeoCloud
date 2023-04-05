@@ -34,7 +34,6 @@ else
                         @if (col.IsReference)
                         {
                             <RadzenDropDown TValue="TRefType?" Data=@RefData(col) Value=@(GetValueEdit(row, col.Field))
-                                ValueProperty="Id" TextProperty="Name"
                                 ValueChanged=@(e => OnValueChanged(row, col.Field, e))
                                 Style="width:100%;" />
                         }
