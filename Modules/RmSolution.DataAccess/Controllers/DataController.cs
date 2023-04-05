@@ -18,7 +18,7 @@ namespace RmSolution.DataAccess
         {
         }
 
-        /// <summary> http://localhost:8087/api/objects </summary>
+        /// <summary> https://localhost:8087/api/objects </summary>
         [HttpGet("[action]")]
         public async Task<IActionResult> Objects() => await UseDatabase(db =>
             new JsonResult(Runtime.Metadata.Entities.Where(e => e.Type == TType.Catalog).OrderBy(e => e.Ordinal).Select(entity =>
@@ -38,7 +38,7 @@ namespace RmSolution.DataAccess
             }).ToArray())
         );
 
-        /// <summary> http://localhost:8087/api/object/equipments </summary>
+        /// <summary> https://localhost:8087/api/object/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Object(string name) => await UseDatabase(db =>
         {
@@ -62,7 +62,7 @@ namespace RmSolution.DataAccess
             throw new Exception("Тип " + name + " не найден!");
         });
 
-        /// <summary> http://localhost:8087/api/data/equipments </summary>
+        /// <summary> https://localhost:8087/api/data/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Data(string name)
         {
@@ -73,7 +73,7 @@ namespace RmSolution.DataAccess
             throw new Exception("Тип " + name + " не найден!");
         }
 
-        /// <summary> http://localhost:8087/api/datatable/equipments </summary>
+        /// <summary> https://localhost:8087/api/datatable/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Rows(string name)
         {

@@ -6,14 +6,15 @@ namespace RmSolution.Web
 {
     #region Using
     using System;
+    using System.Net;
     using System.Net.Http.Json;
     using System.Reflection;
     using System.Text.Json.Serialization;
     using System.Text.Json;
     using RmSolution.Data;
-    using System.ComponentModel;
-    using RmSolution.DataAnnotations;
-    using System.Xml.Linq;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Security.Authentication;
+    using System.Reflection.Metadata;
     #endregion Using
 
     public class RmHttpClient : HttpClient
@@ -38,6 +39,19 @@ namespace RmSolution.Web
 
         public RmHttpClient()
         {
+            /*
+            var webhandler = new HttpClientHandler()
+            {
+                ClientCertificateOptions = ClientCertificateOption.Manual,
+                SslProtocols = SslProtocols.Tls12
+            };
+            var cert2 = new X509Certificate2(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cert\\RmSolution.RmGeo.pfx"), "7HfpJnvthm!", X509KeyStorageFlags.MachineKeySet);
+            webhandler.ClientCertificates.Add(cert2);
+
+            //     h.ClientCertificates.Add();
+            // ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            */
             BaseAddress = new Uri(DataServer);
         }
 
@@ -46,7 +60,14 @@ namespace RmSolution.Web
         /// <summary> Возвращает список метаданных всех объектов в Системе.</summary>
         public async Task<TObjectDto[]?> GetObjectsAsync()
         {
-            return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(WellKnownObjects.Api.GetObjects));
+            try
+            {
+                return await this.GetFromJsonAsync<TObjectDto[]?>(string.Concat(WellKnownObjects.Api.GetObjects));
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         /// <summary> Возвращает метаданные объекта конфигурации.</summary>

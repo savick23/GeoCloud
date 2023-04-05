@@ -4,6 +4,8 @@
 //--------------------------------------------------------------------------------------------------
 using RmSolution.Web;
 using System.Reflection;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
 {
@@ -16,9 +18,7 @@ builder.Host.UseWindowsService()
     {
         srv.AddRazorPages();
         srv.AddServerSideBlazor();
-        srv.AddScoped(sp => new RmHttpClient
-        {
-        });
+        srv.AddScoped(sp => new RmHttpClient());
         srv.AddHostedService<RmInformationService>();
     });
 

@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Certificate\RmSolution.RmGeo.pfx" />
+    <None Remove="cert\RmSolution.RmGeo.pfx" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\..\Keys\RmSolution.RmGeo.pfx">
-      <Link>Certificate\RmSolution.RmGeo.pfx</Link>
+      <Link>cert\RmSolution.RmGeo.pfx</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

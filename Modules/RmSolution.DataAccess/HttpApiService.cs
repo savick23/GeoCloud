@@ -6,6 +6,7 @@ namespace RmSolution.DataAccess
 {
     #region Using
     using RmSolution.Runtime;
+    using System.Security.Cryptography.X509Certificates;
     using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     #endregion Using
@@ -19,22 +20,43 @@ namespace RmSolution.DataAccess
 
         WebApplication? _host;
 
-        int _port;
+        readonly SslCertificate? _cert;
+        readonly int _port;
 
         #endregion Declarations
 
+        #region Constructor
+
         public HttpApiService(IRuntime runtime, int? port, string scheme, SslCertificate certificate) : base(runtime)
         {
+            _cert = scheme.ToLower() == "https" ? certificate : null;
             _port = port ?? (scheme.ToLower() == "https" ? 443 : 80);
+            Name = "Веб-сервис доступа к данным, порт " + _port;
         }
+
+        #endregion Constructor
 
         void Init()
         {
             var builder = WebApplication.CreateBuilder();
-            builder.WebHost.ConfigureKestrel(opt =>
+            if (_cert != null)
             {
-                opt.ListenAnyIP(_port);
-            });
+                var cert = Path.Combine(Runtime.GetWorkDirectory(), _cert.Path ?? string.Empty);
+                if (!File.Exists(cert)) throw new Exception("Не найден SSL-сертификат: " + cert);
+                builder.WebHost.ConfigureKestrel(opt =>
+                {
+                    opt.ListenAnyIP(_port, listen =>
+                    {
+                        listen.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+                        listen.UseHttps(new X509Certificate2(cert, _cert.Password));
+                    });
+                });
+            }
+            else
+                builder.WebHost.ConfigureKestrel(opt =>
+                {
+                    opt.ListenAnyIP(_port);
+                });
 
             builder.Services.AddCors(opt =>
                 opt.AddPolicy(CORSPOLICENAME, police => // Политика для всех узлов -->

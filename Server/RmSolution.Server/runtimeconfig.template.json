@@ -35,11 +35,11 @@
       "name": "Веб-сервис доступа к данным",
       "type": "RmSolution.DataAccess.HttpApiService, RmSolution.DataAccess",
       "start": "auto",
-      "scheme": "https",
+      "scheme": "http",
       "port": 8087,
       "certificate": {
         "path": "cert\\RmSolution.RmGeo.pfx",
-        "password": ""
+        "password": "7HfpJnvthm!"
       }
     }
   ]
