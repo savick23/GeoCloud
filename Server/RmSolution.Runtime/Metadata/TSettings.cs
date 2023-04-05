@@ -12,7 +12,7 @@ namespace RmSolution.Runtime
     #endregion Using
 
     /// <summary> Различные настройки конфигурации.</summary>
-    [TObject("Настройки конфигурации", "config.settings", Ordinal = 1, IsSystem = true)]
+    [TObject("Настройки конфигурации", "config.settings", Ordinal = 1)]
     public class TSettings
     {
         [TColumn("Идентификатор", Length = 64, IsKey = true)]

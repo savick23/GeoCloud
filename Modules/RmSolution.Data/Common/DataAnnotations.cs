@@ -34,7 +34,7 @@ namespace RmSolution.DataAnnotations
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    [TObject("Объекты конфигурации", "config.objects", Ordinal = 1, IsSystem = true)]
+    [TObject("Объекты конфигурации", "config.objects", Ordinal = 1)]
     public sealed class TObject : TEntity
     {
         [TColumn("Источник", Length = 64, Nullable = true)]
@@ -43,11 +43,11 @@ namespace RmSolution.DataAnnotations
         [TColumn("Порядок")]
         public int Ordinal { get; set; } = int.MaxValue;
         public Type CType { get; set; }
-        /// <summary> Признак системного объекта.</summary>
-        public bool IsSystem { get; set; }
         /// <summary> Различные флаги объекта конфигурации.</summary>
         [TColumn("Флаги")]
         public TObjectFlags Flags { get; set; }
+        /// <summary> [Flag] Признак системного объекта.</summary>
+        public bool IsSystem => (Flags & TObjectFlags.System) > 0;
 
         /// <summary> Полное имя таблицы в базе данных.</summary>
         public string TableName
@@ -86,13 +86,11 @@ namespace RmSolution.DataAnnotations
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2, IsSystem = true)]
+    [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2)]
     public sealed class TColumn : TEntity
     {
         [TColumn("Длинна")]
         public int Length { get; set; }
-        /// <summary> Признак первичного ключа.</summary>
-        public bool IsKey { get; set; }
         /// <summary> Признак возможности пустых значений.</summary>
         public bool Nullable { get; set; }
         /// <summary> Встроенный тип C#.</summary>
@@ -100,6 +98,12 @@ namespace RmSolution.DataAnnotations
         /// <summary> Различные флаги реквизита объекта конфигурации.</summary>
         [TColumn("Флаги")]
         public TAttributeFlags Flags { get; set; }
+        /// <summary> Признак первичного ключа.</summary>
+        public bool IsKey
+        {
+            get => (Flags & TAttributeFlags.Key) > 0;
+            set => Flags = value ? Flags | TAttributeFlags.Key : Flags & (0x7FFFFFFF - TAttributeFlags.Key);
+        }
 
         /// <summary> Definition </summary>
         public string? Source { get; set; }
@@ -172,14 +176,18 @@ namespace RmSolution.DataAnnotations
         }
     }
 
+    [Flags]
     public enum TObjectFlags
     {
-        None = 0
+        None = 0,
+        System = 1
     }
 
+    [Flags]
     public enum TAttributeFlags
     {
-        None = 0
+        None = 0,
+        Key = 1
     }
 }
 #pragma warning restore CS8618

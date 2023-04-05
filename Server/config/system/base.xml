@@ -11,22 +11,21 @@
           <row id="5" parent="1" type="5" code="Обработчик" name="Обработчики"/>
           <row id="6" parent="1" type="6" code="Приложение" name="Приложения" desciption="Приложения (группировка микросервисов, модулей по функциональным признакам)"/>
           <row id="7" parent="1" type="7" code="Модуль" name="Модули" desciption="Микросервисы, модули, службы" source="RmSolution.Runtime.TModule, RmSolution.Runtime"/>
-          <row id="8" parent="6" type="8" code="Системный" name="Системные объекты" source="config.objects"/>
-          <row id="9" parent="1" type="9" code="Настройки" name="Настройки" source="config.settings"/>
-          <row id="10" parent="3" type="10" code="Константа" name="Константы"/>
-          <row id="11" parent="3" type="11" code="Перечисление" name="Перечисления" source="config.enums"/>
-          <row id="12" parent="3" type="12" code="Справочник" name="Справочники"/>
-          <row id="13" parent="3" type="13" code="Документ" name="Документы"/>
-          <row id="14" parent="3" type="14" code="Журнал" name="Журналы"/>
-          <row id="15" parent="3" type="15" code="Отчёт" name="Отчёты"/>
-          <row id="16" parent="3" type="16" code="Регистр" name="Регистры"/>
-          <row id="17" parent="3" type="17" code="Учётный" name="Учётный регистр"/>
-          <row id="18" parent="1" type="18" code="Измерение" name="Измерение"/>
-          <row id="19" parent="1" type="19" code="Детали" name="Табличная часть"/>
-          <row id="20" parent="3" type="20" code="Запрос" name="Запросы" desciption="Заранее продготовленные запросы данных, представления"/>
-          <row id="21" parent="1" type="21" code="Реквизит" name="Реквизиты" description="Реквизиты, поля классов, свойства и т.д."/>
-          <row id="22" parent="1" type="22" code="Меню" name="Меню"/>
-          <row id="23" parent="1" type="23" code="Инструменты" name="Панели инструментов"/>
+          <row id="8" parent="1" type="8" code="Настройки" name="Настройки" source="config.settings"/>
+          <row id="9" parent="3" type="9" code="Константа" name="Константы"/>
+          <row id="10" parent="3" type="10" code="Перечисление" name="Перечисления" source="config.enums"/>
+          <row id="11" parent="3" type="11" code="Справочник" name="Справочники"/>
+          <row id="12" parent="3" type="12" code="Документ" name="Документы"/>
+          <row id="13" parent="3" type="13" code="Журнал" name="Журналы"/>
+          <row id="14" parent="3" type="14" code="Отчёт" name="Отчёты"/>
+          <row id="15" parent="3" type="15" code="Регистр" name="Регистры"/>
+          <row id="16" parent="3" type="16" code="Учётный" name="Учётный регистр"/>
+          <row id="17" parent="1" type="17" code="Измерение" name="Измерение"/>
+          <row id="18" parent="1" type="18" code="Детали" name="Табличная часть"/>
+          <row id="19" parent="3" type="19" code="Запрос" name="Запросы" desciption="Заранее продготовленные запросы данных, представления"/>
+          <row id="20" parent="1" type="20" code="Реквизит" name="Реквизиты" description="Реквизиты, поля классов, свойства и т.д."/>
+          <row id="21" parent="1" type="21" code="Меню" name="Меню"/>
+          <row id="22" parent="1" type="22" code="Инструменты" name="Панели инструментов"/>
           <row id="32" parent="3" type="32" code="Тэги" name="Словарь тэгов"/>
           <datatypes>
             <row id="64" parent="4" type="4" code="treftype" name="Ссылочный тип" source="bigint"/>
@@ -56,17 +55,17 @@
           </datatypes>
         </data>
       </item>
-      <item id="9" parent="1" type="9" code="SETTINGS" name="Настройки" source="config.settings">
+      <item id="8" parent="1" type="8" code="SETTINGS" name="Настройки" source="config.settings" flags="System">
         <data>
           <row id="DBVersion" value="3.0.0.3"/>
         </data>
       </item>
-      <item id="281474976710656" parent="12" type="12" code="NODES" name="Узлы БД" source="config.nodes">
+      <item id="281474976710656" parent="12" type="12" code="NODES" name="Узлы БД" source="config.nodes" flags="System">
         <data>
           <row id="281474976711680" state="1" code="0001" name="Центральный узел" index="1"/>
         </data>
       </item>
-      <item id="562949953421312" parent="12" type="12" code="SITES" name="Площадки" source="config.sites">
+      <item id="562949953421312" parent="12" type="12" code="SITES" name="Площадки" source="config.sites" flags="System">
         <data>
           <row id="562949953422336" state="1" code="0001" name="Строительная площадка 1"/>
         </data>

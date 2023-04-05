@@ -21,37 +21,35 @@ namespace RmSolution.Runtime
         public static readonly long Application = 6;
         /// <summary> Модуль.</summary>
         public static readonly long Module = 7;
-        /// <summary> Системный.</summary>
-        public static readonly long System = 8;
         /// <summary> Настройки.</summary>
-        public static readonly long Settings = 9;
+        public static readonly long Settings = 8;
         /// <summary> Константа.</summary>
-        public static readonly long Constant = 10;
+        public static readonly long Constant = 9;
         /// <summary> Перечисление.</summary>
-        public static readonly long Enum = 11;
+        public static readonly long Enum = 10;
         /// <summary> Справочник.</summary>
-        public static readonly long Catalog = 12;
+        public static readonly long Catalog = 11;
         /// <summary> Документ.</summary>
-        public static readonly long Document = 13;
+        public static readonly long Document = 12;
         /// <summary> Журнал.</summary>
-        public static readonly long Journal = 14;
+        public static readonly long Journal = 13;
         /// <summary> Отчёт.</summary>
-        public static readonly long Report = 15;
+        public static readonly long Report = 14;
         /// <summary> Регистр.</summary>
-        public static readonly long Register = 16;
+        public static readonly long Register = 15;
         /// <summary> Регистр учётный.</summary>
-        public static readonly long Account = 17;
+        public static readonly long Account = 16;
         /// <summary> Измерения для регистров.</summary>
-        public static readonly long Dimension = 18;
+        public static readonly long Dimension = 17;
         /// <summary> Табличная часть, детали.</summary>
-        public static readonly long Details = 19;
+        public static readonly long Details = 18;
         /// <summary> Запрос.</summary>
         /// <remarks> Заранее продготовленные запросы данных, представления.</remarks>
-        public static readonly long Query = 20;
+        public static readonly long Query = 19;
         /// <summary> Реквизит.</summary>
-        public static readonly long Attribute = 21;
+        public static readonly long Attribute = 20;
         /// <summary> Меню.</summary>
-        public static readonly long Menu = 22;
+        public static readonly long Menu = 21;
         /// <summary> Панели инструментов.</summary>
         public static readonly long Tool = 22;
         /// <summary> Словарь тэгов.</summary>

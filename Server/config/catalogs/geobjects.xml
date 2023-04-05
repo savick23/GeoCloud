@@ -4,7 +4,7 @@
     <catalogs>
       <item id="844424930131968" parent="12" type="12" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects">
         <attributes>
-          <item id="844424930132992" code="ИД" name="Идентификатор" source="id" />
+          <item id="844424930132992" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="844424930134016" code="Состояние" name="Состояние" source="state" />
           <item id="844424930135040" code="Код" name="Код" source="code" width="100"/>
           <item id="844424930136064" code="Наименование" name="Наименование" source="name" width="300"/>
@@ -16,7 +16,7 @@
       </item>
       <item id="1125899906842624" parent="12" type="12" code="GEOGROUPS" name="Группы измерений" source="geogroups">
         <attributes>
-          <item id="1125899906843648" code="ИД" name="Идентификатор" source="id" />
+          <item id="1125899906843648" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="1125899906844672" code="Состояние" name="Состояние" source="state" />
           <item id="1125899906845696" code="Код" name="Код" source="code" width="100"/>
           <item id="1125899906846720" code="Наименование" name="Наименование" source="name" width="300"/>
@@ -28,7 +28,7 @@
       </item>
       <item id="1407374883553280" parent="12" type="12" code="GEOPOINTS" name="Точки измерения" source="geopoints">
         <attributes>
-          <item id="1407374883554304" code="ИД" name="Идентификатор" source="id" />
+          <item id="1407374883554304" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="1407374883555328" code="Состояние" name="Состояние" source="state" />
           <item id="1407374883556352" code="Код" name="Код" source="code" width="100"/>
           <item id="1407374883557376" code="Наименование" name="Наименование" source="name" width="300"/>
