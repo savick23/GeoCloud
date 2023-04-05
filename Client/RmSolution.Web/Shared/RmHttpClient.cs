@@ -119,7 +119,7 @@ namespace RmSolution.Web
         {
             Task.Run( async () =>
             {
-                var t = await this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetData + "equiptypes"), typeof(TItem), _jsonOptions);
+              //  var t = await this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetData + "equiptypes"), typeof(TItem), _jsonOptions);
             });
             return new List<TItem>() { new TItem(123456798, "QWERTY") };
         }
