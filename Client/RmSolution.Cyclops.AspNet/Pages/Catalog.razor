@@ -33,9 +33,10 @@ else
                     <EditTemplate Context="row">
                         @if (col.IsReference)
                         {
-                            <RadzenDropDown TValue="long" Data=@RefData(col) Value=@(GetValueEdit(row, col.Field))
-                                ValueProperty="Id" TextProperty="Name" Multiple="true" SelectedItemsText="выбрано"
-                                ValueChanged=@(e => OnValueChanged(row, col.Field, e)) />
+                            <RadzenDropDown TValue="long?" Data=@RefData(col) Value=@(GetValueEdit(row, col.Field))
+                                ValueProperty="Id" TextProperty="Name"
+                                ValueChanged=@(e => OnValueChanged(row, col.Field, e))
+                                Style="width:100%;" />
                         }
                         else
                         {

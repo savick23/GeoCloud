@@ -47,9 +47,15 @@ namespace RmSolution.Web
         protected string GetValueEdit(object item, string name) =>
           item.GetType().GetProperty(name, _propFlags)?.GetValue(item)?.ToString() ?? string.Empty;
 
-        protected void OnValueChanged(object data, string name, object value)
+        protected void OnValueChanged(object data, string name, object? value)
         {
-            data.GetType().GetProperty(name, _propFlags)?.SetValue(data, value);
+            var prop = data.GetType().GetProperty(name, _propFlags);
+            if (prop.PropertyType == typeof(TRefType))
+            {
+                prop.SetValue(data, new TRefType((long)value, value.ToString()));
+            }
+            else
+                data.GetType().GetProperty(name, _propFlags)?.SetValue(data, value);
         }
 
         protected void Cancel(object dataRow, object? originValues)

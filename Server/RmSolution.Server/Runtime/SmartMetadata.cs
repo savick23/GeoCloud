@@ -195,6 +195,18 @@ namespace RmSolution.Server
             return null;
         });
 
+        public async Task<DataTable?> GetReferenceData(long id) => await UseDatabase(db =>
+        {
+            var obj = GetObject(id);
+            if (obj != null)
+            {
+                return db.Query(new StringBuilder("SELECT ")
+                    .Append(obj.Attributes.IdField.Field).Append(',').Append(obj.Attributes.ViewField)
+                    .Append(" FROM ").Append(obj.TableName).ToString());
+            }
+            return null;
+        });
+
         public object? UpdateData(object? item)
         {
             if (item != null) _db.Update(item);

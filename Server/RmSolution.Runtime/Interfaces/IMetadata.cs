@@ -22,6 +22,8 @@ namespace RmSolution.Runtime
 
         /// <summary> Возвращает табличные данные объекта конфигурации.</summary>
         Task<DataTable?> GetDataTableAsync(string id);
+        /// <summary> Возвращает табличные данные объекта конфигурации для списков.</summary>
+        Task<DataTable?> GetReferenceData(long id);
 
         /// <summary> Обновляет данные объекта конфигурации.</summary>
         object? UpdateData(object? item);

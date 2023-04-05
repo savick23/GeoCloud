@@ -115,13 +115,9 @@ namespace RmSolution.Web
             throw new Exception("Объект не указан!");
         }
 
-        public List<TItem>? GetReferenceData(long objid)
-        {
-            if (AsyncHelper.RunSync(() => GetDataAsync("equiptypes")) is IEnumerable<TCatalogRow> catalog)
-                return catalog.Select(item => new TItem(item.Id, item.Name)).ToList();
-
-            return null;
-        }
+        public List<TItem>? GetReferenceData(long objid) =>
+            AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TItem>), _jsonOptions))
+                is List<TItem> res ? res : null;
 
         #endregion API Data operations
 

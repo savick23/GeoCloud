@@ -49,6 +49,18 @@ namespace RmSolution.DataAccess
             throw new Exception("Тип " + name + " не найден!");
         }
 
+        /// <summary> http://localhost:8087/api/reference/4785074604081152 </summary>
+        [HttpGet("[action]/{objid}")]
+        public async Task<IActionResult> Reference(long objid)
+        {
+            var obj = Runtime.Metadata.GetObject(objid);
+            if (obj != null)
+            {
+                return new JsonResult((await Runtime.Metadata.GetReferenceData(objid)).Rows.Cast<DataRow>().Select(r => new TItem((long)r[0], (string)r[1])).ToArray());
+            }
+            throw new Exception("Тип не найден!");
+        }
+
         /// <summary> https://localhost:8087/api/datatable/equipments </summary>
         [HttpGet("[action]/{name}")]
         public async Task<IActionResult> Rows(string name)
@@ -81,5 +93,17 @@ namespace RmSolution.DataAccess
         {
             return new JsonResult(Runtime.Metadata.NewItem(objid));
         });
+
+        struct TItem
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+
+            public TItem(long id, string name)
+            {
+                Id = id;
+                Name = name;
+            }
+        }
     }
 }
