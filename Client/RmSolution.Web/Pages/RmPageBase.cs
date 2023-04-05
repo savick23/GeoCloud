@@ -32,20 +32,29 @@ namespace RmSolution.Web
         protected RmHttpClient Client { get; set; }
 
         /// <summary> Представление, как отображать значения NULL.</summary>
-        public string NullValue { get; set; } = "(null)";
+        public string NullValue { get; set; } = string.Empty;
 
         #endregion Properties
 
         #region Data operations
 
+        Dictionary<Type, Dictionary<string, MethodInfo>> _prop_get_cache = new();
+
         protected async Task<object?> NewItem(TObjectDto mdtype) =>
             await Client.NewItemAsync(mdtype);
 
-        protected string GetValue(object item, string name) =>
-          item.GetType().GetProperty(name, _propFlags)?.GetValue(item)?.ToString() ?? NullValue;
+        protected string GetValue(object item, string name)
+        {
+            var type = item.GetType();
+            if (!_prop_get_cache.ContainsKey(type))
+                _prop_get_cache.Add(type, type.GetProperties(_propFlags).OrderBy(p => p.Name).Where(p => p.GetGetMethod() != null)
+                    .ToDictionary(k => k.Name.ToLower(), v => v.GetGetMethod()));
+
+            return _prop_get_cache[type][name.ToLower()].Invoke(item, null)?.ToString() ?? NullValue;
+        }
 
         protected string GetValueEdit(object item, string name) =>
-          item.GetType().GetProperty(name, _propFlags)?.GetValue(item)?.ToString() ?? string.Empty;
+            _prop_get_cache[item.GetType()][name.ToLower()].Invoke(item, null)?.ToString() ?? string.Empty;
 
         protected void OnValueChanged(object data, string name, object? value)
         {
