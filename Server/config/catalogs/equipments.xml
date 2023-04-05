@@ -44,6 +44,8 @@
         </attributes>
         <data>
           <row id="4785074604082176" code="001" name="Тахеометр"/>
+          <row id="4785074604083200" code="002" name="Теодолит"/>
+          <row id="4785074604084224" code="003" name="Нивелир"/>
         </data>
       </item>
       <item id="5066549580791808" parent="11" type="11" code="Оборудование" name="Оборудование" source="equipments" autoinc="Common">
