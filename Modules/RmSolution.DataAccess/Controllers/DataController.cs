@@ -56,7 +56,7 @@ namespace RmSolution.DataAccess
             var obj = Runtime.Metadata.GetObject(objid);
             if (obj != null)
             {
-                return new JsonResult((await Runtime.Metadata.GetReferenceData(objid)).Rows.Cast<DataRow>().Select(r => new TItem((long)r[0], (string)r[1])).ToArray());
+                return new JsonResult((await Runtime.Metadata.GetReferenceData(objid)).Rows.Cast<DataRow>().Select(r => new TRefType((long)r[0], (string)r[1])).ToArray());
             }
             throw new Exception("Тип не найден!");
         }
@@ -93,17 +93,5 @@ namespace RmSolution.DataAccess
         {
             return new JsonResult(Runtime.Metadata.NewItem(objid));
         });
-
-        struct TItem
-        {
-            public long Id { get; set; }
-            public string Name { get; set; }
-
-            public TItem(long id, string name)
-            {
-                Id = id;
-                Name = name;
-            }
-        }
     }
 }
