@@ -31,6 +31,8 @@ namespace RmSolution.DataAnnotations
         /// <summary> Описание объекта конфигурации.</summary>
         [TColumn("Описание", Length = 1024, Nullable = true)]
         public string? Description { get; set; }
+        [TColumn("Автонумерация")]
+        public TCodeAutoInc AutoInc { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -89,6 +91,8 @@ namespace RmSolution.DataAnnotations
     [TObject("Реквизиты объекта конфигурации", "config.attributes", Ordinal = 2)]
     public sealed class TColumn : TEntity
     {
+        #region Properties
+
         [TColumn("Длинна")]
         public int Length { get; set; }
         /// <summary> Признак возможности пустых значений.</summary>
@@ -104,6 +108,7 @@ namespace RmSolution.DataAnnotations
             get => (Flags & TAttributeFlags.Key) > 0;
             set => Flags = value ? Flags | TAttributeFlags.Key : Flags & (0x7FFFFFFF - TAttributeFlags.Key);
         }
+        #endregion Properties
 
         /// <summary> Definition </summary>
         public string? Source { get; set; }
@@ -187,7 +192,24 @@ namespace RmSolution.DataAnnotations
     public enum TAttributeFlags
     {
         None = 0,
-        Key = 1
+        Key = 1,
+        Parent = 2,
+        Dimension = 4,
+        Code = 8
+    }
+
+    public enum TCodeAutoInc
+    {
+        None = 0,
+        /// <summary> Во всем справочнике.</summary>
+        /// <remarks> В процессе формирования нового кода для элемента справочника будет сформирован код, уникальный во всем справочнике.</remarks>
+        Common = 1,
+        /// <summary> В пределах подчинения (группы).</summary>
+        /// <remarks> В процессе формирования нового кода для элемента справочника будет сформирован код, уникальный в пределах иерархии элемента (элементы, имеющие одного и того же родителя будут иметь различные коды, элементы, имеющие разных родителей могут иметь одинаковые коды).</remarks>
+        Parent = 2,
+        /// <summary> В пределах подчинения владельцу.</summary>
+        /// <remarks> В процессе формирования нового кода для элемента справочника будет сформирован код, уникальный в пределах подчинения (элементы, имеющие одного и того же владельца будут иметь различные коды; элементы, имеющие различных владельцев могут иметь одинаковые коды).</remarks>
+        Owner = 4
     }
 }
 #pragma warning restore CS8618

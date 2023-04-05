@@ -79,5 +79,8 @@ namespace RmSolution.Runtime
         public static readonly long Array = 85;
         public static readonly long Xml = 86;
         public static readonly long Json = 87;
+
+        /// <summary> Идентификатор новой записи.</summary>
+        public static readonly long NewId = 0xFFFFFFFFFC00;
     }
 }

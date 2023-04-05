@@ -9,7 +9,7 @@ namespace RmSolution.Data
     using System.Text.Json.Serialization;
     #endregion Using
 
-    public class TBaseRow: ICloneable
+    public class TItemBase: ICloneable
     {
         internal static readonly DateTime DATETIMEEMPTY = new(1970, 1, 1); // UnixTime minimum
 
@@ -22,7 +22,7 @@ namespace RmSolution.Data
             MemberwiseClone();
     }
 
-    public class TCatalogRow : TBaseRow
+    public class TCatalogRow : TItemBase
     {
         [TColumn("Код", Length = 8)]
         public string Code { get; set; }

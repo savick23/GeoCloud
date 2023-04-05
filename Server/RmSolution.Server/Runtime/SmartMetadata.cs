@@ -105,7 +105,7 @@ namespace RmSolution.Server
                         ai.PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns;
                         ai.Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns;
                         ai.Nullable |= ai.CType.AssemblyQualifiedName.Contains("System.Nullable");
-                        ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TBaseRow.DATETIMEEMPTY
+                        ai.DefaultValue = pi.PropertyType == typeof(DateTime) ? TItemBase.DATETIMEEMPTY
                                 : ai.DefaultValue == null ? pi.GetValue(Activator.CreateInstance(mdtype)) : ai.DefaultValue;
 
                         obj.Attributes.Add(ai);
@@ -195,6 +195,22 @@ namespace RmSolution.Server
             return item;
         }
 
+        public object? NewItem(object? id)
+        {
+            TObject? obj;
+            if (id is long objid && (obj = Entities[objid]) != null)
+            {
+                var newitem = (TItemBase)Activator.CreateInstance(obj.CType);
+                newitem.Id = TType.NewId;
+                return newitem;
+            }
+            throw new Exception("Не найден объект конфигурации " + (id ?? "(null)"));
+        }
+
+        #endregion IMetadata implementation
+
+        #region Database connection
+
         /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
         async Task<T> UseDatabase<T>(Func<IDatabase, T> operation) => await Task.Run(() =>
         {
@@ -210,6 +226,6 @@ namespace RmSolution.Server
             }
         });
 
-        #endregion IMetadata implementation
+        #endregion Database connection
     }
 }

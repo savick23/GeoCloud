@@ -7,6 +7,7 @@ namespace RmSolution.Data
     #region Using
     using System.Text.Json.Serialization;
     using System.Text.Json;
+    using RmSolution.DataAnnotations;
     #endregion Using
 
     /// <summary> Класс обмена метаданными.</summary>
@@ -17,6 +18,7 @@ namespace RmSolution.Data
         public string Name { get; set; }
         public string Source { get; set; }
         public string Type { get; set; }
+        public TObjectFlags Flags { get; set; }
 
         public TAttributeDto[] Attributes {get;set;}
     }
@@ -27,6 +29,7 @@ namespace RmSolution.Data
         public string Field { get; set; }
         public string DisplayField { get; set; }
         public bool Visible { get; set; }
+        public TAttributeFlags Flags { get; set; }
     }
 
     /// <summary> JsonConverters </summary>

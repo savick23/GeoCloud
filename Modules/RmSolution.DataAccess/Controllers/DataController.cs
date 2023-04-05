@@ -30,12 +30,14 @@ namespace RmSolution.DataAccess
                 Name = entity.Name,
                 Source = entity.Source,
                 Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
+                Flags = entity.Flags,
                 Attributes = entity.Attributes.Select(a => new TAttributeDto()
                 {
                     Name = a.Name,
                     Field = a.Field[1..^1],
                     DisplayField = a.DisplayField[1..^1],
-                    Visible = a.Visible
+                    Visible = a.Visible,
+                    Flags = a.Flags
                 }).ToArray()
             }).ToArray())
         );
@@ -92,25 +94,23 @@ namespace RmSolution.DataAccess
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Update() => await UseDatabase((db, item) =>
+        public async Task<IActionResult> Update() => await UseDatabase((db, request) =>
         {
-            if (item != null) db.Update(item);
+            if (request != null && request is TItemBase item)
+                if (item.Id == TType.NewId)
+                {
+
+                }
+                else
+                    db.Update(item);
+
             return new JsonResult("{\"result\":\"ok\"}");
         });
 
         [HttpPost("[action]")]
         public async Task<IActionResult> New() => await UseDatabase((db, objid) =>
         {
-            if (objid is long id)
-            {
-                var obj =  Runtime.Metadata.Entities[id];
-                if (obj != null)
-                {
-                    var newitem = Activator.CreateInstance(obj.CType);
-                    return new JsonResult(newitem);
-                }
-            }
-            throw new Exception("Ошибка получения новой записи.");
+            return new JsonResult(Runtime.Metadata.NewItem(objid));
         });
     }
 }

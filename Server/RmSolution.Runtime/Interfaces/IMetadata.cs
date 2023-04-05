@@ -22,5 +22,8 @@ namespace RmSolution.Runtime
 
         /// <summary> Обновляет данные объекта конфигурации.</summary>
         object? UpdateData(object? item);
+
+        /// <summary> Возвращает новую запись для объекта конфигурации.</summary>
+        object? NewItem(object? id);
     }
 }

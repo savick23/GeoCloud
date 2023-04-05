@@ -109,7 +109,8 @@ namespace RmSolution.Web
         {
             if (mdtype != null)
             {
-                return await PostAsync(WellKnownObjects.Api.PostNewItem, JsonContent.Create(new XItemEnvelop(mdtype.Id), typeof(XItemEnvelop), null, _jsonOptions));
+                var resp = await PostAsync(WellKnownObjects.Api.PostNewItem, JsonContent.Create(new XItemEnvelop(mdtype.Id), typeof(XItemEnvelop), null, _jsonOptions));
+                return await resp.Content.ReadFromJsonAsync(Type.GetType(mdtype.Type));
             }
             throw new Exception("Объект не указан!");
         }
