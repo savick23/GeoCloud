@@ -13,26 +13,26 @@
           <item id="4503599627377664" code="Описание" name="Описание" source="description" />
         </attributes>
         <data>
-          <row Id="4503599627371520" group="0" code="003" name="Миллиметр" symbol="мм" />
-          <row Id="4503599627372544" group="0" code="004" name="Сантиметр" symbol="см" />
-          <row Id="4503599627373568" group="0" code="005" name="Дециметр" symbol="дм" />
-          <row Id="4503599627374592" group="0" code="006" name="Метр" symbol="м" />
-          <row Id="4503599627375616" group="0" code="008" name="Километр" symbol="км" />
-          <row Id="4503599627376640" group="0" code="112" name="Литр" symbol="л" />
-          <row Id="4503599627377664" group="0" code="280" name="Градусов Цельсия" symbol="C°" />
-          <row Id="4503599627378688" group="0" code="294" name="Паскаль" symbol="Па" />
-          <row Id="4503599627379712" group="0" code="297" name="Килопаскаль" symbol="кПа" />
-          <row Id="4503599627380736" group="0" code="298" name="Мегапаскаль" symbol="МПа" />
-          <row Id="4503599627381760" group="0" code="300" name="Атмосфера" symbol="атм" />
-          <row Id="4503599627382784" group="0" code="328" name="Метр в секунду" symbol="м/с" />
-          <row Id="4503599627383808" group="0" code="333" name="Километр в час" symbol="км/ч" />
-          <row Id="4503599627384832" group="0" code="338" name="Миллиметр ртутного столба" symbol="мм рт.ст" />
-          <row Id="4503599627385856" group="0" code="353" name="Миллисекунда" symbol="мс" />
-          <row Id="4503599627386880" group="0" code="642" name="Единица" symbol="ед" />
-          <row Id="4503599627387904" group="0" code="792" name="Человек" symbol="чел" />
-          <row Id="4503599627388928" group="0" code="796" name="Штука" symbol="шт" />
-          <row Id="4503599627389952" group="0" code="222" name="Вольт" symbol="В" />
-          <row Id="4503599627390976" group="0" code="223" name="Милливольт" symbol="мВ" />
+          <row id="4503599627371520" group="0" code="003" name="Миллиметр" symbol="мм" />
+          <row id="4503599627372544" group="0" code="004" name="Сантиметр" symbol="см" />
+          <row id="4503599627373568" group="0" code="005" name="Дециметр" symbol="дм" />
+          <row id="4503599627374592" group="0" code="006" name="Метр" symbol="м" />
+          <row id="4503599627375616" group="0" code="008" name="Километр" symbol="км" />
+          <row id="4503599627376640" group="0" code="112" name="Литр" symbol="л" />
+          <row id="4503599627377664" group="0" code="280" name="Градусов Цельсия" symbol="C°" />
+          <row id="4503599627378688" group="0" code="294" name="Паскаль" symbol="Па" />
+          <row id="4503599627379712" group="0" code="297" name="Килопаскаль" symbol="кПа" />
+          <row id="4503599627380736" group="0" code="298" name="Мегапаскаль" symbol="МПа" />
+          <row id="4503599627381760" group="0" code="300" name="Атмосфера" symbol="атм" />
+          <row id="4503599627382784" group="0" code="328" name="Метр в секунду" symbol="м/с" />
+          <row id="4503599627383808" group="0" code="333" name="Километр в час" symbol="км/ч" />
+          <row id="4503599627384832" group="0" code="338" name="Миллиметр ртутного столба" symbol="мм рт.ст" />
+          <row id="4503599627385856" group="0" code="353" name="Миллисекунда" symbol="мс" />
+          <row id="4503599627386880" group="0" code="642" name="Единица" symbol="ед" />
+          <row id="4503599627387904" group="0" code="792" name="Человек" symbol="чел" />
+          <row id="4503599627388928" group="0" code="796" name="Штука" symbol="шт" />
+          <row id="4503599627389952" group="0" code="222" name="Вольт" symbol="В" />
+          <row id="4503599627390976" group="0" code="223" name="Милливольт" symbol="мВ" />
         </data>
       </item>
       <item id="4785074604081152" parent="11" type="11" code="ТипыОборудования" name="Типы оборудования" source="equiptypes" autoinc="Common">
