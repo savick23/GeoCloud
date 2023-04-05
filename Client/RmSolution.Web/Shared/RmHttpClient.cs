@@ -117,8 +117,9 @@ namespace RmSolution.Web
 
         public List<TRefType>? GetReferenceData(long objid)
         {
-            /*var resp = AsyncHelper.RunSync(() => GetStreamAsync(string.Concat(WellKnownObjects.Api.GetReference + objid)));
-            var ms = new TMemoryStream();
+            /*var resp = AsyncHelper.RunSync(() => GetAsync(string.Concat(WellKnownObjects.Api.GetReference + objid)));
+            var t = AsyncHelper.RunSync(() => resp.Content.ReadAsByteArrayAsync());
+            var ms = new TMemoryStream(t);
             resp.CopyTo(ms);
             ms.Position = 0;
             var cnt = ms.ReadInt32();
