@@ -49,13 +49,7 @@ namespace RmSolution.Web
 
         protected void OnValueChanged(object data, string name, object? value)
         {
-            var prop = data.GetType().GetProperty(name, _propFlags);
-            if (prop.PropertyType == typeof(TRefType))
-            {
-                prop.SetValue(data, new TRefType((long)value, value.ToString()));
-            }
-            else
-                data.GetType().GetProperty(name, _propFlags)?.SetValue(data, value);
+            data.GetType().GetProperty(name, _propFlags)?.SetValue(data, value);
         }
 
         protected void Cancel(object dataRow, object? originValues)
@@ -64,7 +58,7 @@ namespace RmSolution.Web
                 dataRow.GetType().GetProperties().ToList().ForEach(p => p.SetValue(dataRow, p.GetValue(originValues)));
         }
 
-        protected List<TItem> RefData(TAttributeDto ai) =>
+        protected List<TRefType>? RefData(TAttributeDto ai) =>
             Client.GetReferenceData(ai.Type);
 
         #endregion Data operations
@@ -73,17 +67,5 @@ namespace RmSolution.Web
     public enum ActionState
     {
         Select, Edit, New
-    }
-
-    public struct TItem
-    {
-        public long Id { get; set; }
-        public string Name { get; set; }
-
-        public TItem(long id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
     }
 }

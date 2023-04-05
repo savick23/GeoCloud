@@ -115,9 +115,9 @@ namespace RmSolution.Web
             throw new Exception("Объект не указан!");
         }
 
-        public List<TItem>? GetReferenceData(long objid) =>
-            AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TItem>), _jsonOptions))
-                is List<TItem> res ? res : null;
+        public List<TRefType>? GetReferenceData(long objid) =>
+            AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TRefType>), _jsonOptions))
+                is List<TRefType> values ? values : null;
 
         #endregion API Data operations
 
