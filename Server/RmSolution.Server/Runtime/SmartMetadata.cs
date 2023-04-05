@@ -97,10 +97,10 @@ namespace RmSolution.Server
                     foreach (var pi in mdtype.GetProperties(BindingFlags.Instance | BindingFlags.Public).OrderBy(d => d.MetadataToken)
                         .Where(d => d.IsDefined(typeof(TColumn))))
                     {
-                        var ai = (TColumn?)pi.GetCustomAttributes(typeof(TColumn)).First();
-                        var dbai = attrs?.FirstOrDefault(a => a.Name == ai.Name);
-                        ai.Code = pi.Name;
-                        ai.Type = dbai?.Type ?? 0;
+                        var ai = attrs?.FirstOrDefault(a => a.Source?.Equals(pi.Name, StringComparison.OrdinalIgnoreCase) ?? false)
+                            ?? (TColumn?)pi.GetCustomAttributes(typeof(TColumn)).First();
+
+                        ai.Code ??= pi.Name;
                         ai.CType = pi.PropertyType;
                         ai.PrimaryKey = ((PrimaryKeyAttribute?)pi.GetCustomAttributes(typeof(PrimaryKeyAttribute)).FirstOrDefault())?.Columns;
                         ai.Indexes = ((IndexAttribute?)pi.GetCustomAttributes(typeof(IndexAttribute)).FirstOrDefault())?.Columns;
@@ -136,12 +136,18 @@ namespace RmSolution.Server
 
         #region IMetadata implementation
 
+        public TObject? GetObject(long id)
+        {
+            id &= TType.TypeMask;
+            return Entities.FirstOrDefault(oi => oi.Id == id);
+        }
+
         public TObject? GetObject(string id) =>
             Entities.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
 
         public async Task<IEnumerable<object>?> GetDataAsync(string id) => await UseDatabase(db =>
         {
-            var obj = Entities.FirstOrDefault(e => e.Code == id || e.Name == id || e.Source == id);
+            var obj = GetObject(id);
             if (obj != null)
             {
                 string alias = "a";
@@ -201,7 +207,17 @@ namespace RmSolution.Server
             if (id is long objid && (obj = Entities[objid]) != null)
             {
                 var newitem = (TItemBase)Activator.CreateInstance(obj.CType);
-                newitem.Id = TType.NewId;
+                newitem.Id = obj.Id + TType.NewId;
+                if (obj.AutoInc == TCodeAutoInc.Common && obj.Attributes.CodeField is TColumn fcode)
+                {
+                    var code = _connectionf().Open().Scalar<string>("SELECT max(code) FROM " + obj.TableName);
+                    if (code == null)
+                        code = "1".PadLeft(fcode.Length, '0');
+                    else if (long.TryParse(code, out var num))
+                        code = (++num).ToString().PadLeft(code.Length, '0');
+
+                    obj.CType.GetProperty(fcode.Source, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase)?.SetValue(newitem, code);
+                }
                 return newitem;
             }
             throw new Exception("Не найден объект конфигурации " + (id ?? "(null)"));

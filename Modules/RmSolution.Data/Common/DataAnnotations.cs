@@ -5,6 +5,7 @@
 #pragma warning disable CS8618
 namespace RmSolution.DataAnnotations
 {
+    using RmSolution.Data;
     #region Using
     using System;
     #endregion Using
@@ -31,20 +32,21 @@ namespace RmSolution.DataAnnotations
         /// <summary> Описание объекта конфигурации.</summary>
         [TColumn("Описание", Length = 1024, Nullable = true)]
         public string? Description { get; set; }
-        [TColumn("Автонумерация")]
-        public TCodeAutoInc AutoInc { get; set; }
+        /// <summary> Источник значения (таблица, поле, файл и т.д.).</summary>
+        [TColumn("Источник", Length = 256, Nullable = true)]
+        public string? Source { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     [TObject("Объекты конфигурации", "config.objects", Ordinal = 1)]
     public sealed class TObject : TEntity
     {
-        [TColumn("Источник", Length = 64, Nullable = true)]
-        public string? Source { get; set; }
         public bool IsView { get; }
         [TColumn("Порядок")]
         public int Ordinal { get; set; } = int.MaxValue;
         public Type CType { get; set; }
+        [TColumn("Автонумерация")]
+        public TCodeAutoInc AutoInc { get; set; }
         /// <summary> Различные флаги объекта конфигурации.</summary>
         [TColumn("Флаги")]
         public TObjectFlags Flags { get; set; }
@@ -73,6 +75,21 @@ namespace RmSolution.DataAnnotations
             Source = source;
             IsView = isView;
         }
+
+        public TObjectDto ToDto() => new()
+        {
+            Id = Id,
+            Code = Code,
+            Name = Name,
+            Source = Source,
+            Type = CType.AssemblyQualifiedName ?? CType.Name,
+            Attributes = Attributes.Select(a => new TAttributeDto()
+            {
+                Name = a.Name,
+                Field = a.Source ?? a.Code,
+                Visible = a.Visible
+            }).ToArray()
+        };
 
         public override string ToString() =>
             $"{Source}";
@@ -108,10 +125,12 @@ namespace RmSolution.DataAnnotations
             get => (Flags & TAttributeFlags.Key) > 0;
             set => Flags = value ? Flags | TAttributeFlags.Key : Flags & (0x7FFFFFFF - TAttributeFlags.Key);
         }
+        public bool IsCode => (Flags & TAttributeFlags.Code) > 0;
+        public bool IsName => (Flags & TAttributeFlags.Name) > 0;
+        public bool IsParent => (Flags & TAttributeFlags.Parent) > 0;
+
         #endregion Properties
 
-        /// <summary> Definition </summary>
-        public string? Source { get; set; }
         /// <summary> Definition </summary>
         public string[]? PrimaryKey { get; set; }
         /// <summary> Definition </summary>
@@ -119,7 +138,7 @@ namespace RmSolution.DataAnnotations
         /// <summary> Ссылочная таблица.</summary>
         public string? Binding { get; set; }
         /// <summary> Наименование поля БД.</summary>
-        public string Field => string.Concat('"', Code.ToLower(), '"');
+        public string Field => string.Concat('"', (Source ?? Code).ToLower(), '"');
         /// <summary> Наименование поля БД для отображения.</summary>
         public string DisplayField => Type > 10000000 ? string.Concat('"', Code.ToLower(), "_view", '"') : Field;
         /// <summary> Значение поля по умолчанию.</summary>
@@ -143,7 +162,9 @@ namespace RmSolution.DataAnnotations
 
     public sealed class TAttributeCollection : List<TColumn>, ICloneable
     {
-        public string ViewField => "\"name\"";
+        public TColumn? IdField => this.FirstOrDefault(a => a.IsKey);
+        public TColumn? CodeField => this.FirstOrDefault(a => a.IsCode);
+        public string ViewField => this.FirstOrDefault(a => a.IsName)?.Field ?? "\"name\"";
 
         public bool TryGetAttribute(string name, out TColumn? attribute)
         {
@@ -195,7 +216,10 @@ namespace RmSolution.DataAnnotations
         Key = 1,
         Parent = 2,
         Dimension = 4,
-        Code = 8
+        Code = 8,
+        Name = 16,
+        /// <summary> Признак обязательности поля.</summary>
+        Required = 32
     }
 
     public enum TCodeAutoInc

@@ -23,24 +23,9 @@ namespace RmSolution.DataAccess
         /// <summary> https://localhost:8087/api/objects </summary>
         [HttpGet("[action]")]
         public async Task<IActionResult> Objects() => await UseDatabase(db =>
-            new JsonResult(Runtime.Metadata.Entities.Where(e => e.Type == TType.Catalog).OrderBy(e => e.Ordinal).Select(entity =>
-            new TObjectDto()
-            {
-                Code = entity.Code,
-                Name = entity.Name,
-                Source = entity.Source,
-                Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
-                Flags = entity.Flags,
-                Attributes = entity.Attributes.Select(a => new TAttributeDto()
-                {
-                    Name = a.Name,
-                    Field = a.Field[1..^1],
-                    DisplayField = a.DisplayField[1..^1],
-                    Visible = a.Visible,
-                    Flags = a.Flags
-                }).ToArray()
-            }).ToArray())
-        );
+            new JsonResult(Runtime.Metadata.Entities
+                .Where(e => e.Type == TType.Catalog).OrderBy(e => e.Ordinal)
+                .Select(entity => entity.ToDto())));
 
         /// <summary> https://localhost:8087/api/object/equipments </summary>
         [HttpGet("[action]/{name}")]
@@ -48,22 +33,8 @@ namespace RmSolution.DataAccess
         {
             var entity = Runtime.Metadata.Entities[name];
             if (entity != null)
-            {
-                return new JsonResult(new TObjectDto()
-                {
-                    Id = entity.Id,
-                    Code = entity.Code,
-                    Name = entity.Name,
-                    Source = entity.Source,
-                    Type = entity.CType.AssemblyQualifiedName ?? entity.CType.Name,
-                    Attributes = entity.Attributes.Select(a => new TAttributeDto()
-                    {
-                        Name = a.Name,
-                        Field = a.Code,
-                        Visible = a.Visible
-                    }).ToArray()
-                });
-            }
+                return new JsonResult(entity.ToDto());
+
             throw new Exception("Тип " + name + " не найден!");
         });
 
@@ -97,10 +68,8 @@ namespace RmSolution.DataAccess
         public async Task<IActionResult> Update() => await UseDatabase((db, request) =>
         {
             if (request != null && request is TItemBase item)
-                if (item.Id == TType.NewId)
-                {
-
-                }
+                if ((item.Id & TType.RecordMask) == TType.NewId)
+                    db.Insert(item);
                 else
                     db.Update(item);
 

@@ -6,8 +6,8 @@
         <attributes>
           <item id="4503599627371520" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="4503599627372544" code="Состояние" name="Состояние" source="state"/>
-          <item id="4503599627373568" code="Код" name="Код" source="code" width="100" flags="Code"/>
-          <item id="4503599627374592" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="4503599627373568" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="4503599627374592" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
         </attributes>
         <data>
           <row id="4503599627371520" state="1" code="001" name="Тахеометр" flags="Key"/>
@@ -17,8 +17,8 @@
         <attributes>
           <item id="4785074604082176" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="4785074604083200" code="Состояние" name="Состояние" source="state" />
-          <item id="4785074604084224" code="Код" name="Код" source="code" width="100" flags="Code"/>
-          <item id="4785074604085248" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="4785074604084224" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="4785074604085248" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
           <item id="4785074604086272" code="Тип" name="Тип" source="type" type="4503599627370496"/>
         </attributes>
         <data>

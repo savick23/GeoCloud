@@ -134,8 +134,12 @@ namespace RmSolution.Data
         public object? Insert(object item)
         {
             var obj = item.GetDefinition();
-            if (obj != null)
+            if (obj != null && item is TItemBase xitem)
             {
+                if ((xitem.Id & TType.RecordMask) == TType.NewId)
+                {
+                    xitem.Id = Scalar<long>("SELECT max(id) from " + obj.TableName) + TType.TypeIterator;
+                }
                 Exec(BuildInsertCommand(obj, item));
                 return item;
             }
@@ -169,6 +173,7 @@ namespace RmSolution.Data
 
         string BuildInsertCommand(TObject obj, object item)
         {
+            // DECLARE @newid bigint=(SELECT max(id)+0x1000000000000 from "equiptypes"); SELECT @newid;
             var stmt = new StringBuilder("INSERT " + obj.TableName + " (");
             var vals = new StringBuilder(") VALUES (");
             string comma = string.Empty;

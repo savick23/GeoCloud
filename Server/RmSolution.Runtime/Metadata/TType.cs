@@ -80,7 +80,18 @@ namespace RmSolution.Runtime
         public static readonly long Xml = 86;
         public static readonly long Json = 87;
 
+        /// <summary> Маска идентификатора объекта конфигурации.</summary>
+        /// <remarks> 32767 возможных объекта конфигурации.</remarks>
+        public static readonly long TypeMask = 0x7FFF000000000000;
+        /// <summary> Маска идентификатора строки.</summary>
+        /// <remarks> 274 877 906 942 возможных записей в таблице для каждого объекта конфигурации.</remarks>
+        public static readonly long RecordMask = 0xFFFFFFFFFFFF;
+        /// <summary> Маска идентификатора узла базы данных.</summary>
+        /// <remarks> 1024 возможных узла баз данных в случае распределённой БД.</remarks>
+        public static readonly long NodeMask = 0x3FF;
         /// <summary> Идентификатор новой записи.</summary>
         public static readonly long NewId = 0xFFFFFFFFFC00;
+
+        public static readonly long TypeIterator = 0x1000000000000;
     }
 }

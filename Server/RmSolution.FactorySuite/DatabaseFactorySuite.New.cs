@@ -229,10 +229,8 @@ namespace RmSolution.Data
                     {
                         foreach (var attr in sect.Elements())
                         {
-                            var record = new TColumn()
-                            {
-                                Parent = long.Parse(sect.Parent.Attribute(WellKnownAttributes.Id).Value)
-                            };
+                            var record = entity.Attributes.FirstOrDefault(a => a.Code.ToLower() == attr.Attribute(WellKnownAttributes.Source)?.Value) ?? new TColumn();
+                            record.Parent = long.Parse(sect.Parent.Attribute(WellKnownAttributes.Id).Value);
                             typeof(TColumn).GetProperties().Where(p => attr.Attribute(p.Name.ToLower()) != null).ToList()
                                 .ForEach(p => p.SetValue(record, InitGetValue(p.PropertyType, attr.Attribute(p.Name.ToLower())?.Value)));
 

@@ -8,6 +8,7 @@ namespace RmSolution.Web
     using Microsoft.AspNetCore.Components;
     using RmSolution.Data;
     using RmSolution.Web;
+    using System.Reflection;
     #endregion Using
 
     public abstract class RmPageBase : ComponentBase
@@ -20,6 +21,8 @@ namespace RmSolution.Web
         public const string CMD_DELETE = "DELETE";
         public const string CMD_APPLY = "APPLY";
         public const string CMD_CANCEL = "CANCEL";
+
+        readonly static BindingFlags _propFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
 
         #endregion Constants
 
@@ -39,14 +42,14 @@ namespace RmSolution.Web
             await Client.NewItemAsync(mdtype);
 
         protected string GetValue(object item, string name) =>
-          item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? NullValue;
+          item.GetType().GetProperty(name, _propFlags)?.GetValue(item)?.ToString() ?? NullValue;
 
         protected string GetValueEdit(object item, string name) =>
-          item.GetType().GetProperty(name)?.GetValue(item)?.ToString() ?? string.Empty;
+          item.GetType().GetProperty(name, _propFlags)?.GetValue(item)?.ToString() ?? string.Empty;
 
         protected void OnValueChanged(object data, string name, object value)
         {
-            data.GetType().GetProperty(name)?.SetValue(data, value);
+            data.GetType().GetProperty(name, _propFlags)?.SetValue(data, value);
         }
 
         protected void Cancel(object dataRow, object? originValues)

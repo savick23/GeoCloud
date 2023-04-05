@@ -6,8 +6,8 @@
         <attributes>
           <item id="844424930132992" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="844424930134016" code="Состояние" name="Состояние" source="state" />
-          <item id="844424930135040" code="Код" name="Код" source="code" width="100" flags="Code"/>
-          <item id="844424930136064" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="844424930135040" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="844424930136064" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
           <item id="844424930137088" code="Местоположение" name="Местоположение" source="location"/>
         </attributes>
         <data>
@@ -18,8 +18,8 @@
         <attributes>
           <item id="1125899906843648" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="1125899906844672" code="Состояние" name="Состояние" source="state" />
-          <item id="1125899906845696" code="Код" name="Код" source="code" width="100" flags="Code"/>
-          <item id="1125899906846720" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="1125899906845696" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="1125899906846720" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
           <item id="1125899906847744" code="Проект" name="Проект" source="project" type="844424930131968"/>
         </attributes>
         <data>
@@ -30,8 +30,8 @@
         <attributes>
           <item id="1407374883554304" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="1407374883555328" code="Состояние" name="Состояние" source="state" />
-          <item id="1407374883556352" code="Код" name="Код" source="code" width="100" flags="Code"/>
-          <item id="1407374883557376" code="Наименование" name="Наименование" source="name" width="300"/>
+          <item id="1407374883556352" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="1407374883557376" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
           <item id="1407374883558400" code="Группа" name="Группа" source="group" type="1125899906842624"/>
         </attributes>
         <data>
