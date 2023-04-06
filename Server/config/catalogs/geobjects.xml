@@ -2,19 +2,20 @@
 <rmgeo>
   <objects>
     <catalogs>
-      <item id="5348024557502464" parent="11" type="11" code="GEOPROJECTS" name="Проекты измерений" source="geoprojects" autoinc="Common">
+      <item id="5348024557502464" parent="11" type="11" code="ПроектыИзмерений" name="Проекты измерений" source="geoprojects" autoinc="Common">
         <attributes>
           <item id="5348024557503488" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="5348024557504512" code="Состояние" name="Состояние" source="state" />
-          <item id="5348024557505536" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
-          <item id="5348024557506560" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
-          <item id="5348024557507584" code="Местоположение" name="Местоположение" source="location"/>
+          <item id="5348024557505536" code="Статус" name="Статус" source="status" />
+          <item id="5348024557506560" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="5348024557507584" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+          <item id="5348024557508608" code="Местоположение" name="Местоположение" source="location"/>
         </attributes>
         <data>
           <row id="5348024557503488" code="000001" name="Площадь Конституции" location="Санкт-Петербург, 59.851977, 30.304702"/>
         </data>
       </item>
-      <item id="5629499534213120" parent="11" type="11" code="GEOGROUPS" name="Группы измерений" source="geogroups" autoinc="Common">
+      <item id="5629499534213120" parent="11" type="11" code="ГруппыИзмерений" name="Группы измерений" source="geogroups" autoinc="Common">
         <attributes>
           <item id="5629499534214144" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="5629499534215168" code="Состояние" name="Состояние" source="state" />
@@ -26,7 +27,7 @@
           <row id="5629499534214144" code="000001" name="Пиццерия Pizza Hut" project="5348024557503488"/>
         </data>
       </item>
-      <item id="5910974510923776" parent="11" type="11" code="GEOPOINTS" name="Точки измерения" source="geopoints" autoinc="Common">
+      <item id="5910974510923776" parent="11" type="11" code="ТочкиИзмерения" name="Точки измерения" source="geopoints" autoinc="Common">
         <attributes>
           <item id="5910974510924800" code="ИД" name="Идентификатор" source="id" flags="Key"/>
           <item id="5910974510925824" code="Состояние" name="Состояние" source="state" />
@@ -39,6 +40,24 @@
           <row id="5910974510925824" code="000002" name="Фасад 2" group="5629499534214144"/>
         </data>
       </item>
+      <!--<item id="6192449487634432" parent="11" type="11" code="ТипыЛиний" name="Типы линий" source="typelines" autoinc="Common">
+        <attributes>
+          <item id="6192449487635456" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="6192449487636480" code="Состояние" name="Состояние" source="state" />
+          <item id="6192449487637504" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="6192449487638528" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+        </attributes>
+      </item>
+      <item id="6473924464345088" parent="11" type="11" code="CommLines" name="Comm lines" source="commlines" autoinc="Common">
+        <attributes>
+          <item id="6473924464346112" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="6473924464347136" code="Состояние" name="Состояние" source="state" />
+          <item id="6473924464348160" code="Тип" name="Тип" source="type" type="6192449487634432"/>
+          <item id="6473924464349184" code="Код" name="Код" source="code" width="100" flags="Code,Required"/>
+          <item id="6473924464350208" code="Наименование" name="Наименование" source="name" width="300" flags="Name,Required"/>
+          <item id="6473924464351232" code="Конфигурация" name="Конфигурация" source="config"/>
+        </attributes>
+      </item>-->
     </catalogs>
   </objects>
 </rmgeo>

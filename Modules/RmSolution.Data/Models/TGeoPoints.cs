@@ -11,6 +11,8 @@ namespace RmSolution.Data
     [TObject("Проекты измерений", "geoprojects", Ordinal = 110)]
     public class TGeoProjects : TCatalogRow
     {
+        [TColumn("Статус")]
+        public long Status { get; set; }
         [TColumn("Местоположение", Length = 128)]
         public string Location { get; set; }
     }
