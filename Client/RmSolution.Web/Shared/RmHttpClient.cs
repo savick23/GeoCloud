@@ -15,6 +15,7 @@ namespace RmSolution.Web
     using System.Security.Cryptography.X509Certificates;
     using System.Security.Authentication;
     using System.Reflection.Metadata;
+    using System.Security.Cryptography;
     #endregion Using
 
     public class RmHttpClient : HttpClient
@@ -114,21 +115,33 @@ namespace RmSolution.Web
             }
             throw new Exception("Объект не указан!");
         }
-
+        
         public List<TRefType>? GetReferenceData(long objid)
         {
-            /*var resp = AsyncHelper.RunSync(() => GetAsync(string.Concat(WellKnownObjects.Api.GetReference + objid)));
-            var t = AsyncHelper.RunSync(() => resp.Content.ReadAsByteArrayAsync());
-            var ms = new TMemoryStream(t);
-            resp.CopyTo(ms);
-            ms.Position = 0;
-            var cnt = ms.ReadInt32();
-            var res = new List<TRefType>(cnt);
-            for (int i = 0; i < cnt; i++)
-                res.Add(new TRefType(ms.ReadInt32(), ms.ReadString()));*/
+            var resp = AsyncHelper.RunSync(() => PostBytes(WellKnownObjects.Api.PostReference, JsonContent.Create(new XItemEnvelop(objid), typeof(XItemEnvelop), null, _jsonOptions)));         
+            if (resp != null)
+            {
+                using var ms = new TMemoryStream(resp);
+                var cnt = ms.ReadInt32();
+                var res = new List<TRefType>(cnt);
+                for (int i = 0; i < cnt; i++)
+                    res.Add(new TRefType(ms.ReadInt64(), ms.ReadString()));
 
-            return AsyncHelper.RunSync(() => this.GetFromJsonAsync(string.Concat(WellKnownObjects.Api.GetReference + objid), typeof(List<TRefType>), _jsonOptions))
-                is List<TRefType> values ? values : null;
+                return res;
+            }
+            return null;
+        }
+
+        async Task<byte[]?> GetBytes(string uri)
+        {
+            using var resp = await GetAsync(uri);
+            return resp.IsSuccessStatusCode ? await resp.Content.ReadAsByteArrayAsync() : null;
+        }
+
+        async Task<byte[]?> PostBytes(string uri, HttpContent? content)
+        {
+            using var resp = await PostAsync(uri, content);
+            return resp.IsSuccessStatusCode ? await resp.Content.ReadAsByteArrayAsync() : null;
         }
 
         #endregion API Data operations

@@ -7,6 +7,7 @@ namespace RmSolution.DataAccess
     #region Using
     using System.Data;
     using System.Net.Http.Headers;
+    using System.Security.Cryptography;
     using System.Xml.Linq;
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Data;
@@ -50,14 +51,13 @@ namespace RmSolution.DataAccess
             throw new Exception("Тип " + name + " не найден!");
         }
 
-        /// <summary> http://localhost:8087/api/reference/4785074604081152 </summary>
-        [HttpGet("[action]/{objid}")]
-        public async Task<IActionResult> Reference(long objid)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Reference(object request)
         {
-            var obj = Runtime.Metadata.GetObject(objid);
+            var obj = Runtime.Metadata.GetObject(((System.Text.Json.JsonElement)request).GetProperty("Item").GetInt64());
             if (obj != null)
             {
-                /*using var dt = await Runtime.Metadata.GetReferenceData(objid);
+                using var dt = await Runtime.Metadata.GetReferenceData(obj.Id);
                 if (dt != null)
                 {
                     using var ms = new TMemoryStream();
@@ -68,8 +68,7 @@ namespace RmSolution.DataAccess
                         ms.Write((string)row[1]);
                     }
                     return File(ms.ToArray(), "application/octet-stream", false);
-                }*/
-                return new JsonResult((await Runtime.Metadata.GetReferenceData(objid)).Rows.Cast<DataRow>().Select(r => new TRefType((long)r[0], (string)r[1])).ToArray());
+                }
             }
             throw new Exception("Тип не найден!");
         }

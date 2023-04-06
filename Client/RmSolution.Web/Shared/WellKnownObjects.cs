@@ -15,7 +15,7 @@
             public static readonly string GetObject = "object/";
             public static readonly string GetData = "data/";
             public static readonly string GetDataTable = "rows/";
-            public static readonly string GetReference = "reference/";
+            public static readonly string PostReference = "reference";
             public static readonly string PostNewItem = "new";
             public static readonly string PostUpdateItem = "update";
         }
