@@ -7,7 +7,7 @@ namespace RmSolution.Web
     #region Using
     using Microsoft.AspNetCore.Components;
     using RmSolution.Data;
-    using RmSolution.Web;
+    using System.Collections.Concurrent;
     using System.Reflection;
     #endregion Using
 
@@ -38,7 +38,7 @@ namespace RmSolution.Web
 
         #region Data operations
 
-        Dictionary<Type, Dictionary<string, MethodInfo>> _prop_get_cache = new();
+        static readonly ConcurrentDictionary<Type, Dictionary<string, MethodInfo>> _prop_get_cache = new();
 
         protected async Task<object?> NewItem(TObjectDto mdtype) =>
             await Client.NewItemAsync(mdtype);
@@ -47,7 +47,7 @@ namespace RmSolution.Web
         {
             var type = item.GetType();
             if (!_prop_get_cache.ContainsKey(type))
-                _prop_get_cache.Add(type, type.GetProperties(_propFlags).OrderBy(p => p.Name).Where(p => p.GetGetMethod() != null)
+                _prop_get_cache.TryAdd(type, type.GetProperties(_propFlags).OrderBy(p => p.Name).Where(p => p.GetGetMethod() != null)
                     .ToDictionary(k => k.Name.ToLower(), v => v.GetGetMethod()));
 
             return _prop_get_cache[type][name.ToLower()].Invoke(item, null)?.ToString() ?? NullValue;
