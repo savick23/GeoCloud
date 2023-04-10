@@ -10,6 +10,7 @@ namespace RmSolution.Runtime
     using System.Net;
     using System.Diagnostics;
     using RmSolution.Server;
+    using System.Reflection;
     #endregion Using
 
     partial class TelnetSession
@@ -81,5 +82,54 @@ namespace RmSolution.Runtime
 
             return Math.Round(cpuUsageTotal * 100.0, 2);
         }
+
+        #region Module command (control)
+
+        List<IModule> GetModules() =>
+            ((RuntimeService)Runtime).Modules.GetModules<IModule>();
+
+        IModule GetModuleByNumber(int id) =>
+            GetModules().FirstOrDefault(m => m.ProcessId == id);
+
+        void DoModuleCommand(StringBuilder output, string command, string[] args)
+        {
+            if (args.Length > 0 && int.TryParse(args[0], out int nppMod))
+                if (args.Length > 1)
+                {
+                    Runtime.Send(MSG.ConsoleCommand, ProcessId, nppMod, args.Skip(1).ToArray());
+                }
+                else
+                {
+                    GetModuleProperties(nppMod);
+                }
+        }
+
+        /// <summary> Получить конфигурацию модуля (процесса). Команда MOD CONFIG.</summary>
+        void GetModuleProperties(int id)
+        {
+            var output = new StringBuilder();
+            var mod = GetModuleByNumber(id);
+            if (mod != null)
+            {
+                foreach (var prop in mod.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(m => m.MetadataToken))
+                {
+                    output.Append("  ").Append(prop.Name).Append(" = ");
+
+                    var val = prop.GetValue(mod);
+                    if (prop.Name.Equals("Subscribe") && val is IEnumerable<int> msgs)
+                        output.Append(string.Join(", ", msgs.Select(m => MSG.ToString(m)))).Append(NEWLINE);
+                    else if (prop.PropertyType.IsSZArray && val is IEnumerable<int> val32s)
+                        output.Append(string.Join(", ", val32s)).Append(NEWLINE);
+                    else if (prop.PropertyType.IsSZArray && val is IEnumerable<long> val64s)
+                        output.Append(string.Join(", ", val64s)).Append(NEWLINE);
+                    else
+                        output.Append(val?.ToString() ?? "NULL").Append(NEWLINE);
+                }
+                Print(output.ToString());
+            }
+            else PrintLine($"Модуль #{id} не найден!");
+        }
+
+        #endregion Module command (control)
     }
 }

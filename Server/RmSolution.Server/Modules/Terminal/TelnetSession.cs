@@ -86,6 +86,7 @@ namespace RmSolution.Runtime
             _handlers = new()
             {
                 { "WHO", ShowModules },
+                { "MOD", DoModuleCommand },
                 { "SYSTEMINFO", ShowSystemInfo },
                 { "TEST", Test }
             };
