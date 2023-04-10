@@ -120,7 +120,14 @@ namespace RmSolution.Runtime
                                 switch (m.Msg)
                                 {
                                     case MSG.Terminal:
-                                        _channel.SendString((m.Data?.ToString() ?? "<пустое сообщение>") + "\r\n");
+                                        if (m.Data is DataTable dt)
+                                        {
+                                            var o = new StringBuilder(NEWLINE);
+                                            PrintTable(o, dt);
+                                            _channel.SendString(o.Append(NEWLINE).ToString());
+                                        }
+                                        else
+                                            _channel.SendString((m.Data?.ToString() ?? "<пустое сообщение>") + NEWLINE);
                                         break;
 
                                     case MSG.InformMessage:
@@ -146,7 +153,7 @@ namespace RmSolution.Runtime
                 }
                 catch (Exception ex)
                 {
-                    PrintLine("ERROR: " + ex.Message + "\r\n" + ex.StackTrace);
+                    PrintLine("ERROR: " + ex.Message + NEWLINE + ex.StackTrace);
                 }
 
             if (_client?.Connected ?? false)
@@ -161,18 +168,18 @@ namespace RmSolution.Runtime
             ((RuntimeService)Runtime).Modules.Remove(this);
         }
 
-        string StringException(Exception ex)
+        string StringException(Exception? ex)
         {
             var res = new StringBuilder();
             var comma = string.Empty;
             while (ex != null)
             {
-                res.Append(comma).Append(ex.Message).Append("\r\n");
-                if (ex.StackTrace != null) res.Append(ex.StackTrace.Replace("\n", "\r\n"));
-                ex = ex.InnerException;
-                comma = "\r\n >>> ";
+                res.Append(comma).Append(ex.Message).Append(NEWLINE);
+                if (ex.StackTrace != null) res.Append(ex.StackTrace.Replace("\n", NEWLINE));
+                ex = ex?.InnerException;
+                comma = NEWLINE + " >>> ";
             }
-            return res.Append("\r\n").ToString();
+            return res.Append(NEWLINE).ToString();
         }
 
         #region Private methods

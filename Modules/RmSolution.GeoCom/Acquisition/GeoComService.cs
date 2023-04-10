@@ -23,7 +23,7 @@ namespace RmSolution.GeoCom
 
         public GeoComService(IRuntime runtime, GeoComAdapterSet adapter) : base(runtime)
         {
-            Subscribe = new[] { MSG.RuntimeStarted };
+            Subscribe = new[] { MSG.RuntimeStarted, MSG.ConsoleCommand };
         }
 
         public override void Start() => UseDatabase(db =>
@@ -44,9 +44,27 @@ namespace RmSolution.GeoCom
                     {
                         case MSG.RuntimeStarted:
                             break;
+
+                        case MSG.ConsoleCommand:
+                            if (m.HParam == ProcessId && m.Data is string[] args && args.Length > 0)
+                                DoCommand(args);
+                            break;
                     }
             }
             return base.ExecuteProcess();
+        }
+
+        void DoCommand(string[] args)
+        {
+            switch (args[0].ToUpper())
+            {
+                case "SEND":
+                    break;
+
+                default:
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, "Неизвестная команда: " + string.Join(' ', args));
+                    break;
+            }
         }
     }
 

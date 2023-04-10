@@ -50,6 +50,9 @@ namespace RmSolution.Runtime
     /// <summary> Константы. Сообщения системной очереди сообщений.</summary>
     public static class MSG
     {
+        public static string ToString(int msg) =>
+            typeof(MSG).GetFields().FirstOrDefault(f => (int)f.GetValue(null) == msg)?.Name ?? msg.ToString("X4");
+
         /// <summary> Выполняется после окончания запуска всех служб.</summary>
         public const int StartServer = 0x0001;
         /// <summary> Выполняется при остановке объектового сервере.</summary>
@@ -76,6 +79,9 @@ namespace RmSolution.Runtime
         /// <summary> LParam = Id процесса.</summary>
         public const int InformMessage = 0x000f;
 
+        /// <summary> Приём консольной команды.</summary>
+        /// <remarks> LParam = ИД терминальной сессии; HParam = ИД процесса (модуля).</remarks>
+        public const int ConsoleCommand = 0x0011;
         /// <summary> Вывод в окно терминала по протоколу <em>Telnet</em>. HParam = ИД session.</summary>
         /// <remarks> LParam = ИД процесса (модуля); HParam = ИД терминальной сессии; Data = text/int - 0x484F4C44 HOLD, 0x46524545 FREE.</remarks>
         public const int Terminal = 0x0014;

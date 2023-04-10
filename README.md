@@ -6,6 +6,7 @@
 **Modules\RmSolution.Data** - Содержит модель данных конфигурации, все классы;  
 **Modules\RmSolution.DataAccess** - Обеспечивает доступ к данным Системы для прочих приложений, например: Веб-клиента;  
 **Modules\RmSolution.GeoCom** - Обеспечивает сбор данных с различных устройств;  
+**Modules\RmSolution.Maintenance** - Регламентное и техническое обслуживание Системы;  
 **Server\RmSolution.Runtime** - Содержит базовые классы и интерфейсы Системы для управлениями микромодулями;  
 **Server\RmSolution.Server** - Сервер приложений РМ Солюшн;  
 **Deployment\RmSolution.Installer** - Установщик приложений;  
