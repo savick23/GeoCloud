@@ -65,6 +65,20 @@
           <row id="5066549580792832" code="000001" name="Тахеометр Leica" type="4785074604082176" model="" serial=""/>
         </data>
       </item>
+      <item id="6755399441055744" parent="11" type="11" code="Команды" name="Команды" source="commands">
+        <attributes>
+          <item id="6755399441056768" code="ИД" name="Идентификатор" source="id" flags="Key"/>
+          <item id="6755399441057792" code="Состояние" name="Состояние" source="state" flags="Required"/>
+          <item id="6755399441058816" code="Родитель" name="Родитель" source="parent" type="68" flags="Required"/>
+          <item id="6755399441059840" code="Код" name="Код" source="code" type="76" width="100" flags="Code,Required"/>
+          <item id="6755399441060864" code="Наименование" name="Наименование" source="name" type="76" width="300" flags="Name,Required"/>
+          <item id="6755399441061888" code="Команда" name="Команда" source="command" type="75" length="256" width="200" flags="Required"/>
+          <item id="6755399441062912" code="Описание" name="Описание" source="description" type="76" width="200"/>
+        </attributes>
+        <data>
+          <row id="6755399441056768" type="4785074604082176" code="INFO" name="Получить сведения об устройстве" command="INFO"/>
+        </data>
+      </item>
     </catalogs>
   </objects>
 </rmgeo>
