@@ -121,6 +121,7 @@ namespace RmSolution.Runtime
                                 switch (m.Msg)
                                 {
                                     case MSG.Terminal:
+                                        if (m.HParam == 0 || m.HParam == ProcessId)
                                         if (m.Data is DataTable dt)
                                         {
                                             var o = new StringBuilder(NEWLINE);
@@ -224,7 +225,11 @@ namespace RmSolution.Runtime
                     break;
 
                 case SessionState.Password:
+#if !DEBUG
                     var authenticated = ValidateUser(_username, input);
+#else
+                    var authenticated = true;
+#endif
                     if (!authenticated)
                     {
                         if (--_pass_attempt == 0)
@@ -342,6 +347,6 @@ namespace RmSolution.Runtime
             }
         }
 
-        #endregion Private methods
+#endregion Private methods
     }
 }

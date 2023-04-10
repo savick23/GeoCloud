@@ -6,6 +6,7 @@ namespace RmSolution.GeoCom
 {
     #region Using
     using System.IO.Ports;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
@@ -47,24 +48,36 @@ namespace RmSolution.GeoCom
 
                         case MSG.ConsoleCommand:
                             if (m.HParam == ProcessId && m.Data is string[] args && args.Length > 0)
-                                DoCommand(args);
+                                DoCommand(m.LParam, args);
                             break;
                     }
             }
             return base.ExecuteProcess();
         }
 
-        void DoCommand(string[] args)
+        /// <summary> Выполнить консольную команду.</summary>
+        void DoCommand(long idTerminal, string[] args)
         {
             switch (args[0].ToUpper())
             {
                 case "SEND":
+                    if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^COM\d+$"))
+                    {
+                        SendCom(args[1].ToUpper(), args.Skip(2).ToArray());
+                    }
+                    else
+                        Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан COM-порт \"" + args[1] + "\"");
                     break;
 
                 default:
-                    Runtime.Send(MSG.Terminal, ProcessId, 0, "Неизвестная команда: " + string.Join(' ', args));
+                    Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Неизвестная команда: " + string.Join(' ', args));
                     break;
             }
+        }
+
+        void SendCom(string name, string[] args)
+        {
+
         }
     }
 
