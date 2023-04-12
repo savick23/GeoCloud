@@ -8,6 +8,23 @@ namespace RmSolution.Devices
     using System.IO.Ports;
     #endregion Using
 
+    /// <summary> Интерфейс подключения к устройству.</summary>
+    public interface IDeviceConnection
+    {
+        /// <summary> Состояние подключения.</summary>
+        bool Connected { get; }
+        /// <summary> Данные содержаться на устройстве.</summary>
+        bool DataAvailable { get; }
+        /// <summary> Подключиться к устройству.</summary>
+        void Open();
+        /// <summary> Закрыть подключение к устройству.</summary>
+        void Close();
+        /// <summary> Прочитать данные с устройства.</summary>
+        byte[] Read();
+        /// <summary> Записать данные на устройство.</summary>
+        void Write(byte[] data);
+    }
+
     public interface IDeviceContext
     {
         string Name { get; }

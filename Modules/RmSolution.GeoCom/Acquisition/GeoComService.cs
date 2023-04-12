@@ -9,14 +9,12 @@ namespace RmSolution.GeoCom
 {
     #region Using
     using System.IO.Ports;
-    using System.Net.Sockets;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
     using RmSolution.Runtime;
-    using SmartMinex.Runtime;
     #endregion Using
 
     public class GeoComService : TModule, IOServer
@@ -133,7 +131,7 @@ namespace RmSolution.GeoCom
         void SendToCom(string portName, string[] args)
         {
             _comsets.Name = portName;
-            var com = new TSerialPort(_comsets);
+            var com = new RmSerialPort(_comsets);
             try
             {
                 com.Open();
@@ -155,17 +153,17 @@ namespace RmSolution.GeoCom
 
         void SendToTcp(string hostName, string[] args)
         {
-            using var tcp = new TTcpClient(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
+            using var tcp = new RmTcpClient(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
             try
             {
-                tcp.Connect();
-                tcp.Send(LF.Concat(Encoding.ASCII.GetBytes(string.Concat(args))).Concat(TERM).ToArray());
+                tcp.Open();
+                tcp.Write(LF.Concat(Encoding.ASCII.GetBytes(string.Concat(args))).Concat(TERM).ToArray());
                 byte[] resp;
                 int attempt = 120;
                 do
                 {
                     Task.Delay(250).Wait();
-                    resp = tcp.Receive();
+                    resp = tcp.Read();
                 }
                 while (resp.Length == 0 && attempt-- > 0);
 

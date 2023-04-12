@@ -19,7 +19,7 @@ namespace RmSolution.GeoCom
     {
         #region Declarations
 
-        TSerialPort _port;
+        RmSerialPort _port;
 
         #endregion Declarations
 
@@ -35,7 +35,7 @@ namespace RmSolution.GeoCom
         {
             Subscribe = new[] { MSG.RuntimeStarted };
             PortName = portname ?? "COM1";
-            _port = new TSerialPort(PortName, baudRate ?? 57600, 8, System.IO.Ports.StopBits.One, System.IO.Ports.Parity.None);
+            _port = new RmSerialPort(PortName, baudRate ?? 57600, 8, System.IO.Ports.StopBits.One, System.IO.Ports.Parity.None);
             Name = "Эмулятор устройства Leica Total Station, порт " + PortName;
         }
 
