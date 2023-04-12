@@ -78,10 +78,24 @@ namespace RmSolution.GeoCom
         {
             switch (args[0].ToUpper())
             {
+                case "COM":
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, new Dictionary<string, string>()
+                    {
+                        { "Name", _comsets.Name },
+                        { "BaudRate", _comsets.BaudRate.ToString() },
+                        { "DataBits", _comsets.DataBits.ToString() },
+                        { "StopBits", _comsets.StopBits switch { StopBits.One => "1", StopBits.OnePointFive => "1.5", StopBits.Two => "2", _ => "0"} },
+                        { "Parity", _comsets.Parity.ToString() },
+                        { "FlowControl", _comsets.FlowControl.ToString() },
+                        { "FIFO", _comsets.Fifo.ToString() },
+                        { "Interface", _comsets.Interface }
+                    });
+                    break;
+
                 case "SEND":
                     if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^COM\d+$"))
                     {
-                        SendCom(args[1].ToUpper(), args.Skip(2).ToArray());
+                        SendToCom(args[1].ToUpper(), args.Skip(2).ToArray());
                     }
                     else
                         Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан COM-порт \"" + args[1] + "\"");
@@ -93,7 +107,7 @@ namespace RmSolution.GeoCom
             }
         }
 
-        void SendCom(string name, string[] args)
+        void SendToCom(string name, string[] args)
         {
             _comsets.Name = name;
             var com = new TSerialPort(_comsets);
@@ -101,13 +115,14 @@ namespace RmSolution.GeoCom
             {
                 com.Open();
                 com.Write(Encoding.ASCII.GetBytes(string.Concat(args)));
-                Task.Delay(1000);
+                Task.Delay(250).Wait();
                 var resp = com.Read();
-                var txt = string.Concat("0x", resp.Select(n => n.ToString("x2")));
+                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null ? "<нет данных>"
+                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ",  Encoding.ASCII.GetString(resp)));
             }
             catch (Exception ex)
             {
-                Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка отправки " + name + ": " + ex.Message);
+                Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка отправки " + _comsets.Name + ": " + ex.Message);
             }
             finally
             {

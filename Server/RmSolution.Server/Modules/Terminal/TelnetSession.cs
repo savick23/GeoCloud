@@ -122,14 +122,20 @@ namespace RmSolution.Runtime
                                 {
                                     case MSG.Terminal:
                                         if (m.HParam == 0 || m.HParam == ProcessId)
-                                        if (m.Data is DataTable dt)
-                                        {
-                                            var o = new StringBuilder(NEWLINE);
-                                            PrintTable(o, dt);
-                                            _channel.SendString(o.Append(NEWLINE).ToString());
-                                        }
-                                        else
-                                            _channel.SendString((m.Data?.ToString() ?? "<пустое сообщение>") + NEWLINE);
+                                            if (m.Data is DataTable dt)
+                                            {
+                                                var o = new StringBuilder(NEWLINE);
+                                                PrintTable(o, dt);
+                                                _channel.SendString(o.Append(NEWLINE).ToString());
+                                            }
+                                            else if (m.Data is Dictionary<string, string> dict)
+                                            {
+                                                var o = new StringBuilder(NEWLINE);
+                                                PrintDictionary(o, dict);
+                                                _channel.SendString(o.Append(NEWLINE).ToString());
+                                            }
+                                            else
+                                                _channel.SendString((m.Data?.ToString() ?? "<пустое сообщение>") + NEWLINE);
                                         break;
 
                                     case MSG.InformMessage:
@@ -235,7 +241,7 @@ namespace RmSolution.Runtime
                         if (--_pass_attempt == 0)
                             Stop();
 
-                        prompt = "Не верное имя пользователя или пароль!\r\n" + PASS_PROMPT;
+                        prompt = "Не верное имя пользователя или пароль!" + NEWLINE + PASS_PROMPT;
                     }
                     else
                     {
@@ -245,6 +251,8 @@ namespace RmSolution.Runtime
                     break;
 
                 default:
+                    if (args.Length == 0) return;
+
                     StoreHistoryCommand(input);
 
                     if (_handlers.ContainsKey(cmd))

@@ -20,7 +20,7 @@
       "start": "auto",
       "adapter": {
         "mode": "COM",
-        "name": "COM3",
+        "name": "COM7",
         "baudrate": 57600,
         "databits": 8,
         "stopbits": 1.0,
@@ -30,6 +30,13 @@
         "interface": "RS-232",
         "address": "127.0.0.1"
       }
+    },
+    {
+      "name": "Эмулятор устройства Leica Total Station",
+      "type": "RmSolution.GeoCom.LeicaTotalStationEmul, RmSolution.GeoCom",
+      "start": "auto",
+      "portname": "COM8",
+      "baudrate": 57600
     },
     {
       "name": "Веб-сервис доступа к данным",

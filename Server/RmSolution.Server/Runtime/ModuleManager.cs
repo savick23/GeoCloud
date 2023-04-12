@@ -93,7 +93,7 @@ namespace RmSolution.Server
                 }
                 mod = (IModule)Activator.CreateInstance(serviceType, prms);
                 mod.ProcessId = ++_count;
-                mod.Name = modinfo?.Name ?? mod.Name;
+                mod.Name = mod.Name ?? modinfo?.Name;
                 _modules.TryAdd(new ModuleDescript(mod.ProcessId, mod.GetType()), mod);
                 Task.Run(() => Created?.Invoke(mod, EventArgs.Empty));
 

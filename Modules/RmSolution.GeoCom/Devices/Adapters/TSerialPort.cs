@@ -117,14 +117,23 @@ namespace RmSolution.Devices
 
     public struct SerialPortSetting
     {
+        /// <summary> Имя последовательного порта.</summary>
         public string Name { get; set; }
+        /// <summary> Описание при необходимости.</summary>
         public string Description { get; set; }
+        /// <summary> Скорость, бит в секунду.</summary>
         public int BaudRate { get; set; }
+        /// <summary> Биты данных.</summary>
         public int DataBits { get; set; }
+        /// <summary> Стоповые биты.</summary>
         public StopBits StopBits { get; set; }
+        /// <summary> Чётность.</summary>
         public Parity Parity { get; set; }
+        /// <summary> Управление потоком.</summary>
         public int FlowControl { get; set; }
+        /// <summary> Физический интерфейс.</summary>
         public string Interface { get; set; }
+        /// <summary> Буфер ввода/вывода.</summary>
         public bool Fifo { get; set; }
 
         public override string ToString() =>
