@@ -8,18 +8,22 @@ namespace RmSolution.GeoCom
 {
     #region Using
     using System.IO.Ports;
+    using System.Net.Sockets;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
     using RmSolution.Runtime;
+    using SmartMinex.Runtime;
     #endregion Using
 
     public class GeoComService : TModule, IOServer
     {
         #region Declarations
 
+        readonly static byte[] LF = new byte[] { 0x0a };
+        readonly static byte[] TERM = new byte[] { 0x0d, 0x0a };
         readonly List<IDevice> _devices = new();
         SerialPortSetting _comsets;
 
@@ -125,9 +129,9 @@ namespace RmSolution.GeoCom
             }
         }
 
-        void SendToCom(string name, string[] args)
+        void SendToCom(string portName, string[] args)
         {
-            _comsets.Name = name;
+            _comsets.Name = portName;
             var com = new TSerialPort(_comsets);
             try
             {
@@ -148,26 +152,31 @@ namespace RmSolution.GeoCom
             }
         }
 
-        void SendToTcp(string name, string[] args)
+        void SendToTcp(string hostName, string[] args)
         {
-            _comsets.Name = name;
-            var com = new TSerialPort(_comsets);
+            using var tcp = new TTcpClient(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
             try
             {
-                com.Open();
-                com.Write(Encoding.ASCII.GetBytes(string.Concat(args)));
-                Task.Delay(250).Wait();
-                var resp = com.Read();
-                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null ? "<нет данных>"
+                tcp.Connect();
+                tcp.Send(LF.Concat(Encoding.ASCII.GetBytes(string.Concat(args))).Concat(TERM).ToArray());
+                byte[] resp;
+                int attempt = 120;
+                do
+                {
+                    Task.Delay(250).Wait();
+                    resp = tcp.Receive();
+                }
+                while (resp.Length == 0 && attempt-- > 0);
+
+                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null || resp.Length == 0 ? "<нет данных>"
                     : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
             }
             catch (Exception ex)
             {
-                Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка отправки " + _comsets.Name + ": " + ex.Message);
             }
             finally
             {
-                com.Close();
+                tcp.Close();
             }
         }
     }
