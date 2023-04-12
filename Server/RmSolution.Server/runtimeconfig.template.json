@@ -20,7 +20,7 @@
       "start": "auto",
       "adapter": {
         "mode": "COM",
-        "port": "COM3",
+        "name": "COM3",
         "baudrate": 57600,
         "databits": 8,
         "stopbits": 1.0,

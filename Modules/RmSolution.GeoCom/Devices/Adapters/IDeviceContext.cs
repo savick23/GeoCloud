@@ -32,21 +32,4 @@ namespace RmSolution.Devices
         public string Host { get; set; }
         public int Port { get; set; }
     }
-
-    public struct SerialPortSetting
-    {
-        public string Name { get; set; }
-        public int BaudRate { get; set; }
-        public int DataBits { get; set; }
-        public StopBits StopBits { get; set; }
-        public Parity Parity { get; set; }
-        public int FlowControl { get; set; }
-        public string Interface { get; set; }
-        public bool Fifo { get; set; }
-
-        public override string ToString()
-        {
-            return $"Baud rate:{BaudRate}; Stop bits:{StopBits}";
-        }
-    }
 }
