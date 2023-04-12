@@ -94,11 +94,27 @@ namespace RmSolution.GeoCom
                     });
                     break;
 
-                case "SEND":
-                    if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^COM\d+$"))
+                case "TCP":
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, new Dictionary<string, string>()
                     {
+                        { "Name", _comsets.Name },
+                        { "BaudRate", _comsets.BaudRate.ToString() },
+                        { "DataBits", _comsets.DataBits.ToString() },
+                        { "StopBits", _comsets.StopBits switch { StopBits.One => "1", StopBits.OnePointFive => "1.5", StopBits.Two => "2", _ => "0"} },
+                        { "Parity", _comsets.Parity.ToString() },
+                        { "FlowControl", _comsets.FlowControl.ToString() },
+                        { "FIFO", _comsets.Fifo.ToString() },
+                        { "Interface", _comsets.Interface }
+                    });
+                    break;
+
+                case "SEND":
+                    if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^\d+\.\d+\.\d+\.\d+\:*\d*$"))
+                        SendToTcp(Regex.Match(args[1], @"^\d+\.\d+\.\d+\.\d+\:*\d*$").Value, args.Skip(2).ToArray());
+
+                    else if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^COM\d+$"))
                         SendToCom(args[1].ToUpper(), args.Skip(2).ToArray());
-                    }
+
                     else
                         Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан COM-порт \"" + args[1] + "\"");
                     break;
