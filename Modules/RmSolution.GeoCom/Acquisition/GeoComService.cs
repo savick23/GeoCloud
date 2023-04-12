@@ -1,6 +1,8 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: GeoComService - Сервер сбора геоданных.
+// Тунель к COM-порту: 109.74.129.114:32325
+// HTTP API: 109.74.129.114:32328
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.GeoCom
 {
@@ -118,7 +120,30 @@ namespace RmSolution.GeoCom
                 Task.Delay(250).Wait();
                 var resp = com.Read();
                 Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null ? "<нет данных>"
-                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ",  Encoding.ASCII.GetString(resp)));
+                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
+            }
+            catch (Exception ex)
+            {
+                Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка отправки " + _comsets.Name + ": " + ex.Message);
+            }
+            finally
+            {
+                com.Close();
+            }
+        }
+
+        void SendToTcp(string name, string[] args)
+        {
+            _comsets.Name = name;
+            var com = new TSerialPort(_comsets);
+            try
+            {
+                com.Open();
+                com.Write(Encoding.ASCII.GetBytes(string.Concat(args)));
+                Task.Delay(250).Wait();
+                var resp = com.Read();
+                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null ? "<нет данных>"
+                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
             }
             catch (Exception ex)
             {
