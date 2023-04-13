@@ -31,6 +31,7 @@ namespace RmSolution.GeoCom
         #region Properties
 
         public List<IDevice> Devices => _devices;
+        public int Delay => 250;
 
         #endregion Properties
 
@@ -132,50 +133,41 @@ namespace RmSolution.GeoCom
         {
             _comsets.Name = portName;
             var com = new RmSerialPort(_comsets);
-            try
-            {
-                com.Open();
-                com.Write(Encoding.ASCII.GetBytes(string.Concat(args)));
-                Task.Delay(250).Wait();
-                var resp = com.Read();
-                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null ? "<нет данных>"
-                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
-            }
-            catch (Exception ex)
-            {
-                Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка отправки " + _comsets.Name + ": " + ex.Message);
-            }
-            finally
-            {
-                com.Close();
-            }
+            Send(com, args);
         }
 
         void SendToTcp(string hostName, string[] args)
         {
             using var tcp = new RmTcpClient(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
+            Send(tcp, args);
+        }
+
+        void Send(IDeviceConnection device, string[] args)
+        {
             try
             {
-                tcp.Open();
-                tcp.Write(LF.Concat(Encoding.ASCII.GetBytes(string.Concat(args))).Concat(TERM).ToArray());
+                device.Open();                
+                device.Write(LF.Concat(Encoding.ASCII.GetBytes(string.Concat(args))).Concat(TERM).ToArray());
+
                 byte[] resp;
                 int attempt = 120;
                 do
                 {
-                    Task.Delay(250).Wait();
-                    resp = tcp.Read();
+                    Task.Delay(Delay).Wait();
+                    resp = device.Read();
                 }
-                while (resp.Length == 0 && attempt-- > 0);
+                while ((resp == null || resp.Length == 0) && attempt-- > 0);
 
                 Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null || resp.Length == 0 ? "<нет данных>"
                     : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
             }
             catch (Exception ex)
             {
+                Runtime.Send(MSG.Terminal, ProcessId, 0, nameof(GeoComService) + ": " + ex.Message);
             }
             finally
             {
-                tcp.Close();
+                device.Close();
             }
         }
     }
