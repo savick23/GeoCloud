@@ -25,10 +25,9 @@ namespace RmSolution.Devices
         void Write(byte[] data);
     }
 
-    public interface IDeviceContext
+    public interface IDeviceContext : IDeviceConnection
     {
         GeoComAccessMode OperationMode { get; }
-        IDeviceConnection Connection { get; }
         NetworkSetting? NetworkSetting { get; set; }
         SerialPortSetting? SerialPortSetting { get; set; }
     }

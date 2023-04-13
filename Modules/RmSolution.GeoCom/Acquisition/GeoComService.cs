@@ -124,7 +124,7 @@ namespace RmSolution.GeoCom
                         SendToCom(args[1].ToUpper(), args.Skip(2).ToArray());
 
                     else if (Devices.Any(d => d.Code.ToUpper() == receiver || d.Name.ToUpper() == receiver))
-                        Send(((IDeviceContext)Devices.First(d => d.Code.ToUpper() == receiver || d.Name.ToUpper() == receiver)).Connection, args);
+                        Send((IDeviceConnection)Devices.First(d => d.Code.ToUpper() == receiver || d.Name.ToUpper() == receiver), args);
 
                     else
                         Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан адрес \"" + args[1] + "\"");

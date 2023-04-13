@@ -13,6 +13,12 @@ namespace RmSolution.Devices
     /// <summary> Тахеометр Leica.</summary>
     public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
+        #region Declarations
+
+        IDeviceConnection? _connection;
+
+        #endregion Declarations
+
         #region Properties
 
         public long Id { get; set; }
@@ -21,11 +27,44 @@ namespace RmSolution.Devices
         public string? Descript { get; set; }
 
         public GeoComAccessMode OperationMode { get; }
-        public IDeviceConnection Connection { get; }
         public NetworkSetting? NetworkSetting { get; set; }
         public SerialPortSetting? SerialPortSetting { get; set; }
 
         #endregion Properties
+
+        #region IDeviceConnection implementation
+
+        public bool Connected => _connection?.Connected ?? false;
+
+        public bool DataAvailable => _connection?.DataAvailable ?? false;
+
+        public void Open()
+        {
+            if (_connection != null)
+            {
+                _connection.Close();
+                _connection = null;
+            }
+            if (OperationMode == GeoComAccessMode.Com && SerialPortSetting != null)
+                _connection = new RmSerialConnection((SerialPortSetting)SerialPortSetting);
+
+            else if (OperationMode == GeoComAccessMode.Tcp && NetworkSetting != null)
+                _connection = new RmNetworkConnection((NetworkSetting)NetworkSetting);
+
+            _connection?.Open();
+        }
+
+        public void Close()
+        {
+            _connection?.Close();
+            _connection = null;
+        }
+
+        public byte[] Read() => _connection?.Read() ?? Array.Empty<byte>();
+
+        public void Write(byte[] data) => _connection?.Write(data);
+
+        #endregion IDeviceConnection implementation
 
         public LeicaTotalStationDevice(string code, string name, SerialPortSetting serialPortSetting)
         {
@@ -33,7 +72,6 @@ namespace RmSolution.Devices
             Name = name;
             OperationMode = GeoComAccessMode.Com;
             SerialPortSetting = serialPortSetting;
-            Connection = new RmSerialConnection(serialPortSetting);
         }
 
         public LeicaTotalStationDevice(TEquipment info, NetworkSetting networkSetting)
@@ -42,7 +80,6 @@ namespace RmSolution.Devices
             Name = info.Name;
             OperationMode = GeoComAccessMode.Tcp;
             NetworkSetting = networkSetting;
-            Connection = new RmNetworkConnection(networkSetting);
         }
 
         public void Dispose()
