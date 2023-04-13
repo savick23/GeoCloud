@@ -11,6 +11,7 @@ namespace RmSolution.Runtime
     using System.Diagnostics;
     using RmSolution.Server;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     #endregion Using
 
     partial class TelnetSession
@@ -93,15 +94,12 @@ namespace RmSolution.Runtime
 
         void DoModuleCommand(StringBuilder output, string command, string[] args)
         {
-            if (args.Length > 0 && int.TryParse(args[0], out int nppMod))
-                if (args.Length > 1)
-                {
-                    Runtime.Send(MSG.ConsoleCommand, ProcessId, nppMod, args.Skip(1).ToArray());
-                }
+            var inpp = Regex.IsMatch(command, @"\d+") ? 0 : 1;
+            if (args.Length >= inpp && int.TryParse(inpp == 1 ? args[0] : Regex.Match(command, @"\d+").Value, out int nppMod))
+                if (args.Length > inpp)
+                    Runtime.Send(MSG.ConsoleCommand, ProcessId, nppMod, args.Skip(inpp).ToArray());
                 else
-                {
                     GetModuleProperties(nppMod);
-                }
         }
 
         /// <summary> Получить конфигурацию модуля (процесса). Команда MOD CONFIG.</summary>

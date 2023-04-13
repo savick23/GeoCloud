@@ -11,6 +11,8 @@ namespace RmSolution.Runtime
     using System.Data;
     using RmSolution.Data;
     using RmSolution.Server;
+    using System.Text.RegularExpressions;
+    using Microsoft.AspNetCore.DataProtection.KeyManagement;
     #endregion Using
 
     /// <summary> [Системный модуль] Терминальная клиентская сессия Telnet.</summary>
@@ -85,10 +87,10 @@ namespace RmSolution.Runtime
 
             _handlers = new()
             {
-                { "WHO", ShowModules },
-                { "MOD", DoModuleCommand },
-                { "SYSTEMINFO", ShowSystemInfo },
-                { "TEST", Test }
+                { "^WHO$", ShowModules },
+                { "^MOD\\d*$", DoModuleCommand },
+                { "^SYSTEMINFO$", ShowSystemInfo },
+                { "^TEST$", Test }
             };
             GetCpuUsage();
         }
@@ -208,13 +210,13 @@ namespace RmSolution.Runtime
             return res;
         }
 
-        void ExecuteCommand(string line)
+        void ExecuteCommand(string input)
         {
-            var input = line.Trim();
+            input = input.Trim();
             var output = new StringBuilder();
             var prompt = "\r\n";
             var args = input.SplitArguments();
-            var cmd = args.FirstOrDefault()?.ToUpper();
+            string cmd = args.FirstOrDefault()?.ToUpper() ?? string.Empty;
             bool isloop = false;
             bool handled = true;
 
@@ -255,8 +257,8 @@ namespace RmSolution.Runtime
 
                     StoreHistoryCommand(input);
 
-                    if (_handlers.ContainsKey(cmd))
-                        _handlers[cmd](output, cmd, args.Skip(1).ToArray());
+                    if (_handlers.Keys.Any(key => Regex.IsMatch(cmd, key)))
+                        _handlers.First(h => Regex.IsMatch(cmd, h.Key)).Value(output, cmd, args.Skip(1).ToArray());
 
                     break;
             }
