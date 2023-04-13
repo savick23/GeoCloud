@@ -34,6 +34,13 @@ namespace RmSolution.Devices
             Connect(EndPoint);
         }
 
+        public new void Close()
+        {
+            Shutdown(SocketShutdown.Both);
+            Disconnect(true);
+            Close();
+        }
+
         public byte[] Read()
         {
             var buf = new byte[64];
@@ -53,6 +60,6 @@ namespace RmSolution.Devices
         public void Write(byte[] data)
         {
             Send(data);
-        } 
+        }
     }
 }
