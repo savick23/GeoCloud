@@ -19,6 +19,8 @@ namespace RmSolution.GeoCom
     {
         #region Declarations
 
+        readonly static byte[] TERM = new byte[] { 0x0d, 0x0a };
+
         RmSerialPort _port;
 
         #endregion Declarations
@@ -48,10 +50,13 @@ namespace RmSolution.GeoCom
                 if (_port.Available > 0)
                 {
                     var resp = _port.Read();
-                    if (resp.Length > 0)
+                    if (resp.Length > 0 && resp[^2..^0].SequenceEqual(TERM))
                     {
-                        _port.Write(Encoding.ASCII.GetBytes("SUCCESFULL"));
+                        resp = resp[0] == '\n' ? resp[1..^2] : resp[0..^2];
+                        _port.Write(resp.Concat(TERM).ToArray());
                     }
+                    else _port.Write(Encoding.ASCII.GetBytes("undefined").ToArray());
+
                     while (_esb.TryDequeue(out TMessage m))
                         switch (m.Msg)
                         {

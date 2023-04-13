@@ -21,8 +21,11 @@ namespace RmSolution.GeoCom
     {
         #region Declarations
 
+        /// <summary> При посылке в начале строки (не обязательно), отчищает входной буфер команд на устройстве.</summary>
         readonly static byte[] LF = new byte[] { 0x0a };
         readonly static byte[] TERM = new byte[] { 0x0d, 0x0a };
+        /// <summary> GeoCOM request type 1.</summary>
+        readonly static byte[] REQTYPE1 = "%R1Q"u8.ToArray();
         readonly List<IDevice> _devices = new();
         SerialPortSetting _comsets;
 
@@ -41,7 +44,7 @@ namespace RmSolution.GeoCom
             _comsets = new SerialPortSetting()
             {
                 Name = adapter.Name ?? "COM1",
-                BaudRate = adapter.BaudRate ?? 57600,
+                BaudRate = adapter.BaudRate ?? 19200,
                 DataBits = adapter.DataBits ?? 8,
                 StopBits = adapter.StopBits == 1f ? StopBits.One : adapter.StopBits == 1.5f ? StopBits.OnePointFive : adapter.StopBits == 2f ? StopBits.Two : StopBits.None,
                 Parity = adapter.Parity,

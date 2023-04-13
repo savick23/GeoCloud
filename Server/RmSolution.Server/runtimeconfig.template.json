@@ -36,7 +36,7 @@
       "type": "RmSolution.GeoCom.LeicaTotalStationEmul, RmSolution.GeoCom",
       "start": "auto",
       "portname": "COM8",
-      "baudrate": 57600
+      "baudrate": 19200
     },
     {
       "name": "Веб-сервис доступа к данным",
