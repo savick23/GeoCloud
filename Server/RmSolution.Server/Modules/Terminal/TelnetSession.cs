@@ -36,6 +36,7 @@ namespace RmSolution.Runtime
         readonly TelnetChannel _channel = new();
 
         readonly LinkedList<string> _history = new();
+        /// <summary> Обоаботчики команд. Ключ команды задан регулярным выражением.</summary>
         readonly Dictionary<string, Action<StringBuilder, string, string[]>> _handlers;
 
         #endregion Declarations
@@ -88,7 +89,11 @@ namespace RmSolution.Runtime
             _handlers = new()
             {
                 { "^WHO$", ShowModules },
-                { "^MOD\\d*$", DoModuleCommand },
+                { "^MOD\\s*$", ShowModules },
+                { "^#\\d+", DoModuleCommand },
+                { "^MOD\\s*\\d+", DoModuleCommand },
+                { "^DEV\\s*$", ShowDevices },
+                { "^DEV\\s*\\d+", DoDeviceCommand },
                 { "^SYSTEMINFO$", ShowSystemInfo },
                 { "^TEST$", Test }
             };
@@ -215,7 +220,14 @@ namespace RmSolution.Runtime
             input = input.Trim();
             var output = new StringBuilder();
             var prompt = "\r\n";
-            var args = input.SplitArguments();
+            string[] args;
+            var handler = _handlers.FirstOrDefault(h => Regex.IsMatch(input, h.Key, RegexOptions.IgnoreCase));
+            if (handler.Key != null)
+            {
+                var cmd_ = Regex.Match(input, handler.Key, RegexOptions.IgnoreCase).Value.ToUpper();
+                args = new[] { cmd_ }.Concat(input[cmd_.Length..].SplitArguments()).ToArray();
+            }
+            else args = input.SplitArguments();
             string cmd = args.FirstOrDefault()?.ToUpper() ?? string.Empty;
             bool isloop = false;
             bool handled = true;
@@ -257,8 +269,8 @@ namespace RmSolution.Runtime
 
                     StoreHistoryCommand(input);
 
-                    if (_handlers.Keys.Any(key => Regex.IsMatch(cmd, key)))
-                        _handlers.First(h => Regex.IsMatch(cmd, h.Key)).Value(output, cmd, args.Skip(1).ToArray());
+                    if (handler.Value != null)
+                        handler.Value(output, cmd, args.Skip(1).ToArray());
 
                     break;
             }

@@ -130,6 +130,11 @@ namespace RmSolution.GeoCom
                         Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан адрес \"" + args[1] + "\"");
                     break;
 
+                case "DEV":
+                case "DEVICES":
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, Devices.ToDictionary(k => k.Code, v => string.Concat(v.Name)));
+                    break;
+
                 default:
                     Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Неизвестная команда: " + string.Join(' ', args));
                     break;
