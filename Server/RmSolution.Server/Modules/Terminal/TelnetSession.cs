@@ -266,7 +266,7 @@ namespace RmSolution.Runtime
                     if (string.IsNullOrWhiteSpace(input)) return;
 
                     StoreHistoryCommand(input);
-                    handler.Value?.Invoke(output, cmd, args.Skip(1).ToArray());
+                    handler.Value?.Invoke(output, cmd, args.ToArray());
                     break;
             }
 
