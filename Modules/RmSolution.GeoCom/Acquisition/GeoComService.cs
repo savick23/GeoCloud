@@ -207,7 +207,9 @@ namespace RmSolution.GeoCom
 
                     i++;
                 }
-                func.Invoke(dev, prms);
+                var resp = func.Invoke(dev, prms) as byte[];
+                Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null || resp.Length == 0 ? "<нет данных>"
+                    : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
             }
         }
     }

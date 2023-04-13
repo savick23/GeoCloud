@@ -7,6 +7,8 @@ namespace RmSolution.Devices
 {
     #region Using
     using System;
+    using System.Linq;
+    using System.Text;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
     #endregion Using
@@ -15,6 +17,10 @@ namespace RmSolution.Devices
     public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
         #region Declarations
+
+        /// <summary> При посылке в начале строки (не обязательно), отчищает входной буфер команд на устройстве.</summary>
+        readonly static byte[] LF = new byte[] { 0x0a };
+        readonly static byte[] TERM = "\r\n"u8.ToArray();
 
         IDeviceConnection? _connection;
 
@@ -92,10 +98,33 @@ namespace RmSolution.Devices
 
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
-        /// <example> %R1Q,1004:eLaser[long] >>> %R1P,0,0:RC </example>
-        public void EDM_Laserpointer(ON_OFF_TYPE eOn)
+        /// <example> %R1Q,1004:eLaser[long] >>> %R1P,0,0:RC mod3 dev 000001 EDM_Laserpointer on </example>
+        public byte[]? EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
+            byte[]? resp;
+            var req = Request("%R1Q,1004:", ((int)eOn).ToString());
+            try
+            {
+                Open();
+                Write(req);
+                int attempt = 120;
+                do
+                {
+                    Task.Delay(250).Wait();
+                    resp = Read();
+                }
+                while ((resp == null || resp.Length == 0) && attempt-- > 0);
+            }
+            finally
+            {
+                Close();
+            }
+            return resp;
         }
+
+        /// <summary> Упаковка данных для отправки на устройство.</summary>
+        public static byte[] Request(params string[] data) =>
+            LF.Concat(Encoding.ASCII.GetBytes(string.Concat(data))).Concat(TERM).ToArray();
 
         #endregion Leica functions
     }
