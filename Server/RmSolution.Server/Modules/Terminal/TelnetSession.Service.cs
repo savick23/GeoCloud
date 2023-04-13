@@ -92,40 +92,42 @@ namespace RmSolution.Runtime
         IModule GetModuleByNumber(int id) =>
             GetModules().FirstOrDefault(m => m.ProcessId == id);
 
-        void DoModuleCommand(StringBuilder output, string command, string[] args)
+        void DoModuleCommand(StringBuilder output, string command, string[] args) => UseModule(command, mod =>
         {
-            var inpp = Regex.IsMatch(command, @"\d+") ? 0 : 1;
-            if (args.Length >= inpp && int.TryParse(inpp == 1 ? args[0] : Regex.Match(command, @"\d+").Value, out int nppMod))
-                if (args.Length > inpp)
-                    Runtime.Send(MSG.ConsoleCommand, ProcessId, nppMod, args.Skip(inpp).ToArray());
-                else
-                    GetModuleProperties(nppMod);
-        }
+            Runtime.Send(MSG.ConsoleCommand, ProcessId, mod.ProcessId, args);
+        });
 
         /// <summary> Получить конфигурацию модуля (процесса). Команда MOD CONFIG.</summary>
-        void GetModuleProperties(int id)
+        void GetModuleProperties(StringBuilder output, string command, string[] args) => UseModule(command, mod =>
         {
-            var output = new StringBuilder();
-            var mod = GetModuleByNumber(id);
-            if (mod != null)
+            foreach (var prop in mod.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(m => m.MetadataToken))
             {
-                foreach (var prop in mod.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(m => m.MetadataToken))
-                {
-                    output.Append("  ").Append(prop.Name).Append(" = ");
+                output.Append("  ").Append(prop.Name).Append(" = ");
 
-                    var val = prop.GetValue(mod);
-                    if (prop.Name.Equals("Subscribe") && val is IEnumerable<int> msgs)
-                        output.Append(string.Join(", ", msgs.Select(m => MSG.ToString(m)))).Append(NEWLINE);
-                    else if (prop.PropertyType.IsSZArray && val is IEnumerable<int> val32s)
-                        output.Append(string.Join(", ", val32s)).Append(NEWLINE);
-                    else if (prop.PropertyType.IsSZArray && val is IEnumerable<long> val64s)
-                        output.Append(string.Join(", ", val64s)).Append(NEWLINE);
-                    else
-                        output.Append(val?.ToString() ?? "NULL").Append(NEWLINE);
-                }
-                Print(output.ToString());
+                var val = prop.GetValue(mod);
+                if (prop.Name.Equals("Subscribe") && val is IEnumerable<int> msgs)
+                    output.Append(string.Join(", ", msgs.Select(m => MSG.ToString(m)))).Append(NEWLINE);
+                else if (prop.PropertyType.IsSZArray && val is IEnumerable<int> val32s)
+                    output.Append(string.Join(", ", val32s)).Append(NEWLINE);
+                else if (prop.PropertyType.IsSZArray && val is IEnumerable<long> val64s)
+                    output.Append(string.Join(", ", val64s)).Append(NEWLINE);
+                else
+                    output.Append(val?.ToString() ?? "NULL").Append(NEWLINE);
             }
-            else PrintLine($"Модуль #{id} не найден!");
+        });
+
+        void UseModule(string command, Action<IModule> handler)
+        {
+            if (int.TryParse(Regex.Match(command, @"\d+").Value, out var npp))
+            {
+                var mod = GetModuleByNumber(npp);
+                if (mod != null)
+                {
+                    handler?.Invoke(mod);
+                    return;
+                }
+            }
+            PrintLine($"Модуль #{npp} не найден!");
         }
 
         #endregion Module command (control)

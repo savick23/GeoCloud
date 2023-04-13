@@ -91,6 +91,7 @@ namespace RmSolution.Runtime
                 { "^WHO$", ShowModules },
                 { "^MOD\\s*$", ShowModules },
                 { "^#\\d+", DoModuleCommand },
+                { "^MOD\\s*\\d+$", GetModuleProperties },
                 { "^MOD\\s*\\d+", DoModuleCommand },
                 { "^DEV\\s*$", ShowDevices },
                 { "^DEV\\s*\\d+", DoDeviceCommand },
@@ -220,15 +221,12 @@ namespace RmSolution.Runtime
             input = input.Trim();
             var output = new StringBuilder();
             var prompt = "\r\n";
-            string[] args;
             var handler = _handlers.FirstOrDefault(h => Regex.IsMatch(input, h.Key, RegexOptions.IgnoreCase));
-            if (handler.Key != null)
-            {
-                var cmd_ = Regex.Match(input, handler.Key, RegexOptions.IgnoreCase).Value.ToUpper();
-                args = new[] { cmd_ }.Concat(input[cmd_.Length..].SplitArguments()).ToArray();
-            }
-            else args = input.SplitArguments();
-            string cmd = args.FirstOrDefault()?.ToUpper() ?? string.Empty;
+            string cmd = handler.Key == null
+                ? Regex.Match(input, @".*?(?=\s|$)").Value.ToUpper()
+                : Regex.Match(input, handler.Key, RegexOptions.IgnoreCase).Value.ToUpper();
+
+            string[] args = input[cmd.Length..].SplitArguments();
             bool isloop = false;
             bool handled = true;
 
@@ -265,13 +263,10 @@ namespace RmSolution.Runtime
                     break;
 
                 default:
-                    if (args.Length == 0) return;
+                    if (string.IsNullOrWhiteSpace(input)) return;
 
                     StoreHistoryCommand(input);
-
-                    if (handler.Value != null)
-                        handler.Value(output, cmd, args.Skip(1).ToArray());
-
+                    handler.Value?.Invoke(output, cmd, args.Skip(1).ToArray());
                     break;
             }
 
