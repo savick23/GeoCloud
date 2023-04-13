@@ -28,6 +28,7 @@ namespace RmSolution.GeoCom
         readonly static byte[] REQTYPE1 = "%R1Q"u8.ToArray();
         readonly List<IDevice> _devices = new();
         SerialPortSetting _comsets;
+        NetworkSetting _netsets;
 
         #endregion Declarations
 
@@ -41,9 +42,14 @@ namespace RmSolution.GeoCom
         public GeoComService(IRuntime runtime, GeoComAdapterSet adapter) : base(runtime)
         {
             Subscribe = new[] { MSG.RuntimeStarted, MSG.ConsoleCommand };
+            _netsets = new NetworkSetting()
+            {
+                Host = Regex.Match(adapter?.Address ?? string.Empty, @"(\d+\.*){4}").Value,
+                Port = int.TryParse(Regex.Match(adapter?.Address ?? string.Empty, @"(?<=\:)\d+").Value, out var port) ? port : 80
+            };
             _comsets = new SerialPortSetting()
             {
-                Name = adapter.Name ?? "COM1",
+                PornName = adapter.Name ?? "COM1",
                 BaudRate = adapter.BaudRate ?? 19200,
                 DataBits = adapter.DataBits ?? 8,
                 StopBits = adapter.StopBits == 1f ? StopBits.One : adapter.StopBits == 1.5f ? StopBits.OnePointFive : adapter.StopBits == 2f ? StopBits.Two : StopBits.None,
@@ -62,7 +68,7 @@ namespace RmSolution.GeoCom
 
         protected override Task ExecuteProcess()
         {
-            var sock = new GeoComSocket(new LeicaTotalStationDevice());
+            Devices.Add(new LeicaTotalStationDevice("000001", "Тахеометр Leica", _netsets));
 
             Status = RuntimeStatus.Running;
             while (_sync.WaitOne() && (Status & RuntimeStatus.Loop) > 0)
@@ -90,7 +96,7 @@ namespace RmSolution.GeoCom
                 case "COM":
                     Runtime.Send(MSG.Terminal, ProcessId, 0, new Dictionary<string, string>()
                     {
-                        { "Name", _comsets.Name },
+                        { "Name", _comsets.PornName },
                         { "BaudRate", _comsets.BaudRate.ToString() },
                         { "DataBits", _comsets.DataBits.ToString() },
                         { "StopBits", _comsets.StopBits switch { StopBits.One => "1", StopBits.OnePointFive => "1.5", StopBits.Two => "2", _ => "0"} },
@@ -104,26 +110,24 @@ namespace RmSolution.GeoCom
                 case "TCP":
                     Runtime.Send(MSG.Terminal, ProcessId, 0, new Dictionary<string, string>()
                     {
-                        { "Name", _comsets.Name },
-                        { "BaudRate", _comsets.BaudRate.ToString() },
-                        { "DataBits", _comsets.DataBits.ToString() },
-                        { "StopBits", _comsets.StopBits switch { StopBits.One => "1", StopBits.OnePointFive => "1.5", StopBits.Two => "2", _ => "0"} },
-                        { "Parity", _comsets.Parity.ToString() },
-                        { "FlowControl", _comsets.FlowControl.ToString() },
-                        { "FIFO", _comsets.Fifo.ToString() },
-                        { "Interface", _comsets.Interface }
+                        { "Host", _netsets.Host },
+                        { "Port", _netsets.Port.ToString() }
                     });
                     break;
 
                 case "SEND":
-                    if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^\d+\.\d+\.\d+\.\d+\:*\d*$"))
+                    var receiver = args[1].ToUpper();
+                    if (args.Length > 1 && Regex.IsMatch(receiver, @"^\d+\.\d+\.\d+\.\d+\:*\d*$"))
                         SendToTcp(Regex.Match(args[1], @"^\d+\.\d+\.\d+\.\d+\:*\d*$").Value, args.Skip(2).ToArray());
 
-                    else if (args.Length > 1 && Regex.IsMatch(args[1].ToUpper(), @"^COM\d+$"))
+                    else if (args.Length > 1 && Regex.IsMatch(receiver, @"^COM\d+$"))
                         SendToCom(args[1].ToUpper(), args.Skip(2).ToArray());
 
+                    else if (Devices.Any(d => d.Code.ToUpper() == receiver || d.Name.ToUpper() == receiver))
+                        Send(((IDeviceContext)Devices.First(d => d.Code.ToUpper() == receiver || d.Name.ToUpper() == receiver)).Connection, args);
+
                     else
-                        Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан COM-порт \"" + args[1] + "\"");
+                        Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан адрес \"" + args[1] + "\"");
                     break;
 
                 default:
@@ -134,14 +138,14 @@ namespace RmSolution.GeoCom
 
         void SendToCom(string portName, string[] args)
         {
-            _comsets.Name = portName;
-            var com = new RmSerialPort(_comsets);
+            _comsets.PornName = portName;
+            var com = new RmSerialConnection(_comsets);
             Send(com, args);
         }
 
         void SendToTcp(string hostName, string[] args)
         {
-            using var tcp = new RmTcpClient(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
+            using var tcp = new RmNetworkConnection(Regex.Match(hostName, @"(\d+\.*){4}").Value, int.TryParse(Regex.Match(hostName, @"(?<=\:)\d+?(?=$)").Value, out var port) ? port : 80);
             Send(tcp, args);
         }
 

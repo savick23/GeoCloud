@@ -27,11 +27,10 @@ namespace RmSolution.Devices
 
     public interface IDeviceContext
     {
-        string Name { get; }
-
         GeoComAccessMode OperationMode { get; }
-        NetworkSetting NetworkSetting { get; set; }
-        SerialPortSetting SerialPortSetting { get; set; }
+        IDeviceConnection Connection { get; }
+        NetworkSetting? NetworkSetting { get; set; }
+        SerialPortSetting? SerialPortSetting { get; set; }
     }
 
     public enum GeoComAccessMode

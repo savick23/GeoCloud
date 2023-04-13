@@ -19,7 +19,7 @@
       "type": "RmSolution.GeoCom.GeoComService, RmSolution.GeoCom",
       "start": "auto",
       "adapter": {
-        "mode": "COM",
+        "mode": "TCP",
         "name": "COM7",
         "baudrate": 57600,
         "databits": 8,
@@ -28,7 +28,7 @@
         "flowcontrol": "None",
         "fifo": true,
         "interface": "RS-232",
-        "address": "127.0.0.1"
+        "address": "109.74.129.114:32325"
       }
     },
     {

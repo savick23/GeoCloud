@@ -1,6 +1,6 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: RmSerialPort - Класс серийного порта COM.
+// Описание: RmSerialConnection - Класс серийного порта COM.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Devices
 {
@@ -9,7 +9,7 @@ namespace RmSolution.Devices
     using System.IO.Ports;
     #endregion Using
 
-    public class RmSerialPort : SerialPort, IDeviceConnection
+    public class RmSerialConnection : SerialPort, IDeviceConnection
     {
         const int BUFSIZE = 1024;
         byte[] _buffer = new byte[BUFSIZE];
@@ -18,17 +18,18 @@ namespace RmSolution.Devices
         public bool Connected => IsOpen;
         public bool DataAvailable => BytesToRead > 0;
 
-        public RmSerialPort(string name, int baudrate, int databits, StopBits stopbits, Parity parity)
+        public RmSerialConnection(string name, int baudrate, int databits, StopBits stopbits, Parity parity)
             : base(name, baudrate, parity, databits, stopbits)
         {
             ReadTimeout = 1000;
             WriteTimeout = 1000;
-
         }
 
-        public RmSerialPort(SerialPortSetting sets)
-            : this(sets.Name, sets.BaudRate, sets.DataBits, sets.StopBits, sets.Parity)
+        public RmSerialConnection(SerialPortSetting sets)
+            : base(sets.PornName, sets.BaudRate, sets.Parity, sets.DataBits, sets.StopBits)
         {
+            ReadTimeout = 1000;
+            WriteTimeout = 1000;
         }
 
         public byte[]? Read()
@@ -64,7 +65,7 @@ namespace RmSolution.Devices
     public struct SerialPortSetting
     {
         /// <summary> Имя последовательного порта.</summary>
-        public string Name { get; set; }
+        public string PornName { get; set; }
         /// <summary> Описание при необходимости.</summary>
         public string Description { get; set; }
         /// <summary> Скорость, бит в секунду.</summary>

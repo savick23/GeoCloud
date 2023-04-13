@@ -13,9 +13,9 @@ namespace RmSolution.Data
         /// <summary> Униальный 64-разрядный идентификатор устройства в Системе.</summary>
         long Id { get; set; }
         /// <summary> Код (шифр) устройства.</summary>
-        string? Code { get; set; }
+        string Code { get; set; }
         /// <summary> Наименование устройства.</summary>
-        string? Name { get; set; }
+        string Name { get; set; }
         /// <summary> Описание устройства (примечание, комментарий).</summary>
         string? Descript { get; set; }
     }

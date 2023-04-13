@@ -1,6 +1,6 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: RmTcpClient - Класс TCP клиента.
+// Описание: RmNetworkConnection - Класс TCP клиента.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Devices
 {
@@ -11,16 +11,22 @@ namespace RmSolution.Devices
     #endregion Using
 
     /// <summary> TCP-клиент.</summary>
-    public class RmTcpClient : Socket, IDeviceConnection
+    public class RmNetworkConnection : Socket, IDeviceConnection
     {
         public IPEndPoint EndPoint { get; }
 
         public bool DataAvailable => Available > 0;
 
-        public RmTcpClient(string host, int port)
+        public RmNetworkConnection(string host, int port)
             : base(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
         {
             EndPoint = new IPEndPoint(IPAddress.Parse(host), port);
+        }
+
+        public RmNetworkConnection(NetworkSetting sets)
+            : base(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+        {
+            EndPoint = new IPEndPoint(IPAddress.Parse(sets.Host), sets.Port);
         }
 
         public void Open()

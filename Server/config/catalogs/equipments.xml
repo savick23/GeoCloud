@@ -62,7 +62,7 @@
           <item id="5066549580796928" code="Тип" name="Тип" source="type" type="4785074604081152"/>
         </attributes>
         <data>
-          <row id="5066549580792832" code="000001" name="Тахеометр Leica" type="4785074604082176" model="" serial=""/>
+          <row id="5066549580792832" code="000001" name="Тахеометр Leica" type="4785074604082176" model="Leica TPS1200+" serial=""/>
         </data>
       </item>
       <item id="6755399441055744" parent="11" type="11" code="Команды" name="Команды" source="commands">

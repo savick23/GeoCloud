@@ -11,23 +11,43 @@ namespace RmSolution.Devices
     #endregion Using
 
     /// <summary> Тахеометр Leica.</summary>
-    public class LeicaTotalStationDevice : IDevice, IDeviceContext
+    public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
         #region Properties
 
         public long Id { get; set; }
-        public string? Code { get; set; }
-        public string? Name { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
         public string? Descript { get; set; }
 
         public GeoComAccessMode OperationMode { get; }
-        public NetworkSetting NetworkSetting { get; set; }
-        public SerialPortSetting SerialPortSetting { get; set; }
+        public IDeviceConnection Connection { get; }
+        public NetworkSetting? NetworkSetting { get; set; }
+        public SerialPortSetting? SerialPortSetting { get; set; }
 
         #endregion Properties
 
-        public LeicaTotalStationDevice()
+        public LeicaTotalStationDevice(string code, string name, SerialPortSetting serialPortSetting)
         {
+            Code = code;
+            Name = name;
+            OperationMode = GeoComAccessMode.Com;
+            SerialPortSetting = serialPortSetting;
+            Connection = new RmSerialConnection(serialPortSetting);
+        }
+
+        public LeicaTotalStationDevice(string code, string name, NetworkSetting networkSetting)
+        {
+            Code = code;
+            Name = name;
+            OperationMode = GeoComAccessMode.Tcp;
+            NetworkSetting = networkSetting;
+            Connection = new RmNetworkConnection(networkSetting);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(true);
         }
     }
 }
