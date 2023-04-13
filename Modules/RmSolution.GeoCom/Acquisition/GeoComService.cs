@@ -68,7 +68,7 @@ namespace RmSolution.GeoCom
 
         protected override Task ExecuteProcess()
         {
-            Devices.Add(new LeicaTotalStationDevice("000001", "Тахеометр Leica", _netsets));
+            Runtime.Metadata.GetData<TEquipment>()?.ToList().ForEach(d => Devices.Add(new LeicaTotalStationDevice(d, _netsets)));
 
             Status = RuntimeStatus.Running;
             while (_sync.WaitOne() && (Status & RuntimeStatus.Loop) > 0)

@@ -17,6 +17,9 @@ namespace RmSolution.Runtime
         /// <summary> Возвращает сведения об объекте конфигурации.</summary>
         TObject? GetObject(string id);
 
+        /// <summary> Возвращает список указанного типа с маппингом из базы данных.</summary>
+        IEnumerable<T>? GetData<T>();
+
         /// <summary> Возвращает данные объекта конфигурации.</summary>
         Task<IEnumerable<object>?> GetDataAsync(string id);
 

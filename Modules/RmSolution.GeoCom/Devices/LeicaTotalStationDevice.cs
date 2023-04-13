@@ -36,10 +36,10 @@ namespace RmSolution.Devices
             Connection = new RmSerialConnection(serialPortSetting);
         }
 
-        public LeicaTotalStationDevice(string code, string name, NetworkSetting networkSetting)
+        public LeicaTotalStationDevice(TEquipment info, NetworkSetting networkSetting)
         {
-            Code = code;
-            Name = name;
+            Code = info.Code;
+            Name = info.Name;
             OperationMode = GeoComAccessMode.Tcp;
             NetworkSetting = networkSetting;
             Connection = new RmNetworkConnection(networkSetting);

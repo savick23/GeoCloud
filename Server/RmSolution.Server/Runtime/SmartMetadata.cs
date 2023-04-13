@@ -145,7 +145,9 @@ namespace RmSolution.Server
         public TObject? GetObject(string id) =>
             Entities.FirstOrDefault(oi => oi.Code == id || oi.Name == id || oi.Source == id);
 
-        public async Task<IEnumerable<object>?> GetDataAsync(string id) => await UseDatabase(db =>
+        public IEnumerable<T>? GetData<T>() => UseDatabase(db => db.Query<T>());
+
+        public async Task<IEnumerable<object>?> GetDataAsync(string id) => await UseDatabaseAsync(db =>
         {
             var obj = GetObject(id);
             if (obj != null)
@@ -170,7 +172,7 @@ namespace RmSolution.Server
             return null;
         });
 
-        public async Task<DataTable?> GetDataTableAsync(string id) => await UseDatabase(db =>
+        public async Task<DataTable?> GetDataTableAsync(string id) => await UseDatabaseAsync(db =>
         {
             var obj = GetObject(id);
             if (obj != null)
@@ -195,7 +197,7 @@ namespace RmSolution.Server
             return null;
         });
 
-        public async Task<DataTable?> GetReferenceData(long id) => await UseDatabase(db =>
+        public async Task<DataTable?> GetReferenceData(long id) => await UseDatabaseAsync(db =>
         {
             var obj = GetObject(id);
             if (obj != null)
@@ -240,7 +242,22 @@ namespace RmSolution.Server
         #region Database connection
 
         /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
-        async Task<T> UseDatabase<T>(Func<IDatabase, T> operation) => await Task.Run(() =>
+        T UseDatabase<T>(Func<IDatabase, T> operation)
+        {
+            var db = _connectionf();
+            try
+            {
+                db.Open();
+                return operation.Invoke(db);
+            }
+            finally
+            {
+                db.Close();
+            }
+        }
+
+        /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
+        async Task<T> UseDatabaseAsync<T>(Func<IDatabase, T> operation) => await Task.Run(() =>
         {
             var db = _connectionf();
             try
