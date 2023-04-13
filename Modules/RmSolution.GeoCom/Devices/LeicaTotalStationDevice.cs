@@ -8,6 +8,7 @@ namespace RmSolution.Devices
     #region Using
     using System;
     using RmSolution.Data;
+    using RmSolution.Devices.Leica;
     #endregion Using
 
     /// <summary> Тахеометр Leica.</summary>
@@ -86,5 +87,16 @@ namespace RmSolution.Devices
         {
             GC.SuppressFinalize(true);
         }
+
+        #region Leica functions
+
+        /// <summary> Turning on/off the laserpointer.</summary>
+        /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
+        /// <example> %R1Q,1004:eLaser[long] >>> %R1P,0,0:RC </example>
+        public void EDM_Laserpointer(ON_OFF_TYPE eOn)
+        {
+        }
+
+        #endregion Leica functions
     }
 }

@@ -176,4 +176,20 @@ namespace RmSolution.Devices.Leica
         public CSV_POWER_PATH()
         { }
     }
+
+    /// <summary> On/off switch type </summary>
+    public enum ON_OFF_TYPE
+    {
+        OFF = 0,
+        ON = 1
+    }
+
+    /// <summary> Intensity of Electronic Guidelight </summary>
+    public enum EDM_EGLINTENSITY_TYPE
+    {
+        EDM_EGLINTEN_OFF = 0,
+        EDM_EGLINTEN_LOW = 1,
+        EDM_EGLINTEN_MID = 2,
+        EDM_EGLINTEN_HIGH = 3
+    }
 }

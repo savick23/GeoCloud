@@ -9,11 +9,13 @@ namespace RmSolution.GeoCom
 {
     #region Using
     using System.IO.Ports;
+    using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
+    using RmSolution.Devices.Leica;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -130,9 +132,12 @@ namespace RmSolution.GeoCom
                         Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Не распознан адрес \"" + args[1] + "\"");
                     break;
 
-                case "DEV":
                 case "DEVICES":
                     Runtime.Send(MSG.Terminal, ProcessId, 0, Devices.ToDictionary(k => k.Code, v => string.Concat(v.Name)));
+                    break;
+
+                case "DEV":
+                    DoDeviceFunction(args[1], args.Skip(2).ToArray());
                     break;
 
                 default:
@@ -180,6 +185,29 @@ namespace RmSolution.GeoCom
             finally
             {
                 device.Close();
+            }
+        }
+
+        /// <summary> Выполнить функцию (инструкцию) на устройстве.</summary>
+        void DoDeviceFunction(string idDevice, string[] args)
+        {
+            idDevice = idDevice.ToUpper();
+            var dev = (IDeviceConnection)Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
+            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public) is MethodInfo func)
+            {
+                var parameters = func.GetParameters();
+                var prms = new object[parameters.Length];
+                int i = 0;
+                foreach(var prm in parameters)
+                {
+                    if (args.Length <= i + 1) return;
+                    var val = args[i + 1];
+                    if (prm.ParameterType.IsEnum)
+                        prms[i] = Enum.TryParse(prm.ParameterType, val, true, out var eval) ? eval : Activator.CreateInstance(prm.ParameterType);
+
+                    i++;
+                }
+                func.Invoke(dev, prms);
             }
         }
     }
