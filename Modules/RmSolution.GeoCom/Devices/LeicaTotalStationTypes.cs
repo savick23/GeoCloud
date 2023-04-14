@@ -6,7 +6,6 @@ namespace RmSolution.Devices.Leica
 {
     #region Using
     using System;
-    using System.ComponentModel.DataAnnotations;
     #endregion Using
 
     /// <summary> TPS Device Precision Class </summary>
@@ -191,15 +190,5 @@ namespace RmSolution.Devices.Leica
         EDM_EGLINTEN_LOW = 1,
         EDM_EGLINTEN_MID = 2,
         EDM_EGLINTEN_HIGH = 3
-    }
-
-    public enum EDM_RETURN_CODE
-    {
-        /// <summary> [0] Function successfully completed.</summary>
-        GRC_OK = 0x0000,
-        /// <summary> [778] Device like EGL, DL is not installed.</summary>
-        GRC_EDM_DEV_NOT_INSTALLED = 0x030A, 
-        /// <summary> [3080] Cannot decode arguments in server.</summary>
-        GRC_COM_CANT_DECODE_REQ = 0x0C08,
     }
 }
