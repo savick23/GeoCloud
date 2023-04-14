@@ -104,6 +104,14 @@ namespace RmSolution.Devices
             return Request(RequestString("%R1Q,1004:", eOn));
         }
 
+        /// <summary> Getting the value of the intensity of the electronic guide light.</summary>
+        /// <remarks> Displays the intensity of the Electronic Guide Light.</remarks>
+        /// <example> %R1Q,1058: >>> %R1Q,0,0:RC,eIntensity[long] mod3 dev 000001 EDM_GetEglIntensity </example>
+        public byte[]? EDM_GetEglIntensity()
+        {
+            return Request(RequestString("%R1Q,1058:"));
+        }
+
         #endregion Leica functions (COMF).
 
         #region Private methods
