@@ -94,19 +94,38 @@ namespace RmSolution.Devices
             GC.SuppressFinalize(true);
         }
 
-        #region Leica functions
+        #region Leica functions (COMF).
 
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
         /// <example> %R1Q,1004:eLaser[long] >>> %R1P,0,0:RC mod3 dev 000001 EDM_Laserpointer on </example>
         public byte[]? EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
+            return Request(RequestString("%R1Q,1004:", eOn));
+        }
+
+        #endregion Leica functions (COMF).
+
+        #region Private methods
+
+        /// <summary> Формирование ASCII строки данных для отправки на устройство.</summary>
+        static byte[] RequestString(params object[] data) =>
+            LF.Concat(Encoding.ASCII.GetBytes(string.Concat(data.Select(p =>
+            {
+                if (p.GetType().IsEnum)
+                    return (int)p;
+
+                return p;
+            }
+            )))).Concat(TERM).ToArray();
+
+        byte[]? Request(byte[] data)
+        {
             byte[]? resp;
-            var req = Request("%R1Q,1004:", ((int)eOn).ToString());
             try
             {
                 Open();
-                Write(req);
+                Write(data);
                 int attempt = 120;
                 do
                 {
@@ -122,10 +141,6 @@ namespace RmSolution.Devices
             return resp;
         }
 
-        /// <summary> Упаковка данных для отправки на устройство.</summary>
-        public static byte[] Request(params string[] data) =>
-            LF.Concat(Encoding.ASCII.GetBytes(string.Concat(data))).Concat(TERM).ToArray();
-
-        #endregion Leica functions
+        #endregion Private methods
     }
 }
