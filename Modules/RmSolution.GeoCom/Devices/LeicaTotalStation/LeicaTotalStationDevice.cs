@@ -317,7 +317,9 @@ namespace RmSolution.Devices
 
         #endregion Private methods
 
-        class XResponse
+        #region Nested types
+
+        internal class XResponse
         {
             public readonly byte[]? Data;
             public readonly string? Response;
@@ -347,5 +349,7 @@ namespace RmSolution.Devices
 
             public override string ToString() => Response ?? "(null)";
         }
+
+        #endregion Nested types
     }
 }
