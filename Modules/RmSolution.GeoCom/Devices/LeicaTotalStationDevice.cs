@@ -95,11 +95,28 @@ namespace RmSolution.Devices
             GC.SuppressFinalize(true);
         }
 
-        #region Leica functions (COMF).
+        #region CENTRAL SERVICES (CSV COMF)
+
+        /// <summary> Getting the factory defined instrument number.</summary>
+        /// <remarks> Gets the factory defined serial number of the instrument.</remarks>
+        /// <example> mod3 dev 000001 CSV_GetInstrumentNo </example>
+        public byte[]? CSV_GetInstrumentNo()
+        {
+            var resp = Request(RequestString("%R1Q,5003:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+                var serial = resp.Value;
+            }
+            return resp.Data;
+        }
+
+        #endregion CENTRAL SERVICES (CSV COMF)
+
+        #region ELECTRONIC DISTANCE MEASUREMENT (EDM COMF)
 
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
-        /// <example> mod3 dev 000001 EDM_Laserpointer on </example>
+        /// <example> mod3 dev 000001 EDM_Laserpointer on/off (0/1) </example>
         public byte[]? EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
             var resp = Request(RequestString("%R1Q,1004:", eOn));
@@ -122,7 +139,19 @@ namespace RmSolution.Devices
             return resp.Data;
         }
 
-        #endregion Leica functions (COMF).
+        /// <summary> Changing the intensity of the electronic guide light.</summary>
+        /// <remarks> Changes the intensity of the Electronic Guide Light.</remarks>
+        /// <example> mod3 dev 000001 EDM_SetEglIntensity off/low/mid/high (0/1/2/3) </example>
+        public byte[]? EDM_SetEglIntensity(EDM_EGLINTENSITY_TYPE intensity)
+        {
+            var resp = Request(RequestString("%R1Q,1059:", intensity));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp.Data;
+        }
+
+        #endregion ELECTRONIC DISTANCE MEASUREMENT (EDM COMF)
 
         #region Private methods
 

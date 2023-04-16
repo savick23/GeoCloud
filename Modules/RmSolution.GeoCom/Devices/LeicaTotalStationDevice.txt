@@ -1,4 +1,6 @@
 ﻿Поддерживаемые функции:
 ----------------------------------------------
+CSV_GetInstrumentNo
 EDM_Laserpointer on/off
 EDM_GetEglIntensity
+EDM_SetEglIntensity off/low/mid/high

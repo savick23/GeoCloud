@@ -186,9 +186,9 @@ namespace RmSolution.Devices.Leica
     /// <summary> Intensity of Electronic Guidelight </summary>
     public enum EDM_EGLINTENSITY_TYPE
     {
-        EDM_EGLINTEN_OFF = 0,
-        EDM_EGLINTEN_LOW = 1,
-        EDM_EGLINTEN_MID = 2,
-        EDM_EGLINTEN_HIGH = 3
+        OFF = 0,
+        LOW = 1,
+        MID = 2,
+        HIGH = 3
     }
 }
