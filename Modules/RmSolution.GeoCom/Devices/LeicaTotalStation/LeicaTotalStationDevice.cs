@@ -113,6 +113,33 @@ namespace RmSolution.Devices
             return resp;
         }
 
+        /// <summary> Turning on the instrument.</summary>
+        /// <remarks> This function switches on the TPS1200 instrument.<br/><b>Note</b>: The TPS1200 instrument can be switched on by any RPC command or even by sending a single character.</remarks>
+        /// <returns> If instrument is already switched on then %R1P,0,0:5 else Nothing </returns>
+        /// <param name="onMode"> Run mode.</param>
+        /// <example> mod3 dev 000001 COM_SwitchOnTPS 0/1 </example>
+        public XResponse COM_SwitchOnTPS(COM_TPS_STARTUP_MODE onMode)
+        {
+            var resp = Request(RequestString("%R1Q,111:", onMode));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        /// <summary> Turning on the instrument.</summary>
+        /// <remarks> This function switches off the TPS1200 instrument.</remarks>
+        /// <param name="offMode"> Stop mode.</param>
+        /// <example> mod3 dev 000001 COM_SwitchOffTPS 0/1 </example>
+        public XResponse COM_SwitchOffTPS(COM_TPS_STOP_MODE offMode)
+        {
+            var resp = Request(RequestString("%R1Q,112:", offMode));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
         #endregion COMMUNICATIONS (COM COMF)
 
         #region CENTRAL SERVICES (CSV COMF)

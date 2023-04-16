@@ -1,6 +1,8 @@
 ﻿Поддерживаемые функции:
 ----------------------------------------------
 COM_GetSWVersion
+COM_SwitchOnTPS
+COM_SwitchOffTPS
 CSV_GetInstrumentNo
 CSV_GetInstrumentName
 CSV_GetDeviceConfig

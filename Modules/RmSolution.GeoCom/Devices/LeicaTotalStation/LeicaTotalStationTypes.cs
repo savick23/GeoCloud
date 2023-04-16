@@ -8,8 +8,26 @@ namespace RmSolution.Devices.Leica
     using System;
     #endregion Using
 
+    /// <summary> Stop Mode </summary>
+    public enum COM_TPS_STOP_MODE
+    {
+        /// <summary> Power down instrument </summary>
+        COM_TPS_STOP_SHUT_DOWN = 0,
+        /// <summary> Not supported by TPS1200 </summary>
+        COM_TPS_STOP_SLEEP = 1
+    }
+
+    /// <summary> Start Mode </summary>
+    public enum COM_TPS_STARTUP_MODE
+    {
+        /// <summary> Not supported by TPS1200 </summary>
+        COM_TPS_STARTUP_LOCAL = 0,
+        /// <summary> RPC’s enabled, online mode </summary>
+        COM_TPS_STARTUP_REMOTE = 1
+    }
+
     /// <summary> TPS Device Precision Class </summary>
-    internal enum TPS_DEVICE_CLASS
+    public enum TPS_DEVICE_CLASS
     {
         /// <summary> TPS1000 family member, 1 mgon, 3" </summary>
         TPS_CLASS_1100 = 0,
@@ -52,7 +70,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> TPS Device Configuration Type </summary>
-    internal enum TPS_DEVICE_TYPE
+    public enum TPS_DEVICE_TYPE
     {
         #region TPS1x00 common
 
@@ -112,7 +130,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Reflectorless Class </summary>
-    internal enum TPS_REFLESS_CLASS
+    public enum TPS_REFLESS_CLASS
     {
         /// <summary> None </summary>
         TPS_REFLESS_NONE = 0,
@@ -127,7 +145,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> TPS Device Configuration Type </summary>
-    internal struct TPS_DEVICE
+    public struct TPS_DEVICE
     {
         /// <summary> device precision class </summary>
         public TPS_DEVICE_CLASS Class;
@@ -143,7 +161,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> General Date </summary>
-    internal struct DATE_TYPE
+    public struct DATE_TYPE
     {
         /// <summary> year </summary>
         public short Year;
@@ -154,7 +172,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> General Time </summary>
-    internal struct TIME_TYPE
+    public struct TIME_TYPE
     {
         /// <summary> 24 hour per day 0..23 </summary>
         public byte Hour;
@@ -165,7 +183,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Power sources </summary>
-    internal struct CSV_POWER_PATH
+    public struct CSV_POWER_PATH
     {
         /// <summary> power source is external </summary>
         public byte CSV_EXTERNAL_POWER = 1;
