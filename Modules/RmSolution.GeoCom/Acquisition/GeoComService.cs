@@ -137,7 +137,7 @@ namespace RmSolution.GeoCom
                     break;
 
                 case "DEV":
-                    DoDeviceFunction(args[1], args.Skip(2).ToArray());
+                    CallDeviceFunction(args[1], args.Skip(2).ToArray());
                     break;
 
                 default:
@@ -189,7 +189,7 @@ namespace RmSolution.GeoCom
         }
 
         /// <summary> Выполнить функцию (инструкцию) на устройстве.</summary>
-        void DoDeviceFunction(string idDevice, string[] args)
+        void CallDeviceFunction(string idDevice, string[] args)
         {
             idDevice = idDevice.ToUpper();
             var dev = (IDeviceConnection)Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
@@ -209,9 +209,9 @@ namespace RmSolution.GeoCom
                 }
                 try
                 {
-                    var resp = func.Invoke(dev, prms) as byte[];
-                    Runtime.Send(MSG.Terminal, ProcessId, 0, resp == null || resp.Length == 0 ? "<нет данных>"
-                        : string.Concat(string.Join(' ', resp.Select(n => n.ToString("x2"))), " > ", Encoding.ASCII.GetString(resp)));
+                    var resp = func.Invoke(dev, prms) as LeicaTotalStationDevice.XResponse;
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, resp.Data == null || resp.Data.Length == 0 ? "<нет данных>"
+                        : string.Concat(string.Join(' ', resp.Data.Select(n => n.ToString("x2"))), " > ", resp.Response));
                 }
                 catch (Exception ex)
                 {
