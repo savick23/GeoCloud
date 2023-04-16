@@ -9,6 +9,7 @@ namespace RmSolution.Devices
     using System;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
     #endregion Using
@@ -98,18 +99,27 @@ namespace RmSolution.Devices
 
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
-        /// <example> %R1Q,1004:eLaser[long] >>> %R1P,0,0:RC mod3 dev 000001 EDM_Laserpointer on </example>
+        /// <example> mod3 dev 000001 EDM_Laserpointer on </example>
         public byte[]? EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
-            return Request(RequestString("%R1Q,1004:", eOn));
+            var resp = Request(RequestString("%R1Q,1004:", eOn));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp.Data;
         }
 
         /// <summary> Getting the value of the intensity of the electronic guide light.</summary>
         /// <remarks> Displays the intensity of the Electronic Guide Light.</remarks>
-        /// <example> %R1Q,1058: >>> %R1Q,0,0:RC,eIntensity[long] mod3 dev 000001 EDM_GetEglIntensity </example>
+        /// <example> mod3 dev 000001 EDM_GetEglIntensity </example>
         public byte[]? EDM_GetEglIntensity()
         {
-            return Request(RequestString("%R1Q,1058:"));
+            var resp = Request(RequestString("%R1Q,1058:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+                var intensity = (EDM_EGLINTENSITY_TYPE)resp.Value;
+            }
+            return resp.Data;
         }
 
         #endregion Leica functions (COMF).
@@ -127,7 +137,7 @@ namespace RmSolution.Devices
             }
             )))).Concat(TERM).ToArray();
 
-        byte[]? Request(byte[] data)
+        XResponse Request(byte[] data)
         {
             byte[]? resp;
             try
@@ -146,9 +156,32 @@ namespace RmSolution.Devices
             {
                 Close();
             }
-            return resp;
+            return new XResponse(resp);
         }
 
         #endregion Private methods
+
+        class XResponse
+        {
+            public readonly byte[]? Data;
+            public readonly string? Response;
+            public readonly GRC ReturnCode = GRC.UNDEFINED;
+            public readonly long Value;
+
+            public XResponse(byte[]? data)
+            {
+                if (data != null)
+                {
+                    Data = data;
+                    Response = Encoding.ASCII.GetString(data);
+                    ReturnCode = int.TryParse(Regex.Match(Response, @"(?<=:)\d+").Value, out var ret) ? (GRC)ret : GRC.UNDEFINED;
+
+                    if (GRC_Resources.Errors.TryGetValue(ReturnCode, out var msg))
+                        throw new Exception(string.Concat("[", (int)ReturnCode, "] ", msg));
+
+                    Value = long.TryParse(Regex.Match(Response, @"(?<=,)\d+$").Value, out var val) ? val : -1;
+                }
+            }
+        }
     }
 }

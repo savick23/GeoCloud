@@ -520,4 +520,12 @@ namespace RmSolution.Devices.Leica
 
         #endregion FTR 0x3300
     }
+
+    public static class GRC_Resources
+    {
+        public static readonly Dictionary<GRC, string> Errors = new()
+        {
+            { GRC.EDM_DEV_NOT_INSTALLED, "Laserpointer is not implemented.\r\nLaserpointer is only available in theodolites which supports distance measurement without reflector." }
+        };
+    }
 }
