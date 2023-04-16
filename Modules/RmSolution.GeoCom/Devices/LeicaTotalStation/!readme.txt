@@ -1,5 +1,6 @@
 ﻿Поддерживаемые функции:
 ----------------------------------------------
+COM_GetSWVersion
 CSV_GetInstrumentNo
 CSV_GetInstrumentName
 CSV_GetDeviceConfig

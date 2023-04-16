@@ -98,6 +98,23 @@ namespace RmSolution.Devices
             GC.SuppressFinalize(true);
         }
 
+        #region COMMUNICATIONS (COM COMF)
+
+        /// <summary> Retrieving server instrument version.</summary>
+        /// <remarks> This function displays the current GeoCOM release (release, version and subversion) of the instrument.</remarks>
+        /// <example> mod3 dev 000001 COM_GetSWVersion </example>
+        public XResponse COM_GetSWVersion()
+        {
+            var resp = Request(RequestString("%R1Q,110:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+                var ver = new Version((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2]);
+            }
+            return resp;
+        }
+
+        #endregion COMMUNICATIONS (COM COMF)
+
         #region CENTRAL SERVICES (CSV COMF)
 
         /// <summary> Getting the factory defined instrument number.</summary>
@@ -210,11 +227,14 @@ namespace RmSolution.Devices
         public XResponse CSV_CheckPower()
         {
             var resp = Request(RequestString("%R1Q,5039:"));
-            if (resp.ReturnCode == GRC.OK)
+            if (resp.ReturnCode == GRC.OK || resp.ReturnCode == GRC.LOW_POWER || resp.ReturnCode == GRC.BATT_EMPTY)
             {
                 var unCapacity = resp.Value[0]; // Actual capacity [%]
                 var eActivePower = resp.Value[1]; // Actual power source
                 var ePowerSuggest = resp.Value[2]; // Not supported
+
+                if (resp.ReturnCode == GRC.LOW_POWER) ; // Power is low. Time remaining is about 30’.
+                if (resp.ReturnCode == GRC.BATT_EMPTY) ; // Battery is nearly empty. Time remaining is about 1’.
             }
             return resp;
         }
@@ -338,7 +358,7 @@ namespace RmSolution.Devices
                     if (GRC_Resources.Errors.TryGetValue(ReturnCode, out var msg))
                         throw new Exception(string.Concat("[", (int)ReturnCode, "] ", msg));
 
-                    Text = Regex.Match(Response, @"(?<=\d+,).*").Value;
+                    Text = Regex.Match(Response, @"(?<=:\d+,).*").Value;
                     if (Text.StartsWith('"'/*string*/))
                         Text = Text[1..^1];
                     else
