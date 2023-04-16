@@ -145,7 +145,7 @@ namespace RmSolution.Devices
         /// <example> mod3 dev 000001 CSV_GetReflectorlessClass </example>
         public byte[]? CSV_GetReflectorlessClass()
         {
-            var resp = Request(RequestString("%R1Q,5100:")); // %R1P,0,0:0,2023,'04','11','00','23','1d'
+            var resp = Request(RequestString("%R1Q,5100:"));
             if (resp.ReturnCode == GRC.OK)
             {
                 var reRefLessClass = resp.Value[0];
@@ -162,6 +162,19 @@ namespace RmSolution.Devices
             if (resp.ReturnCode == GRC.OK)
             {
                 var dt = new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5]);
+            }
+            return resp.Data;
+        }
+
+        /// <summary> Getting the date and time.</summary>
+        /// <remarks> Gets the current date and time of the instrument.</remarks>
+        /// <example> mod3 dev 000001 CSV_GetDateTimeCentiSec </example>
+        public byte[]? CSV_GetDateTimeCentiSec()
+        {
+            var resp = Request(RequestString("%R1Q,5117:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+                var dt = new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5], (int)resp.Value[6]);
             }
             return resp.Data;
         }
@@ -206,7 +219,7 @@ namespace RmSolution.Devices
             return resp.Data;
         }
 
-        /// <summary> Getting the temperature.</summary>
+        /// <summary> Getting the instrument temperature, °C.</summary>
         /// <remarks> Get the internal temperature of the instrument, measured on the Mainboard side. Values are reported in degrees Celsius.</remarks>
         /// <example> mod3 dev 000001 CSV_GetIntTemp </example>
         public byte[]? CSV_GetIntTemp()
