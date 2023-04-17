@@ -9,10 +9,15 @@ namespace RmSolution.DataAccess
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
+    using System.Net.Sockets;
+    using System.Runtime.InteropServices;
     #endregion Using
 
     public class ConsoleController : SmartController
     {
+        const string SESSION = "_sid";
+        static Dictionary<string, Socket> _sessions = new();
+
         public ConsoleController(IRuntime runtime) : base(runtime)
         {
         }
@@ -21,6 +26,10 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]")]
         public async Task<ContentResult> Console() => await Task.Run(() =>
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString(SESSION)))
+            {
+                HttpContext.Session.SetString(SESSION, Guid.NewGuid().ToString());
+            }
             return new ContentResult()
             {
                 ContentType = "text/html",
@@ -32,6 +41,7 @@ namespace RmSolution.DataAccess
         [HttpPost("console/[action]")]
         public async Task<IActionResult> Input(XInput form) => await Task.Run(() =>
         {
+            var t = HttpContext.Session.GetString(SESSION);
             return new JsonResult(new string[] { form.Input, "> " });
         });
 

@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
 {
+    using Microsoft.Extensions.Options;
     #region Using
     using RmSolution.Runtime;
     using System.Security.Cryptography.X509Certificates;
@@ -58,14 +59,15 @@ namespace RmSolution.DataAccess
                     opt.ListenAnyIP(_port);
                 });
 
-            builder.Services.AddCors(opt =>
+            var srv = builder.Services;
+            srv.AddCors(opt =>
                 opt.AddPolicy(CORSPOLICENAME, police => // Политика для всех узлов -->
                     police.AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()));
 
-            builder.Services.AddSingleton(Runtime);
-            builder.Services.AddControllers() // Добавим контроллеры из сборки -->
+            srv.AddSingleton(Runtime);
+            srv.AddControllers() // Добавим контроллеры из сборки -->
                 .AddApplicationPart(GetType().Assembly)
                 .AddJsonOptions(opt =>
                 {
@@ -73,6 +75,14 @@ namespace RmSolution.DataAccess
                     opt.JsonSerializerOptions.IncludeFields = true;         // Включим в результат поля и свойства
                     opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
                 });
+
+            srv.AddDistributedMemoryCache();
+            srv.AddSession(opt =>
+            {
+                opt.Cookie.Name = ".lesev.session";
+                opt.IdleTimeout = TimeSpan.FromMinutes(15);
+                opt.Cookie.IsEssential = true;
+            });
 
             _host = builder.Build();
             //if (!_host.Environment.IsDevelopment())
@@ -83,6 +93,7 @@ namespace RmSolution.DataAccess
             _host.UseRouting();
             _host.UseCors(CORSPOLICENAME);
             _host.UseAuthorization();
+            _host.UseSession();
             _host.MapControllers();
         }
 
