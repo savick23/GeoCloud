@@ -136,6 +136,14 @@ namespace RmSolution.GeoCom
                     Runtime.Send(MSG.Terminal, ProcessId, 0, Devices.ToDictionary(k => k.Code, v => string.Concat(v.Name)));
                     break;
 
+                case "CONFIG":
+                    var cfg = ((LeicaTotalStationDevice?)FindDevice(args[1]))?.ReadConfig();
+                    if (cfg != null)
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, cfg.ToDictionary(k => k.Key, v => v.Value.ToString()));
+                    else
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + args[1] + " не найдено!");
+                    break;
+
                 case "DEV":
                     CallDeviceFunction(args[1], args.Skip(2).ToArray());
                     break;
@@ -144,6 +152,12 @@ namespace RmSolution.GeoCom
                     Runtime.Send(MSG.Terminal, ProcessId, idTerminal, "Неизвестная команда: " + string.Join(' ', args));
                     break;
             }
+        }
+
+        IDevice? FindDevice(string idDevice)
+        {
+            idDevice = idDevice.ToUpper();
+            return Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
         }
 
         void SendToCom(string portName, string[] args)
@@ -191,11 +205,11 @@ namespace RmSolution.GeoCom
         /// <summary> Выполнить функцию (инструкцию) на устройстве.</summary>
         void CallDeviceFunction(string idDevice, string[] args)
         {
-            idDevice = idDevice.ToUpper();
-            var dev = (IDeviceConnection)Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
-            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public) is MethodInfo func)
+            var dev = (IDeviceConnection)FindDevice(idDevice);
+            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public) is MethodInfo call
+                && (call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttributes(typeof(COMFAttribute)) != null))
             {
-                var parameters = func.GetParameters();
+                var parameters = call.GetParameters();
                 var prms = new object[parameters.Length];
                 int i = 0;
                 foreach(var prm in parameters)
@@ -209,9 +223,12 @@ namespace RmSolution.GeoCom
                 }
                 try
                 {
-                    var resp = func.Invoke(dev, prms) as LeicaTotalStationDevice.XResponse;
-                    Runtime.Send(MSG.Terminal, ProcessId, 0, resp.Data == null || resp.Data.Length == 0 ? "<нет данных>"
-                        : string.Concat(string.Join(' ', resp.Data.Select(n => n.ToString("x2"))), " > ", resp.Response));
+                    var val = call.Invoke(dev, prms);
+                    if (val is LeicaTotalStationDevice.ZResponse resp)
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, resp.Data == null || resp.Data.Length == 0 ? "<нет данных>"
+                            : string.Concat(string.Join(' ', resp.Data.Select(n => n.ToString("x2"))), " > ", resp.Response));
+                    else
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, "Результат: " + val.ToString());
                 }
                 catch (Exception ex)
                 {

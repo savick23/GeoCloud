@@ -17,6 +17,8 @@ namespace RmSolution.Devices
     using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
+    public class COMFAttribute : Attribute { }
+
     /// <summary> Тахеометр Leica.</summary>
     public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
@@ -98,12 +100,30 @@ namespace RmSolution.Devices
             GC.SuppressFinalize(true);
         }
 
+        /// <summary> Возвращает сведения об устройстве.</summary>
+        public Dictionary<string, object?> ReadConfig()
+        {
+            var cfg = CSV_GetDeviceConfig();
+            return new Dictionary<string, object?>()
+            {
+                { "Дата/Время прибора", CSV_GetDateTime() },
+                { "Наименование", CSV_GetInstrumentName() },
+                { "Заводской номер", CSV_GetInstrumentNo() },
+                { "Device precision class", cfg[0] },
+                { "Device configuration type", cfg[1] },
+                { "RL type", CSV_GetReflectorlessClass() },
+                { "Версия ПО", CSV_GetSWVersion() },
+                { "Питание", CSV_CheckPower() },
+                { "Температура прибора, °C", CSV_GetIntTemp() }
+            };
+        }
+
         #region COMMUNICATIONS (COM COMF)
 
         /// <summary> Retrieving server instrument version.</summary>
         /// <remarks> This function displays the current GeoCOM release (release, version and subversion) of the instrument.</remarks>
         /// <example> mod3 dev 000001 COM_GetSWVersion </example>
-        public XResponse COM_GetSWVersion()
+        public ZResponse COM_GetSWVersion()
         {
             var resp = Request(RequestString("%R1Q,110:"));
             if (resp.ReturnCode == GRC.OK)
@@ -118,7 +138,7 @@ namespace RmSolution.Devices
         /// <returns> If instrument is already switched on then %R1P,0,0:5 else Nothing </returns>
         /// <param name="onMode"> Run mode.</param>
         /// <example> mod3 dev 000001 COM_SwitchOnTPS 0/1 </example>
-        public XResponse COM_SwitchOnTPS(COM_TPS_STARTUP_MODE onMode)
+        public ZResponse COM_SwitchOnTPS(COM_TPS_STARTUP_MODE onMode)
         {
             var resp = Request(RequestString("%R1Q,111:", onMode));
             if (resp.ReturnCode == GRC.OK)
@@ -131,11 +151,36 @@ namespace RmSolution.Devices
         /// <remarks> This function switches off the TPS1200 instrument.</remarks>
         /// <param name="offMode"> Stop mode.</param>
         /// <example> mod3 dev 000001 COM_SwitchOffTPS 0/1 </example>
-        public XResponse COM_SwitchOffTPS(COM_TPS_STOP_MODE offMode)
+        public ZResponse COM_SwitchOffTPS(COM_TPS_STOP_MODE offMode)
         {
             var resp = Request(RequestString("%R1Q,112:", offMode));
             if (resp.ReturnCode == GRC.OK)
             {
+            }
+            return resp;
+        }
+
+        /// <summary> Checking the communication.</summary>
+        /// <remarks> This function does not provide any functionality except of checking if the communication is up and running.</remarks>
+        /// <example> mod3 dev 000001 COM_NullProc </example>
+        public ZResponse COM_NullProc()
+        {
+            var resp = Request(RequestString("%R1Q,0:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        /// <summary> Getting the binary attribute of the server.</summary>
+        /// <remarks> This function gets the ability information about the server to handle binary communication. The client may make requests in binary format which speeds up the communication by about 40-50%.</remarks>
+        /// <example> mod3 dev 000001 COM_GetBinaryAvailable </example>
+        public ZResponse COM_GetBinaryAvailable()
+        {
+            var resp = Request(RequestString("%R1Q,113:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+                var binAvailable = resp.Value[0] == 0; // binary operation enabled / ASCII operation enabled
             }
             return resp;
         }
@@ -146,137 +191,123 @@ namespace RmSolution.Devices
 
         /// <summary> Getting the factory defined instrument number.</summary>
         /// <remarks> Gets the factory defined serial number of the instrument.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetInstrumentNo </example>
-        public XResponse CSV_GetInstrumentNo()
+        [COMF]
+        public string? CSV_GetInstrumentNo()
         {
             var resp = Request(RequestString("%R1Q,5003:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var serial = resp.Value;
-            }
-            return resp;
+                return resp.Value[0].ToString();
+
+            return null;
         }
 
         /// <summary> Getting the Leica specific instrument name.</summary>
         /// <remarks> Gets the instrument name, for example: TS30 0,5".</remarks>
-        /// <example> mod3 dev 000001 CSV_GetInstrumentName </example>
-        public XResponse CSV_GetInstrumentName()
+        [COMF]
+        public string? CSV_GetInstrumentName()
         {
             var resp = Request(RequestString("%R1Q,5004:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var name = resp.Text;
-            }
-            return resp;
+                return resp.Text?.ToString() ?? string.Empty;
+
+            return null;
         }
 
         /// <summary> Getting the instrument configuration.</summary>
         /// <remarks> This function returns information about the class and the configuration type of the instrument.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetDeviceConfig </example>
-        public XResponse CSV_GetDeviceConfig()
+        [COMF]
+        public long[]? CSV_GetDeviceConfig()
         {
             var resp = Request(RequestString("%R1Q,5035:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var devicePrecisionClass = resp.Value[0];
-                var deviceConfigurationType = resp.Value[1];
-            }
-            return resp;
+                return new long[] { resp.Value[0], resp.Value[1] };
+
+            return null;
         }
 
         /// <summary> Getting the RL type.</summary>
         /// <remarks> This function returns information about the reflectorless and long range distance measurement (RL) of the sinstrument.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetReflectorlessClass </example>
-        public XResponse CSV_GetReflectorlessClass()
+        [COMF]
+        public long? CSV_GetReflectorlessClass()
         {
             var resp = Request(RequestString("%R1Q,5100:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var reRefLessClass = resp.Value[0];
-            }
-            return resp;
+                return resp.Value[0];
+
+            return null;
         }
 
         /// <summary> Getting the date and time.</summary>
         /// <remarks> Gets the current date and time of the instrument. The ASCII response is formatted corresponding to the data type DATIME.A possible response can look like this: %R1P,0,0:0,1996,'07', '19','10','13','2f' (see chapter ASCII data type declaration for further information).</remarks>
-        /// <example> mod3 dev 000001 CSV_GetDateTime </example>
-        public XResponse CSV_GetDateTime()
+        [COMF]
+        public DateTime? CSV_GetDateTime()
         {
             var resp = Request(RequestString("%R1Q,5008:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var dt = new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5]);
-            }
-            return resp;
+                return new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5]);
+
+            return null;
         }
 
         /// <summary> Getting the date and time.</summary>
         /// <remarks> Gets the current date and time of the instrument.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetDateTimeCentiSec </example>
-        public XResponse CSV_GetDateTimeCentiSec()
+        [COMF]
+        public DateTime? CSV_GetDateTimeCentiSec()
         {
             var resp = Request(RequestString("%R1Q,5117:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var dt = new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5], (int)resp.Value[6]);
-            }
-            return resp;
+                return new DateTime((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2], (int)resp.Value[3], (int)resp.Value[4], (int)resp.Value[5], (int)resp.Value[6]);
+
+            return null;
         }
 
         /// <summary> Setting the date and time.</summary>
         /// <remarks> Sets the current date and time of the instrument.</remarks>
-        /// <example> mod3 dev 000001 CSV_SetDateTime 2023,'03','19','10','13','2f' </example>
-        public XResponse CSV_SetDateTime(DateTime datetime)
-        {
-            var resp = Request(RequestString("%R1Q,5007:", datetime));
-            if (resp.ReturnCode == GRC.OK)
-            {
-            }
-            return resp;
-        }
+        [COMF]
+        public bool CSV_SetDateTime(DateTime datetime) =>
+            Request(RequestString("%R1Q,5007:", datetime)).ReturnCode == GRC.OK;
 
         /// <summary> Getting the software version.</summary>
         /// <remarks> Returns the system software version.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetSWVersion </example>
-        public XResponse CSV_GetSWVersion()
+        [COMF]
+        public Version? CSV_GetSWVersion()
         {
             var resp = Request(RequestString("%R1Q,5034:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var ver = new Version((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2]);
-            }
-            return resp;
+                return new Version((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2]);
+
+            return null;
         }
 
         /// <summary> Checking the available power.</summary>
         /// <remarks> This command returns the capacity of the current power source and its source (internal or external).</remarks>
-        /// <example> mod3 dev 000001 CSV_CheckPower </example>
-        public XResponse CSV_CheckPower()
+        [COMF]
+        public string? CSV_CheckPower()
         {
             var resp = Request(RequestString("%R1Q,5039:"));
             if (resp.ReturnCode == GRC.OK || resp.ReturnCode == GRC.LOW_POWER || resp.ReturnCode == GRC.BATT_EMPTY)
             {
-                var unCapacity = resp.Value[0]; // Actual capacity [%]
-                var eActivePower = resp.Value[1]; // Actual power source
-                var ePowerSuggest = resp.Value[2]; // Not supported
+                var capacity = resp.Value[0];
+                var powerSource = resp.Value[1] == 0 ? "От сети" : "От батареи";
+                var powerSuggest = resp.Value[2]; // Not supported
 
-                if (resp.ReturnCode == GRC.LOW_POWER) ; // Power is low. Time remaining is about 30’.
-                if (resp.ReturnCode == GRC.BATT_EMPTY) ; // Battery is nearly empty. Time remaining is about 1’.
+                return string.Concat(powerSource, ", ", capacity, "%",
+                    resp.ReturnCode == GRC.LOW_POWER ? ", Низкий разряд аккумулятора. Время работы около 30 мин."
+                    : resp.ReturnCode == GRC.BATT_EMPTY ? ", Аккумулятор почти разряжен. Время работы около 1 мин." : string.Empty);
             }
-            return resp;
+            return null;
         }
 
         /// <summary> Getting the instrument temperature, °C.</summary>
         /// <remarks> Get the internal temperature of the instrument, measured on the Mainboard side. Values are reported in degrees Celsius.</remarks>
-        /// <example> mod3 dev 000001 CSV_GetIntTemp </example>
-        public XResponse CSV_GetIntTemp()
+        [COMF]
+        public double? CSV_GetIntTemp()
         {
             var resp = Request(RequestString("%R1Q,5011:"));
             if (resp.ReturnCode == GRC.OK)
-            {
-                var temp = resp.Value[0]; // %R1P,0,0:0,11.742000000000001
-            }
-            return resp;
+                return Math.Round(double.Parse(resp.Text, CultureInfo.InvariantCulture), 1);
+
+            return null;
         }
 
         #endregion CENTRAL SERVICES (CSV COMF)
@@ -286,7 +317,7 @@ namespace RmSolution.Devices
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
         /// <example> mod3 dev 000001 EDM_Laserpointer on/off (0/1) </example>
-        public XResponse EDM_Laserpointer(ON_OFF_TYPE eOn)
+        public ZResponse EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
             var resp = Request(RequestString("%R1Q,1004:", eOn));
             if (resp.ReturnCode == GRC.OK)
@@ -298,7 +329,7 @@ namespace RmSolution.Devices
         /// <summary> Getting the value of the intensity of the electronic guide light.</summary>
         /// <remarks> Displays the intensity of the Electronic Guide Light.</remarks>
         /// <example> mod3 dev 000001 EDM_GetEglIntensity </example>
-        public XResponse EDM_GetEglIntensity()
+        public ZResponse EDM_GetEglIntensity()
         {
             var resp = Request(RequestString("%R1Q,1058:"));
             if (resp.ReturnCode == GRC.OK)
@@ -311,7 +342,7 @@ namespace RmSolution.Devices
         /// <summary> Changing the intensity of the electronic guide light.</summary>
         /// <remarks> Changes the intensity of the Electronic Guide Light.</remarks>
         /// <example> mod3 dev 000001 EDM_SetEglIntensity off/low/mid/high (0/1/2/3) </example>
-        public XResponse EDM_SetEglIntensity(EDM_EGLINTENSITY_TYPE intensity)
+        public ZResponse EDM_SetEglIntensity(EDM_EGLINTENSITY_TYPE intensity)
         {
             var resp = Request(RequestString("%R1Q,1059:", intensity));
             if (resp.ReturnCode == GRC.OK)
@@ -340,7 +371,7 @@ namespace RmSolution.Devices
             }
             )))).Concat(TERM).ToArray();
 
-        XResponse Request(byte[] data)
+        ZResponse Request(byte[] data)
         {
             byte[]? resp;
             try
@@ -359,14 +390,14 @@ namespace RmSolution.Devices
             {
                 Close();
             }
-            return new XResponse(resp);
+            return new ZResponse(resp);
         }
 
         #endregion Private methods
 
         #region Nested types
 
-        public class XResponse
+        public class ZResponse
         {
             public readonly byte[]? Data;
             public readonly string? Response;
@@ -374,7 +405,7 @@ namespace RmSolution.Devices
             public readonly string? Text;
             public readonly long[] Value;
 
-            public XResponse(byte[]? data)
+            public ZResponse(byte[]? data)
             {
                 if (data != null)
                 {

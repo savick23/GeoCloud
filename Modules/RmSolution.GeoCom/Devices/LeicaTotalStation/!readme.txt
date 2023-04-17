@@ -3,6 +3,8 @@
 COM_GetSWVersion
 COM_SwitchOnTPS
 COM_SwitchOffTPS
+COM_NullProc
+COM_GetBinaryAvailable
 CSV_GetInstrumentNo
 CSV_GetInstrumentName
 CSV_GetDeviceConfig
