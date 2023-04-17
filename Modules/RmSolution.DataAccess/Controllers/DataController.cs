@@ -6,14 +6,9 @@ namespace RmSolution.DataAccess
 {
     #region Using
     using System.Data;
-    using System.Net.Http.Headers;
-    using System.Security.Cryptography;
-    using System.Xml.Linq;
     using Microsoft.AspNetCore.Mvc;
     using RmSolution.Data;
-    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     public class DataController : SmartController

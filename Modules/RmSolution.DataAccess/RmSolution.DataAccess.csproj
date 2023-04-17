@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <None Remove="cert\RmSolution.RmGeo.pfx" />
+    <None Remove="Controllers\console\console.css" />
+    <None Remove="Controllers\console\console.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +18,8 @@
       <Link>cert\RmSolution.RmGeo.pfx</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Controllers\console\console.css" />
+    <EmbeddedResource Include="Controllers\console\console.js" />
   </ItemGroup>
 
   <ItemGroup>
