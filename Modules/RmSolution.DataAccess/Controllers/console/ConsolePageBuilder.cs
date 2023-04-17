@@ -1,6 +1,7 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: ConsolePageBuilder – Построение страницы консоли.
+// https://learn.javascript.ru/range-textrange-selection
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
 {
@@ -25,11 +26,10 @@ namespace RmSolution.DataAccess
 
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
-            var resp = ReadLines(Array.Empty<byte>());
+            var lines = ReadLines(Array.Empty<byte>());
 
-            _page.Append(resp);
-            _page.Append("<div>USER&lt; <div id=\"input\">DFFFF<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span></div></div>");
-            //   _page.Append("<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span>");
+            lines[lines.Length - 1] += "<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>";
+            _page.Append(string.Concat(lines.Select(r => string.Concat("<div>", r, "</div>"))));
 
             _page.Append("</div></body></html>");
             return _page.ToString();
@@ -47,18 +47,18 @@ namespace RmSolution.DataAccess
 
         #endregion Private methods
 
-        public string ReadLines(byte[] data)
+        public string[] ReadLines(byte[] data)
         {
             _sock.Send(data);
             Task.Delay(1000).Wait();
             var buf = new byte[1024];
             int cnt;
-            if (_sock.Available == 0) return string.Empty;
+            if (_sock.Available == 0) return Array.Empty<string>();
 
             while ((cnt = _sock.Receive(buf, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
-            if (cnt == 0) return string.Empty;
+            if (cnt == 0) return Array.Empty<string>();
 
             var resp = new byte[cnt];
             Array.Copy(buf, resp, cnt);
@@ -72,8 +72,7 @@ namespace RmSolution.DataAccess
                 }
                 break;
             }
-            return string.Concat(Encoding.UTF8.GetString(resp, start, resp.Length - start).Replace(" ", "&nbsp;")
-                .Split(new string[] { "\r\n" }, StringSplitOptions.None).Select(r => string.Concat("<div>", r, "</div>")));
+            return Encoding.UTF8.GetString(resp, start, resp.Length - start).Replace(" ", "&nbsp;").Split(new string[] { "\r\n" }, StringSplitOptions.None);
         }
     }
 }

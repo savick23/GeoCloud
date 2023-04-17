@@ -7,6 +7,7 @@ namespace RmSolution.DataAccess
     #region Using
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
+    using RmSolution.DataAnnotations;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -26,5 +27,17 @@ namespace RmSolution.DataAccess
                 Content = new ConsolePageBuilder().Build()
             };
         });
+
+        /// <summary> Ввод строки в консоли телнет.</summary>
+        [HttpPost("console/[action]")]
+        public async Task<IActionResult> Input(XInput form) => await Task.Run(() =>
+        {
+            return new JsonResult(new string[] { form.Input, "> " });
+        });
+
+        public class XInput
+        {
+            public string Input { get; set; }
+        }
     }
 }

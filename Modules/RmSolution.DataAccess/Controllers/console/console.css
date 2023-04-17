@@ -5,6 +5,7 @@ body {
   caret-color: lime;
 }
 #input {
+  display: inline;
   resize: none;
   padding: 0;
   margin: 0;
@@ -14,4 +15,7 @@ body {
   background-color: transparent;
   color: #ccc;
   font: 12px/14px consolas;
+}
+#cursor {
+  background-color: lime;
 }
