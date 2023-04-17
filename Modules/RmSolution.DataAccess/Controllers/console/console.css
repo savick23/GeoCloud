@@ -4,3 +4,14 @@ body {
   font: 12px/14px consolas;
   caret-color: lime;
 }
+#input {
+  resize: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  height: 14px;
+  background-color: transparent;
+  color: #ccc;
+  font: 12px/14px consolas;
+}

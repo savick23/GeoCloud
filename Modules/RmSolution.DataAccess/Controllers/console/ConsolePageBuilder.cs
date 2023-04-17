@@ -21,16 +21,17 @@ namespace RmSolution.DataAccess
         {
             var _page = new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
                 .Append(GetResource("console.console.css")).Append("</style><script>")
-                .Append(GetResource("console.console.js")).Append("</script></head><body onkeypress=\"onKeyPress(event)\">");
+                .Append(GetResource("console.console.js")).Append("</script></head><body onkeydown=\"onKeyDown(event)\"><div id=\"console\">");
 
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
-            var resp = ReadString(Array.Empty<byte>());
+            var resp = ReadLines(Array.Empty<byte>());
 
             _page.Append(resp);
-            _page.Append("<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span>");
+            _page.Append("<div>USER&lt; <div id=\"input\">DFFFF<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span></div></div>");
+            //   _page.Append("<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span>");
 
-            _page.Append("</body></html>");
+            _page.Append("</div></body></html>");
             return _page.ToString();
         }
 
@@ -46,7 +47,7 @@ namespace RmSolution.DataAccess
 
         #endregion Private methods
 
-        public string ReadString(byte[] data)
+        public string ReadLines(byte[] data)
         {
             _sock.Send(data);
             Task.Delay(1000).Wait();
@@ -71,7 +72,8 @@ namespace RmSolution.DataAccess
                 }
                 break;
             }
-            return Encoding.UTF8.GetString(resp, start, resp.Length - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>");
+            return string.Concat(Encoding.UTF8.GetString(resp, start, resp.Length - start).Replace(" ", "&nbsp;")
+                .Split(new string[] { "\r\n" }, StringSplitOptions.None).Select(r => string.Concat("<div>", r, "</div>")));
         }
     }
 }

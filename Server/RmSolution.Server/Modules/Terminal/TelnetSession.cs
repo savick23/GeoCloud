@@ -220,7 +220,7 @@ namespace RmSolution.Runtime
         {
             input = input.Trim();
             var output = new StringBuilder();
-            var prompt = "\r\n";
+            var prompt = NEWLINE;
             var handler = _handlers.FirstOrDefault(h => Regex.IsMatch(input, h.Key, RegexOptions.IgnoreCase));
             string cmd = handler.Key == null
                 ? Regex.Match(input, @".*?(?=\s|$)").Value.ToUpper()
