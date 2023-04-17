@@ -11,12 +11,13 @@ namespace RmSolution.DataAccess
     using RmSolution.Runtime;
     using System.Net.Sockets;
     using System.Runtime.InteropServices;
+    using System.Text;
     #endregion Using
 
     public class ConsoleController : SmartController
     {
         const string SESSION = "_sid";
-        static Dictionary<string, Socket> _sessions = new();
+        static Dictionary<string, ConsolePageBuilder> _telnet = new();
 
         public ConsoleController(IRuntime runtime) : base(runtime)
         {
@@ -26,14 +27,19 @@ namespace RmSolution.DataAccess
         [HttpGet("[action]")]
         public async Task<ContentResult> Console() => await Task.Run(() =>
         {
+            string seckey;
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SESSION)))
             {
-                HttpContext.Session.SetString(SESSION, Guid.NewGuid().ToString());
+                seckey = Guid.NewGuid().ToString();
+                HttpContext.Session.SetString(SESSION, seckey);
+                _telnet.Add(seckey, new ConsolePageBuilder());
             }
+            else seckey = HttpContext.Session.GetString(SESSION);
+
             return new ContentResult()
             {
                 ContentType = "text/html",
-                Content = new ConsolePageBuilder().Build()
+                Content = _telnet[seckey].Build()
             };
         });
 
@@ -41,8 +47,12 @@ namespace RmSolution.DataAccess
         [HttpPost("console/[action]")]
         public async Task<IActionResult> Input(XInput form) => await Task.Run(() =>
         {
-            var t = HttpContext.Session.GetString(SESSION);
-            return new JsonResult(new string[] { form.Input, "> " });
+            if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
+            {
+                var resp = console.ReadLines(Encoding.UTF8.GetBytes(form.Input));
+                return new JsonResult(resp);
+            }
+            return new JsonResult(Array.Empty<string>());
         });
 
         public class XInput
