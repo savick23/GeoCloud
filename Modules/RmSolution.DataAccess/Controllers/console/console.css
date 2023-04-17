@@ -2,4 +2,5 @@ body {
   background-color: #0c0c0c;
   color: #ccc;
   font: 12px/14px consolas;
+  caret-color: lime;
 }

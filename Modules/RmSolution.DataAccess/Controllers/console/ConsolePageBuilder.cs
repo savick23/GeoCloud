@@ -21,13 +21,14 @@ namespace RmSolution.DataAccess
         {
             var _page = new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
                 .Append(GetResource("console.console.css")).Append("</style><script>")
-                .Append(GetResource("console.console.js")).Append("</script></head><body contenteditable=\"true\">");
+                .Append(GetResource("console.console.js")).Append("</script></head><body onkeypress=\"onKeyPress(event)\">");
 
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
             var resp = ReadString(Array.Empty<byte>());
 
-            _page.AppendLine(resp);
+            _page.Append(resp);
+            _page.Append("<span id=\"cursor\" style=\"background-color:lime\">&nbsp;</span>");
 
             _page.Append("</body></html>");
             return _page.ToString();
