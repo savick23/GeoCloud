@@ -15,6 +15,9 @@ namespace RmSolution.Devices
         bool Connected { get; }
         /// <summary> Данные содержаться на устройстве.</summary>
         bool DataAvailable { get; }
+        /// <summary> Возвращает или задает значение времени ожидания в миллисекундах для метода Read.</summary>
+        /// <remarks> Количество миллисекундах, ожидаемых до истечения времени ожидания запроса. Значение по умолчанию — 10 000 миллисекунд (10 секунд).</remarks>
+        int Timeout { get; set; }
         /// <summary> Подключиться к устройству.</summary>
         void Open();
         /// <summary> Закрыть подключение к устройству.</summary>
@@ -46,5 +49,12 @@ namespace RmSolution.Devices
     {
         public string Host { get; set; }
         public int Port { get; set; }
+    }
+
+    public class CommunicationException : Exception
+    {
+        public CommunicationException(string message): base(message)
+        {
+        }
     }
 }

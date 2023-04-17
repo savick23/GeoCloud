@@ -137,11 +137,7 @@ namespace RmSolution.GeoCom
                     break;
 
                 case "CONFIG":
-                    var cfg = ((LeicaTotalStationDevice?)FindDevice(args[1]))?.ReadConfig();
-                    if (cfg != null)
-                        Runtime.Send(MSG.Terminal, ProcessId, 0, cfg.ToDictionary(k => k.Key, v => v.Value.ToString()));
-                    else
-                        Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + args[1] + " не найдено!");
+                    ReadDeviceConfig(args[1], args.Skip(2).ToArray());
                     break;
 
                 case "DEV":
@@ -199,6 +195,22 @@ namespace RmSolution.GeoCom
             finally
             {
                 device.Close();
+            }
+        }
+
+        void ReadDeviceConfig(string idDevice, string[] args)
+        {
+            try
+            {
+                var cfg = ((LeicaTotalStationDevice?)FindDevice(idDevice))?.ReadConfig();
+                if (cfg != null)
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, cfg.ToDictionary(k => k.Key, v => v.Value.ToString()));
+                else
+                    Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + idDevice + " не найдено!");
+            }
+            catch (Exception ex)
+            {
+                Runtime.Send(MSG.ErrorMessage, ProcessId, 0, ex);
             }
         }
 

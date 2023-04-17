@@ -17,6 +17,8 @@ namespace RmSolution.Devices
 
         public bool DataAvailable => Available > 0;
 
+        public int Timeout { get; set; } = 10000;
+
         public RmNetworkConnection(string host, int port)
             : base(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
         {

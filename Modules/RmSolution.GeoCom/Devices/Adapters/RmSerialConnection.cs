@@ -17,6 +17,7 @@ namespace RmSolution.Devices
         public int Available { get { return BytesToRead; } }
         public bool Connected => IsOpen;
         public bool DataAvailable => BytesToRead > 0;
+        public int Timeout { get; set; } = 10000;
 
         public RmSerialConnection(string name, int baudrate, int databits, StopBits stopbits, Parity parity)
             : base(name, baudrate, parity, databits, stopbits)

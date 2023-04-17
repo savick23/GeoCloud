@@ -9,12 +9,10 @@ namespace RmSolution.Devices
     using System;
     using System.Globalization;
     using System.Linq;
-    using System.Runtime.Intrinsics.X86;
     using System.Text;
     using System.Text.RegularExpressions;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     public class COMFAttribute : Attribute { }
@@ -27,6 +25,8 @@ namespace RmSolution.Devices
         /// <summary> При посылке в начале строки (не обязательно), отчищает входной буфер команд на устройстве.</summary>
         readonly static byte[] LF = new byte[] { 0x0a };
         readonly static byte[] TERM = "\r\n"u8.ToArray();
+
+        readonly object _lockRoot = new();
 
         IDeviceConnection? _connection;
 
@@ -50,6 +50,8 @@ namespace RmSolution.Devices
         public bool Connected => _connection?.Connected ?? false;
 
         public bool DataAvailable => _connection?.DataAvailable ?? false;
+
+        public int Timeout { get; set; } = 5000;
 
         public void Open()
         {
@@ -106,6 +108,10 @@ namespace RmSolution.Devices
             var cfg = CSV_GetDeviceConfig();
             return new Dictionary<string, object?>()
             {
+                { "Подключение", OperationMode },
+                { "Адрес",
+                    OperationMode == GeoComAccessMode.Tcp ? NetworkSetting.HasValue ? NetworkSetting.Value.Host + ":" + NetworkSetting.Value.Port : "(null)" :
+                    OperationMode == GeoComAccessMode.Com ? SerialPortSetting.HasValue ? SerialPortSetting.Value.PornName : "(null)" : "<нет подключения>" },
                 { "Дата/Время прибора", CSV_GetDateTime() },
                 { "Наименование", CSV_GetInstrumentName() },
                 { "Заводской номер", CSV_GetInstrumentNo() },
@@ -374,21 +380,27 @@ namespace RmSolution.Devices
         ZResponse Request(byte[] data)
         {
             byte[]? resp;
-            try
+            lock (_lockRoot)
             {
-                Open();
-                Write(data);
-                int attempt = 120;
-                do
+                try
                 {
-                    Task.Delay(250).Wait();
-                    resp = Read();
+                    Open();
+                    Write(data);
+                    int attempt = Timeout / 250;
+                    do
+                    {
+                        Task.Delay(250).Wait();
+                        resp = Read();
+                    }
+                    while ((resp == null || resp.Length == 0) && --attempt > 0);
+
+                    if (resp == null || resp.Length == 0)
+                        throw new CommunicationException("Не удалось подключиться к устройству");
                 }
-                while ((resp == null || resp.Length == 0) && attempt-- > 0);
-            }
-            finally
-            {
-                Close();
+                finally
+                {
+                    Close();
+                }
             }
             return new ZResponse(resp);
         }
