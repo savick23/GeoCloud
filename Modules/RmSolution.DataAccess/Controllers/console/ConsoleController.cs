@@ -42,21 +42,20 @@ namespace RmSolution.DataAccess
             };
         });
 
+        /// <summary> Ввод строки в консоли телнет.</summary>
+        [HttpPost("console/[action]")]
+        public async Task Input()
+        {
+            if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
+            {
+                byte[] buf = new byte[16];
+                var cnt = await HttpContext.Request.Body.ReadAsync(buf);
+                console.Write(Encoding.UTF8.GetString(buf, 0, cnt));
+            }
+        }
+
         /// <summary> http://localhost:8087/api/console/read </summary>
         [HttpGet("console/[action]")]
         public async Task<ActionResult> Read() => await Task.Run(() => File(_stream, "application/octet-stream", false));
-
-        /// <summary> Ввод строки в консоли телнет.</summary>
-        [HttpPost("console/[action]")]
-        public async Task Input(XInput form) => await Task.Run(() =>
-        {
-            if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
-                console.Write(form.Input);
-        });
-
-        public class XInput
-        {
-            public string Input { get; set; }
-        }
     }
 }

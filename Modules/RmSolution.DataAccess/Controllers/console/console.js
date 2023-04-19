@@ -26,8 +26,8 @@ function input(symb) {
         fetch('console/input', {
             method: 'POST',
             processData: false,
-            headers: { 'Content-Type': 'application/json;charset=utf-8' },
-            body: JSON.stringify({ input: symb }),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: symb,
             signal: ctrl.signal
         });
     }

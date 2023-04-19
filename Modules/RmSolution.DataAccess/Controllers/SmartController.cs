@@ -64,7 +64,7 @@ namespace RmSolution.DataAccess
 
         /// <summary> Чтение JSON-параметров из POST-запроса.</summary>
         /// <remarks> Конструкция ([FromBody] string input) not worked </remarks>
-        string ReadFromBody()
+        protected string ReadFromBody()
         {
             using var reader = new StreamReader(HttpContext.Request.Body, Encoding.UTF8, true, 1024, false);
             return reader.ReadToEndAsync().Result.ToString();
