@@ -52,6 +52,7 @@ namespace RmSolution.DataAccess
         {
             if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
             {
+                console.Write(form.Input);
                 return new JsonResult("OK");
             }
             return new JsonResult(Array.Empty<string>());

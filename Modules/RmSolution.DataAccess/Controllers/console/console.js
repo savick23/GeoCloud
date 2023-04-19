@@ -25,20 +25,14 @@ function onKeyDown(e) {
         case 32:
             $("cursor").before("\u00A0");
             break;
-     //   case 13: input(); break;
         default:
             if (e.keyCode > 32 && e.keyCode <= 255)
                 input(e.key);
-                //$("cursor").before(e.key);
             break;
     }
 }
 function input(symb) {
-    const inp = $("input");
-    const line = inp.parentElement;
-    let cmd = inp.innerText.trimRight();
-    inp.remove();
-    line.innerText += cmd;
+    $("cursor").remove();
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 5000);
     try {
@@ -55,7 +49,7 @@ function input(symb) {
     }
 }
 function cursor() {
-    $("console").lastChild.insertAdjacentHTML("beforeend", "<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>");
+    $("console").insertAdjacentHTML("beforeend", "<span id=\"cursor\">&nbsp;</span>");
 }
 
 function start() {
@@ -69,7 +63,8 @@ function start() {
                             controller.close();
                             return;
                         }
-                        $("console").insertAdjacentHTML("beforeend", utf8String(value)), 
+                        $("console").insertAdjacentHTML("beforeend", utf8String(value));
+                        cursor();
                         push();
                     });
                 }

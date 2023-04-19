@@ -27,8 +27,6 @@ namespace RmSolution.DataAccess
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
 
-            _page.Append("<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>");
-
             _page.Append("</div></body></html>");
             return _page.ToString();
         }
@@ -45,8 +43,15 @@ namespace RmSolution.DataAccess
 
         #endregion Private methods
 
+        public bool Write(string input)
+        {
+            _sock.Send(Encoding.UTF8.GetBytes(input));
+            return true;
+        }
+
         public byte[] Read()
         {
+            if (_sock.Available == 0) return Array.Empty<byte>();
             var buf = new byte[1024];
             int cnt;
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
