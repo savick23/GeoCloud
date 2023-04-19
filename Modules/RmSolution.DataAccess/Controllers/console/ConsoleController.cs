@@ -48,14 +48,10 @@ namespace RmSolution.DataAccess
 
         /// <summary> Ввод строки в консоли телнет.</summary>
         [HttpPost("console/[action]")]
-        public async Task<IActionResult> Input(XInput form) => await Task.Run(() =>
+        public async Task Input(XInput form) => await Task.Run(() =>
         {
             if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
-            {
                 console.Write(form.Input);
-                return new JsonResult("OK");
-            }
-            return new JsonResult(Array.Empty<string>());
         });
 
         public class XInput

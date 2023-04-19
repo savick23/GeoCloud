@@ -20,19 +20,12 @@ function onKeyDown(e) {
             rng.deleteContents();
             break;
         }
-        case 37:
-            break;
-        case 32:
-            $("cursor").before("\u00A0");
-            break;
         default:
-            if (e.keyCode > 32 && e.keyCode <= 255)
-                input(e.key);
+            input(e.key);
             break;
     }
 }
 function input(symb) {
-    $("cursor").remove();
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 5000);
     try {
@@ -63,8 +56,9 @@ function start() {
                             controller.close();
                             return;
                         }
-                        $("console").insertAdjacentHTML("beforeend", utf8String(value));
-                        cursor();
+                        if (value.length > 1 || value[0] !== 0)
+                            $("cursor").insertAdjacentHTML("beforebegin", utf8String(value));
+
                         push();
                     });
                 }

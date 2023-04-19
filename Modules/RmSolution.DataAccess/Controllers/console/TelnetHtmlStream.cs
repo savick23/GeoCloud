@@ -34,8 +34,8 @@ namespace RmSolution.DataAccess
             var data = _sock.Read();
             if (data.Length == 0)
             {
-                buffer[0] = 255;
-                Task.Delay(250).Wait();
+                buffer[0] = 0;
+                Task.Delay(100).Wait();
                 return 1;
             }
             int start;
@@ -52,7 +52,7 @@ namespace RmSolution.DataAccess
             Array.Copy(data, buffer, data.Length);
             _length += data.Length;
             Position += data.Length;
-            Task.Delay(250).Wait();
+            Task.Delay(100).Wait();
             return data.Length;
         }
 
