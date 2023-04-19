@@ -31,12 +31,9 @@ namespace RmSolution.DataAccess
                 seckey = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString(SESSION, seckey);
                 _telnet.Add(seckey, new ConsolePageBuilder());
+                _stream = new TelnetStream(_telnet[seckey]);
             }
             else seckey = HttpContext.Session.GetString(SESSION);
-
-            _stream = new TelnetStream(_telnet[seckey]);
-            var bytes = Encoding.UTF8.GetBytes("LETUNOVSKY");
-            _stream.Write(bytes, 0, bytes.Length);
 
             return new ContentResult()
             {
