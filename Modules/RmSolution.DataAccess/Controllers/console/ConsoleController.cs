@@ -13,7 +13,7 @@ namespace RmSolution.DataAccess
     public class ConsoleController : SmartController
     {
         const string SESSION = "_sid";
-        static Dictionary<string, ConsolePageBuilder> _telnet = new();
+        static Dictionary<string, HttpConsoleHelper> _telnet = new();
 
         static TelnetHtmlStream? _stream;
 
@@ -30,7 +30,7 @@ namespace RmSolution.DataAccess
             {
                 seckey = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString(SESSION, seckey);
-                _telnet.Add(seckey, new ConsolePageBuilder());
+                _telnet.Add(seckey, new HttpConsoleHelper());
                 _stream = new TelnetHtmlStream(_telnet[seckey]);
             }
             else seckey = HttpContext.Session.GetString(SESSION);
@@ -38,7 +38,7 @@ namespace RmSolution.DataAccess
             return new ContentResult()
             {
                 ContentType = "text/html",
-                Content = _telnet[seckey].Build()
+                Content = _telnet[seckey].GetPageContent()
             };
         });
 

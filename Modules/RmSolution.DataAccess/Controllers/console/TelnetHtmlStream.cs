@@ -11,10 +11,10 @@ namespace RmSolution.DataAccess
 
     public class TelnetHtmlStream : Stream
     {
-        ConsolePageBuilder _sock;
+        HttpConsoleHelper _sock;
         long _length = 0;
 
-        public TelnetHtmlStream(ConsolePageBuilder socket)
+        public TelnetHtmlStream(HttpConsoleHelper socket)
         {
             _sock = socket;
         }
