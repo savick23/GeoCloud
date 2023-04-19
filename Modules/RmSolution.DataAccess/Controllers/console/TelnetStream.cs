@@ -1,6 +1,7 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: TelnetStream – Выходной поток консоли телнет.
+// https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
 {
@@ -18,7 +19,7 @@ namespace RmSolution.DataAccess
             _sock = socket;
         }
 
-        public override bool CanRead => true;
+        public override bool CanRead => Position <= _length;
 
         public override bool CanSeek => false;
 
@@ -30,9 +31,9 @@ namespace RmSolution.DataAccess
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var data = Encoding.UTF8.GetBytes("LETUNOVSKY");
+            var data = Encoding.UTF8.GetBytes("LETUNOVSKY SERGEY\r\n");
             Array.Copy(data, buffer, data.Length);
-            _length += data.Length;
+          //  _length += data.Length;
             Position += data.Length;
             return data.Length;
         }

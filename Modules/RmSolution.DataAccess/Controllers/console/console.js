@@ -62,7 +62,7 @@ function start() {
                             controller.close();
                             return;
                         }
-                        console.log(done, value);
+                        console.log(value, String.fromCharCode(...value));
                         //for (int i = 0; i < value.length; i++) {
                         //    $("console").innerText = "dddddddddddddd";
                         //}
