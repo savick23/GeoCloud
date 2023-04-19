@@ -6,19 +6,16 @@ namespace RmSolution.DataAccess
 {
     #region Using
     using System.Text;
-    using System.Data;
     using System.Reflection;
     using System.Net.Sockets;
-    using Microsoft.Extensions.Hosting;
     using System.Net;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     public class HttpConsoleHelper
     {
         #region Declarations
 
-        static readonly Dictionary<string, byte[]> _htmlkeys = new Dictionary<string, byte[]>()
+        static readonly Dictionary<string, byte[]> _htmlkeys = new()
         {
             { "Enter", "\u000d"u8.ToArray() },
             { "Tab", "\u0009"u8.ToArray() },
@@ -51,6 +48,21 @@ namespace RmSolution.DataAccess
             { "F20", "\u001b[34~"u8.ToArray() }
         };
 
+        static readonly Dictionary<string, string> _appearance = new()
+        {
+            { "\u001b[30m", "color:black" },
+            { "\u001b[30m;1m", "color:darkgrey" },
+            { "\u001b[31;1m", "color:red" },
+            { "\u001b[32;1m", "color:green" },
+            { "\u001b[33;1m", "color:yellow" },
+            { "\u001b[34;1m", "color:blue" },
+            { "\u001b[35;1m", "color:magenta" },
+            { "\u001b[36;1m", "color:cyan" },
+            { "\u001b[37;1m", "color:white" },
+            { "\u001b[37;0m", "color:whitesmoke" },
+            { "\u001b[39;49m", "color:white" }
+        };
+
         Socket _sock;
         /// <summary> Кэш консольного вывода.</summary>
         readonly StringBuilder _output = new();
@@ -61,8 +73,8 @@ namespace RmSolution.DataAccess
         {
             Connect();
             return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
-                .Append(GetResource("console.console.css")).Append("</style><script>")
-                .Append(GetResource("console.console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
+                .Append(GetResource("console.css")).Append("</style><script>")
+                .Append(GetResource("console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
                 .Append(_output)
                 .Append("<span id=\"cursor\">&nbsp;</span></div></body></html>").ToString();
         }
@@ -71,7 +83,7 @@ namespace RmSolution.DataAccess
 
         internal static string GetResource(string name)
         {
-            using var rs = Assembly.GetExecutingAssembly().GetManifestResourceStream("RmSolution.DataAccess.Controllers." + name);
+            using var rs = Assembly.GetExecutingAssembly().GetManifestResourceStream("RmSolution.DataAccess.Controllers.console." + name);
             using var ms = new MemoryStream();
             rs.CopyTo(ms);
             return Encoding.UTF8.GetString(ms.ToArray());
@@ -121,17 +133,16 @@ namespace RmSolution.DataAccess
                 }
                 break;
             }
-            var output = Encoding.UTF8.GetString(buf, start, cnt - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>");
-          // output = ToHtmlText(buf);
+            var output = ToHtmlText(buf, cnt);
             _output.Append(output);
             return Encoding.UTF8.GetBytes(output);
         }
 
-        string ToHtmlText(byte[] buffer)
+        static string ToHtmlText(byte[] buffer, int count)
         {
             var res = new StringBuilder();
-            var cnt = buffer.Length;
-            for (int i = 0; i < cnt; i++)
+            bool isspan = false;
+            for (int i = 0; i < count; i++)
             {
                 var c = buffer[i];
                 switch (c)
@@ -149,17 +160,38 @@ namespace RmSolution.DataAccess
                         break;
 
                     case 27:
+                        for (int j = i + 1; j < count; j++)
+                        {
+                            if (buffer[j] == 109) // m
+                            {
+                                if (isspan)
+                                    res.Append("</span>");
+                                else
+                                    res.Append("<span style=\"").Append(_appearance[Encoding.UTF8.GetString(buffer[i..(j + 1)])]).Append("\">");
+
+                                i += j - i;
+                                isspan = !isspan;
+                                break;
+                            }
+                        }
                         break;
 
                     case 255: /*IAC*/
                         i += 2;
                         break;
 
+                    case 208: // UTF-8 (RU)
+                    case 209: // UTF-8 (RU)
+                        res.Append(Encoding.UTF8.GetString(buffer, i++, 2));
+                        break;
+
+                    case 226: // mnemo
+                        res.Append(Encoding.UTF8.GetString(buffer, i, 3));
+                        i += 2;
+                        break;
+
                     default:
-                        if (c == 208)
-                            res.Append(Encoding.UTF8.GetString(buffer, i++, 2));
-                        else
-                            res.Append(Encoding.UTF8.GetString(buffer, i, 1));
+                        res.Append((char)c);
                         break;
                 }
             }

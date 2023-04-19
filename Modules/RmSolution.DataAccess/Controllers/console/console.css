@@ -18,4 +18,5 @@ body {
 }
 #cursor {
   background-color: lime;
+  border: 1px solid lime;
 }

@@ -6,7 +6,7 @@
 namespace RmSolution.DataAccess
 {
     #region Using
-    using System.Text;
+    using System;
     #endregion Using
 
     public class TelnetHtmlStream : Stream
