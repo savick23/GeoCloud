@@ -47,19 +47,7 @@ namespace RmSolution.DataAccess
 
         /// <summary> http://localhost:8087/api/console/read </summary>
         [HttpGet("console/[action]")]
-        public async Task<ActionResult> Read() => await Task.Run(() =>
-        {
-            //    var file = new FileStream(@"d:\test.txt", FileMode.Open);
-            //      return File(file, "application/octet-stream", false);
-            try
-            {
-                return File(_stream, "application/octet-stream", false);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        });
+        public async Task<ActionResult> Read() => await Task.Run(() => File(_stream, "application/octet-stream", false));
 
         /// <summary> Ввод строки в консоли телнет.</summary>
         [HttpPost("console/[action]")]

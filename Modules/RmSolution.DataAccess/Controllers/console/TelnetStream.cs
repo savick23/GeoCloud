@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
 {
+    using System.Text;
     #region Using
     using System.Threading;
     #endregion Using
@@ -19,29 +20,9 @@ namespace RmSolution.DataAccess
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var data = File.ReadAllBytes(@"d:\test.txt");
+            var data = Encoding.UTF8.GetBytes("LETUNOVSKY");
             Array.Copy(data, buffer, data.Length);
             return data.Length;
-        }
-
-        public override int Read(Span<byte> buffer)
-        {
-            return base.Read(buffer);
-        }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            return base.ReadAsync(buffer, offset, count, cancellationToken);
-        }
-
-        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-        {
-            return base.ReadAsync(buffer, cancellationToken);
-        }
-
-        public override int ReadByte()
-        {
-            return base.ReadByte();
         }
     }
 }
