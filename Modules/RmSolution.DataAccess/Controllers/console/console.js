@@ -23,7 +23,7 @@ function input(symb) {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 5000);
     try {
-        fetch('console/input', {
+        fetch('console/write', {
             method: 'POST',
             processData: false,
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },

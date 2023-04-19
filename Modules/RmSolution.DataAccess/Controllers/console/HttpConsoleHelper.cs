@@ -52,6 +52,7 @@ namespace RmSolution.DataAccess
         };
 
         Socket _sock;
+        /// <summary> Кэш консольного вывода.</summary>
         readonly StringBuilder _output = new();
 
         #endregion Declarations
@@ -121,8 +122,48 @@ namespace RmSolution.DataAccess
                 break;
             }
             var output = Encoding.UTF8.GetString(buf, start, cnt - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>");
+          // output = ToHtmlText(buf);
             _output.Append(output);
             return Encoding.UTF8.GetBytes(output);
+        }
+
+        string ToHtmlText(byte[] buffer)
+        {
+            var res = new StringBuilder();
+            var cnt = buffer.Length;
+            for (int i = 0; i < cnt; i++)
+            {
+                var c = buffer[i];
+                switch (c)
+                {
+                    case 32:
+                        res.Append("&nbsp;");
+                        break;
+
+                    case 13:
+                        if (buffer[i + 1] == 10)
+                        {
+                            res.Append("<br/>");
+                            i++;
+                        }
+                        break;
+
+                    case 27:
+                        break;
+
+                    case 255: /*IAC*/
+                        i += 2;
+                        break;
+
+                    default:
+                        if (c == 208)
+                            res.Append(Encoding.UTF8.GetString(buffer, i++, 2));
+                        else
+                            res.Append(Encoding.UTF8.GetString(buffer, i, 1));
+                        break;
+                }
+            }
+            return res.ToString();
         }
     }
 }

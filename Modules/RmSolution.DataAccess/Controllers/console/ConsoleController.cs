@@ -44,7 +44,7 @@ namespace RmSolution.DataAccess
 
         /// <summary> Ввод строки в консоли телнет.</summary>
         [HttpPost("console/[action]")]
-        public async Task Input()
+        public async Task Write()
         {
             if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
             {
