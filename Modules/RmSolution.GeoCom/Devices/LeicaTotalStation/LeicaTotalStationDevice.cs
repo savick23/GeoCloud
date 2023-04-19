@@ -2,6 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: LeicaTotalStationDevice – Тахеометр Leica.
 // Протокол: GEOCOM Leica
+// Вызов функции прибора с консоли: mod3 call 000001 COM_GetSWVersion
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Devices
 {
@@ -51,7 +52,7 @@ namespace RmSolution.Devices
 
         public bool DataAvailable => _connection?.DataAvailable ?? false;
 
-        public int Timeout { get; set; } = 5000;
+        public int Timeout { get; set; } = 30000;
 
         public void Open()
         {
@@ -128,7 +129,7 @@ namespace RmSolution.Devices
 
         /// <summary> Retrieving server instrument version.</summary>
         /// <remarks> This function displays the current GeoCOM release (release, version and subversion) of the instrument.</remarks>
-        /// <example> mod3 dev 000001 COM_GetSWVersion </example>
+        /// <example> mod3 call 000001 COM_GetSWVersion </example>
         public ZResponse COM_GetSWVersion()
         {
             var resp = Request(RequestString("%R1Q,110:"));
@@ -143,7 +144,7 @@ namespace RmSolution.Devices
         /// <remarks> This function switches on the TPS1200 instrument.<br/><b>Note</b>: The TPS1200 instrument can be switched on by any RPC command or even by sending a single character.</remarks>
         /// <returns> If instrument is already switched on then %R1P,0,0:5 else Nothing </returns>
         /// <param name="onMode"> Run mode.</param>
-        /// <example> mod3 dev 000001 COM_SwitchOnTPS 0/1 </example>
+        /// <example> mod3 call 000001 COM_SwitchOnTPS 0/1 </example>
         public ZResponse COM_SwitchOnTPS(COM_TPS_STARTUP_MODE onMode)
         {
             var resp = Request(RequestString("%R1Q,111:", onMode));
@@ -156,7 +157,7 @@ namespace RmSolution.Devices
         /// <summary> Turning on the instrument.</summary>
         /// <remarks> This function switches off the TPS1200 instrument.</remarks>
         /// <param name="offMode"> Stop mode.</param>
-        /// <example> mod3 dev 000001 COM_SwitchOffTPS 0/1 </example>
+        /// <example> mod3 call 000001 COM_SwitchOffTPS 0/1 </example>
         public ZResponse COM_SwitchOffTPS(COM_TPS_STOP_MODE offMode)
         {
             var resp = Request(RequestString("%R1Q,112:", offMode));
@@ -168,7 +169,7 @@ namespace RmSolution.Devices
 
         /// <summary> Checking the communication.</summary>
         /// <remarks> This function does not provide any functionality except of checking if the communication is up and running.</remarks>
-        /// <example> mod3 dev 000001 COM_NullProc </example>
+        /// <example> mod3 call 000001 COM_NullProc </example>
         public ZResponse COM_NullProc()
         {
             var resp = Request(RequestString("%R1Q,0:"));
@@ -180,7 +181,7 @@ namespace RmSolution.Devices
 
         /// <summary> Getting the binary attribute of the server.</summary>
         /// <remarks> This function gets the ability information about the server to handle binary communication. The client may make requests in binary format which speeds up the communication by about 40-50%.</remarks>
-        /// <example> mod3 dev 000001 COM_GetBinaryAvailable </example>
+        /// <example> mod3 call 000001 COM_GetBinaryAvailable </example>
         public ZResponse COM_GetBinaryAvailable()
         {
             var resp = Request(RequestString("%R1Q,113:"));
@@ -322,7 +323,7 @@ namespace RmSolution.Devices
 
         /// <summary> Turning on/off the laserpointer.</summary>
         /// <remarks> Laserpointer is only available on models which support distance measurement without reflector.</remarks>
-        /// <example> mod3 dev 000001 EDM_Laserpointer on/off (0/1) </example>
+        /// <example> mod3 call 000001 EDM_Laserpointer on/off (0/1) </example>
         public ZResponse EDM_Laserpointer(ON_OFF_TYPE eOn)
         {
             var resp = Request(RequestString("%R1Q,1004:", eOn));
@@ -334,7 +335,7 @@ namespace RmSolution.Devices
 
         /// <summary> Getting the value of the intensity of the electronic guide light.</summary>
         /// <remarks> Displays the intensity of the Electronic Guide Light.</remarks>
-        /// <example> mod3 dev 000001 EDM_GetEglIntensity </example>
+        /// <example> mod3 call 000001 EDM_GetEglIntensity </example>
         public ZResponse EDM_GetEglIntensity()
         {
             var resp = Request(RequestString("%R1Q,1058:"));
@@ -347,7 +348,7 @@ namespace RmSolution.Devices
 
         /// <summary> Changing the intensity of the electronic guide light.</summary>
         /// <remarks> Changes the intensity of the Electronic Guide Light.</remarks>
-        /// <example> mod3 dev 000001 EDM_SetEglIntensity off/low/mid/high (0/1/2/3) </example>
+        /// <example> mod3 call 000001 EDM_SetEglIntensity off/low/mid/high (0/1/2/3) </example>
         public ZResponse EDM_SetEglIntensity(EDM_EGLINTENSITY_TYPE intensity)
         {
             var resp = Request(RequestString("%R1Q,1059:", intensity));
@@ -380,29 +381,36 @@ namespace RmSolution.Devices
         ZResponse Request(byte[] data)
         {
             byte[]? resp;
+            TimeSpan executed;
             lock (_lockRoot)
             {
                 try
                 {
                     Open();
+                    var start = DateTime.Now;
                     Write(data);
                     int attempt = Timeout / 250;
                     do
                     {
                         Task.Delay(250).Wait();
                         resp = Read();
+                        executed = DateTime.Now - start;
                     }
                     while ((resp == null || resp.Length == 0) && --attempt > 0);
 
                     if (resp == null || resp.Length == 0)
-                        throw new CommunicationException("Не удалось подключиться к устройству");
+                        throw new CommunicationException("Не удалось подключиться к прибору. Истекло время " + Timeout + " сек, ожидание ответа от прибора.");
+                }
+                catch (Exception ex)
+                {
+                    throw new CommunicationException("Не удалось подключиться к прибору. " + ex.Message);
                 }
                 finally
                 {
                     Close();
                 }
             }
-            return new ZResponse(resp);
+            return new ZResponse(resp, executed);
         }
 
         #endregion Private methods
@@ -416,8 +424,10 @@ namespace RmSolution.Devices
             public readonly GRC ReturnCode = GRC.UNDEFINED;
             public readonly string? Text;
             public readonly long[] Value;
+            /// <summary> Время выполнения комнады, мс.</summary>
+            public TimeSpan? Executed;
 
-            public ZResponse(byte[]? data)
+            public ZResponse(byte[]? data, TimeSpan executed)
             {
                 if (data != null)
                 {
@@ -434,6 +444,8 @@ namespace RmSolution.Devices
                     else
                         Value = Text.Split(new char[] { ',' }).Select(n =>
                             n.StartsWith('\''/*byte*/) ? long.Parse(n[1..^1], NumberStyles.HexNumber) : long.TryParse(n, out var val) ? val : -1L).ToArray();
+
+                    Executed = executed;
                 }
             }
 

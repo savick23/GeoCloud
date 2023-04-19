@@ -50,12 +50,12 @@ namespace RmSolution.DataAccess
         public string[] ReadLines(byte[] data)
         {
             _sock.Send(data);
-            Task.Delay(1000).Wait();
+            Task.Delay(250).Wait();
             var buf = new byte[1024];
             int cnt;
             if (_sock.Available == 0) return Array.Empty<string>();
 
-            while ((cnt = _sock.Receive(buf, buf.Length, SocketFlags.None)) > 0)
+            while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
             if (cnt == 0) return Array.Empty<string>();

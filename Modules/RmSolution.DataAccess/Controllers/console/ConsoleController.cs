@@ -49,8 +49,8 @@ namespace RmSolution.DataAccess
         {
             if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
             {
-                var resp = console.ReadLines(Encoding.UTF8.GetBytes(form.Input));
-                return new JsonResult(resp);
+                var resp = console.ReadLines(Encoding.UTF8.GetBytes(form.Input + "\n"));
+                return new JsonResult(resp.Length > 0 && resp[0].Equals(form.Input) ? resp.Skip(1).ToArray() : resp);
             }
             return new JsonResult(Array.Empty<string>());
         });

@@ -140,7 +140,7 @@ namespace RmSolution.GeoCom
                     ReadDeviceConfig(args[1], args.Skip(2).ToArray());
                     break;
 
-                case "DEV":
+                case "CALL":
                     CallDeviceFunction(args[1], args.Skip(2).ToArray());
                     break;
 
@@ -238,7 +238,7 @@ namespace RmSolution.GeoCom
                     var val = call.Invoke(dev, prms);
                     if (val is LeicaTotalStationDevice.ZResponse resp)
                         Runtime.Send(MSG.Terminal, ProcessId, 0, resp.Data == null || resp.Data.Length == 0 ? "<нет данных>"
-                            : string.Concat(string.Join(' ', resp.Data.Select(n => n.ToString("x2"))), " > ", resp.Response));
+                            : string.Concat(string.Join(' ', resp.Data.Select(n => n.ToString("x2"))), " > ", resp.Response, " [", resp.Executed.Value.ToString(@"hh\:mm\:ss\.fff"), "]"));
                     else
                         Runtime.Send(MSG.Terminal, ProcessId, 0, "Результат: " + val.ToString());
                 }
