@@ -22,7 +22,7 @@ namespace RmSolution.DataAccess
         {
             var _page = new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
                 .Append(GetResource("console.console.css")).Append("</style><script>")
-                .Append(GetResource("console.console.js")).Append("</script></head><body onkeydown=\"onKeyDown(event)\"><div id=\"console\">");
+                .Append(GetResource("console.console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">");
 
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));

@@ -5,19 +5,17 @@
 namespace RmSolution.DataAccess
 {
     #region Using
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.RazorPages;
-    using RmSolution.DataAnnotations;
-    using RmSolution.Runtime;
-    using System.Net.Sockets;
-    using System.Runtime.InteropServices;
     using System.Text;
+    using Microsoft.AspNetCore.Mvc;
+    using RmSolution.Runtime;
     #endregion Using
 
     public class ConsoleController : SmartController
     {
         const string SESSION = "_sid";
         static Dictionary<string, ConsolePageBuilder> _telnet = new();
+
+        static TelnetStream? _stream;
 
         public ConsoleController(IRuntime runtime) : base(runtime)
         {
@@ -36,11 +34,31 @@ namespace RmSolution.DataAccess
             }
             else seckey = HttpContext.Session.GetString(SESSION);
 
+            _stream = new TelnetStream(_telnet[seckey]);
+            var bytes = Encoding.UTF8.GetBytes("LETUNOVSKY");
+            _stream.Write(bytes, 0, bytes.Length);
+
             return new ContentResult()
             {
                 ContentType = "text/html",
                 Content = _telnet[seckey].Build()
             };
+        });
+
+        /// <summary> http://localhost:8087/api/console/read </summary>
+        [HttpGet("console/[action]")]
+        public async Task<ActionResult> Read() => await Task.Run(() =>
+        {
+            //    var file = new FileStream(@"d:\test.txt", FileMode.Open);
+            //      return File(file, "application/octet-stream", false);
+            try
+            {
+                return File(_stream, "application/octet-stream", false);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         });
 
         /// <summary> Ввод строки в консоли телнет.</summary>

@@ -50,3 +50,28 @@ function input() {
 function cursor() {
     $("console").lastChild.insertAdjacentHTML("beforeend", "<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>");
 }
+
+function start() {
+    fetch("console/read").then((resp) => {
+        const rd = resp.body.getReader();
+        return new ReadableStream({
+            start(controller) {
+                function push() {
+                    // "done" is a Boolean and value a "Uint8Array"
+                    return rd.read().then(({ done, value }) => {
+                        // Is there no more data to read?
+                        if (done) {
+                            controller.close();
+                            return;
+                        }
+                        // Get the data and send it to the browser via the controller
+                        controller.enqueue(value);
+                        console.log(done, value);
+                        push();
+                    });
+                }
+                push();
+            },
+        });
+    });
+}
