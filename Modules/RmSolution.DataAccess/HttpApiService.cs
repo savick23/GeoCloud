@@ -4,7 +4,6 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
 {
-    using Microsoft.Extensions.Options;
     #region Using
     using RmSolution.Runtime;
     using System.Security.Cryptography.X509Certificates;

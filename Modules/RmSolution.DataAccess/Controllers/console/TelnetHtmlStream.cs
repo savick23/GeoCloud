@@ -38,17 +38,6 @@ namespace RmSolution.DataAccess
                 Task.Delay(100).Wait();
                 return 1;
             }
-            int start;
-            for (start = 0; start < data.Length; start++)
-            {
-                if (data[start] == 255/*IAC*/)
-                {
-                    start += 2;
-                    continue;
-                }
-                break;
-            }
-            data = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(data, start, data.Length - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>"));
             Array.Copy(data, buffer, data.Length);
             _length += data.Length;
             Position += data.Length;

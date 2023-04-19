@@ -11,6 +11,7 @@ namespace RmSolution.DataAccess
     using System.Net.Sockets;
     using Microsoft.Extensions.Hosting;
     using System.Net;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     public class HttpConsoleHelper
@@ -51,17 +52,18 @@ namespace RmSolution.DataAccess
         };
 
         Socket _sock;
+        readonly StringBuilder _output = new();
 
         #endregion Declarations
 
         public string GetPageContent()
         {
             Connect();
-            var page = new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
+            return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
                 .Append(GetResource("console.console.css")).Append("</style><script>")
-                .Append(GetResource("console.console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">");
-
-            return page.Append("<span id=\"cursor\">&nbsp;</span></div></body></html>").ToString();
+                .Append(GetResource("console.console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
+                .Append(_output)
+                .Append("<span id=\"cursor\">&nbsp;</span></div></body></html>").ToString();
         }
 
         #region Private methods
@@ -89,6 +91,14 @@ namespace RmSolution.DataAccess
         {
             byte[] symb = _htmlkeys.TryGetValue(input, out byte[] bytes) ? bytes : Encoding.UTF8.GetBytes(input);
             _sock.Send(symb);
+            if (input == "Enter" && _output.Length > 32768)
+                for (int i = 0; i < 32768; i++)
+                    if (_output[i] == '<' && _output[++i] == 'b' && _output[++i] == 'r' && _output[++i] == '/' && _output[++i] == '>')
+                    {
+                        _output.Remove(0, i + 1);
+                        break;
+                    }
+
             return true;
         }
 
@@ -100,21 +110,19 @@ namespace RmSolution.DataAccess
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
-            if (cnt == 0) return Array.Empty<byte>();
-
-            var resp = new byte[cnt];
-            Array.Copy(buf, resp, cnt);
             int start;
-            for (start = 0; start < resp.Length; start++)
+            for (start = 0; start < cnt; start++)
             {
-                if (resp[start] == 255/*IAC*/)
+                if (buf[start] == 255/*IAC*/)
                 {
                     start += 2;
                     continue;
                 }
                 break;
             }
-            return resp;
+            var output = Encoding.UTF8.GetString(buf, start, cnt - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>");
+            _output.Append(output);
+            return Encoding.UTF8.GetBytes(output);
         }
     }
 }
