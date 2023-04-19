@@ -1,4 +1,13 @@
 $ = (id) => document.getElementById(id);
+const utf8String = (bytes) => {
+    var result = '';
+    for (var i = 0; i < bytes.length; ++i) {
+        const byte = bytes[i];
+        const text = byte.toString(16);
+        result += (byte < 16 ? '%0' : '%') + text;
+    }
+    return decodeURIComponent(result);
+};
 function onKeyDown(e) {
     switch (e.keyCode) {
         case 8: {
@@ -16,14 +25,15 @@ function onKeyDown(e) {
         case 32:
             $("cursor").before("\u00A0");
             break;
-        case 13: input(); break;
+     //   case 13: input(); break;
         default:
             if (e.keyCode > 32 && e.keyCode <= 255)
-                $("cursor").before(e.key);
+                input(e.key);
+                //$("cursor").before(e.key);
             break;
     }
 }
-function input() {
+function input(symb) {
     const inp = $("input");
     const line = inp.parentElement;
     let cmd = inp.innerText.trimRight();
@@ -36,15 +46,12 @@ function input() {
             method: 'POST',
             processData: false,
             headers: { 'Content-Type': 'application/json;charset=utf-8' },
-            body: JSON.stringify({ input: cmd }),
+            body: JSON.stringify({ input: symb }),
             signal: ctrl.signal
-        }).then(resp => resp.json()).then(lines => {
-            lines.forEach(l => $("console").insertAdjacentHTML("beforeend", "<div>" + l + "</div>"));
-            cursor();
         });
     }
     catch (e) {
-        alert("Не удалось отправить команду! " + e);
+        alert("Не удалось отправить строку! " + e);
     }
 }
 function cursor() {
@@ -62,10 +69,7 @@ function start() {
                             controller.close();
                             return;
                         }
-                        console.log(value, String.fromCharCode(...value));
-                        //for (int i = 0; i < value.length; i++) {
-                        //    $("console").innerText = "dddddddddddddd";
-                        //}
+                        $("console").insertAdjacentHTML("beforeend", utf8String(value)), 
                         push();
                     });
                 }

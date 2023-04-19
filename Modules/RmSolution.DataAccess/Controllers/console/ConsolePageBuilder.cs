@@ -26,10 +26,8 @@ namespace RmSolution.DataAccess
 
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
-            var lines = ReadLines(Array.Empty<byte>());
 
-            lines[lines.Length - 1] += "<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>";
-            _page.Append(string.Concat(lines.Select(r => string.Concat("<div>", r, "</div>"))));
+            _page.Append("<div id=\"input\"><span id=\"cursor\">&nbsp;</span></div>");
 
             _page.Append("</div></body></html>");
             return _page.ToString();
@@ -47,18 +45,14 @@ namespace RmSolution.DataAccess
 
         #endregion Private methods
 
-        public string[] ReadLines(byte[] data)
+        public byte[] Read()
         {
-            _sock.Send(data);
-            Task.Delay(250).Wait();
             var buf = new byte[1024];
             int cnt;
-            if (_sock.Available == 0) return Array.Empty<string>();
-
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
-            if (cnt == 0) return Array.Empty<string>();
+            if (cnt == 0) return Array.Empty<byte>();
 
             var resp = new byte[cnt];
             Array.Copy(buf, resp, cnt);
@@ -72,7 +66,7 @@ namespace RmSolution.DataAccess
                 }
                 break;
             }
-            return Encoding.UTF8.GetString(resp, start, resp.Length - start).Replace(" ", "&nbsp;").Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            return resp;
         }
     }
 }

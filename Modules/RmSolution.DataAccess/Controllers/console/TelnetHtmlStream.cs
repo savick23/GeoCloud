@@ -1,6 +1,6 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: TelnetStream – Выходной поток консоли телнет.
+// Описание: TelnetHtmlStream – Выходной поток консоли телнет.
 // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.DataAccess
@@ -9,12 +9,12 @@ namespace RmSolution.DataAccess
     using System.Text;
     #endregion Using
 
-    public class TelnetStream : Stream
+    public class TelnetHtmlStream : Stream
     {
         ConsolePageBuilder _sock;
         long _length = 0;
 
-        public TelnetStream(ConsolePageBuilder socket)
+        public TelnetHtmlStream(ConsolePageBuilder socket)
         {
             _sock = socket;
         }
@@ -31,10 +31,22 @@ namespace RmSolution.DataAccess
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var data = Encoding.UTF8.GetBytes("LETUNOVSKY SERGEY\r\n");
+            var data = _sock.Read();
+            int start;
+            for (start = 0; start < data.Length; start++)
+            {
+                if (data[start] == 255/*IAC*/)
+                {
+                    start += 2;
+                    continue;
+                }
+                break;
+            }
+            data = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(data, start, data.Length - start).Replace(" ", "&nbsp;").Replace("\r\n", "<br/>"));
             Array.Copy(data, buffer, data.Length);
-          //  _length += data.Length;
+            _length += data.Length;
             Position += data.Length;
+            Task.Delay(250).Wait();
             return data.Length;
         }
 

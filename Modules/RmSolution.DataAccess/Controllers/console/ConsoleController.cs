@@ -15,7 +15,7 @@ namespace RmSolution.DataAccess
         const string SESSION = "_sid";
         static Dictionary<string, ConsolePageBuilder> _telnet = new();
 
-        static TelnetStream? _stream;
+        static TelnetHtmlStream? _stream;
 
         public ConsoleController(IRuntime runtime) : base(runtime)
         {
@@ -31,7 +31,7 @@ namespace RmSolution.DataAccess
                 seckey = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString(SESSION, seckey);
                 _telnet.Add(seckey, new ConsolePageBuilder());
-                _stream = new TelnetStream(_telnet[seckey]);
+                _stream = new TelnetHtmlStream(_telnet[seckey]);
             }
             else seckey = HttpContext.Session.GetString(SESSION);
 
@@ -52,8 +52,7 @@ namespace RmSolution.DataAccess
         {
             if (_telnet.TryGetValue(HttpContext.Session.GetString(SESSION), out var console))
             {
-                var resp = console.ReadLines(Encoding.UTF8.GetBytes(form.Input + "\n"));
-                return new JsonResult(resp.Length > 0 && resp[0].Equals(form.Input) ? resp.Skip(1).ToArray() : resp);
+                return new JsonResult("OK");
             }
             return new JsonResult(Array.Empty<string>());
         });
