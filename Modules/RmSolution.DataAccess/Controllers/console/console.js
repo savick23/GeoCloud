@@ -10,16 +10,20 @@ const utf8String = (bytes) => {
 };
 function onKeyDown(e) {
     switch (e.keyCode) {
-        case 8: {
-            let inp = $("input");
-            let rng = document.createRange();
-            rng.selectNodeContents(inp);
-            let line = rng.toString();
-            rng.setStart(inp, line.length - 2);
-            rng.setEnd(inp, line.length - 1);
-            rng.deleteContents();
+        //case 8: {
+        //    let inp = $("input");
+        //    let rng = document.createRange();
+        //    rng.selectNodeContents(inp);
+        //    let line = rng.toString();
+        //    rng.setStart(inp, line.length - 2);
+        //    rng.setEnd(inp, line.length - 1);
+        //    rng.deleteContents();
+        //    break;
+        //}
+        case 16:
+        case 17:
+        case 18:
             break;
-        }
         default:
             input(e.key);
             break;
@@ -56,9 +60,15 @@ function start() {
                             controller.close();
                             return;
                         }
-                        if (value.length > 1 || value[0] !== 0)
-                            $("cursor").insertAdjacentHTML("beforebegin", utf8String(value));
-
+                        if (value.length > 1 || value[0] !== 0) {
+                            if (value[0] === 8) {
+                                let rng = document.createRange();
+                                rng.setEndBefore($("cursor"));
+                                rng.setStart($("console"), rng.endOffset - 1);
+                                rng.deleteContents();
+                            }
+                            else $("cursor").insertAdjacentHTML("beforebegin", utf8String(value));
+                        }
                         push();
                     });
                 }

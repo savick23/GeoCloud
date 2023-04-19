@@ -51,6 +51,9 @@ namespace RmSolution.DataAccess
                 case "Enter":
                     symb = "\r\n"u8.ToArray();
                     break;
+                case "Backspace":
+                    symb = "\x8"u8.ToArray();
+                    break;
                 default:
                     symb = Encoding.UTF8.GetBytes(input);
                     break;
