@@ -65,7 +65,7 @@ namespace RmSolution.DataAccess
         public byte[] Read()
         {
             if (_sock.Available == 0) return Array.Empty<byte>();
-            var buf = new byte[1024];
+            var buf = new byte[65535];
             int cnt;
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;

@@ -10,16 +10,6 @@ const utf8String = (bytes) => {
 };
 function onKeyDown(e) {
     switch (e.keyCode) {
-        //case 8: {
-        //    let inp = $("input");
-        //    let rng = document.createRange();
-        //    rng.selectNodeContents(inp);
-        //    let line = rng.toString();
-        //    rng.setStart(inp, line.length - 2);
-        //    rng.setEnd(inp, line.length - 1);
-        //    rng.deleteContents();
-        //    break;
-        //}
         case 16:
         case 17:
         case 18:
