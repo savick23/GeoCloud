@@ -57,16 +57,15 @@ function start() {
         return new ReadableStream({
             start(controller) {
                 function push() {
-                    // "done" is a Boolean and value a "Uint8Array"
                     return rd.read().then(({ done, value }) => {
-                        // Is there no more data to read?
                         if (done) {
                             controller.close();
                             return;
                         }
-                        // Get the data and send it to the browser via the controller
-                        controller.enqueue(value);
                         console.log(done, value);
+                        //for (int i = 0; i < value.length; i++) {
+                        //    $("console").innerText = "dddddddddddddd";
+                        //}
                         push();
                     });
                 }
