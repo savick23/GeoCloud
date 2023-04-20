@@ -96,7 +96,9 @@ namespace RmSolution.Runtime
                 { "^DEV\\s*$", ShowDevices },
                 { "^DEV\\s*\\d+", DoDeviceCommand },
                 { "^SYSTEMINFO$", ShowSystemInfo },
-                { "^TEST$", Test }
+                { "^TEST$", Test },
+                { "EXIT", (a, b, c) => Stop() },
+                { "QUIT", (a, b, c) => Stop() }
             };
             GetCpuUsage();
         }

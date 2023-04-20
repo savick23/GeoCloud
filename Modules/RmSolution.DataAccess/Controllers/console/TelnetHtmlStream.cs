@@ -37,17 +37,16 @@ namespace RmSolution.DataAccess
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            Task.Delay(100).Wait();
             var data = _sock.Read();
             if (data.Length == 0)
             {
                 buffer[0] = 0;
-                Task.Delay(100).Wait();
                 return 1;
             }
             Array.Copy(data, buffer, data.Length);
             _length += data.Length;
             Position += data.Length;
-            Task.Delay(100).Wait();
             return data.Length;
         }
 

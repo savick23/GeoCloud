@@ -73,7 +73,7 @@ namespace RmSolution.DataAccess
         int _port;
         Socket _sock;
         /// <summary> Кэш консольного вывода.</summary>
-        readonly StringBuilder _output = new();
+        readonly StringBuilder _output_cache = new();
 
         public TelnetHtmlStream? Output { get; private set; }
 
@@ -91,7 +91,7 @@ namespace RmSolution.DataAccess
             return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>").Append(title).Append("</title><style type=\"text/css\">")
                 .Append(GetResource("console.css")).Append("</style><script>")
                 .Append(GetResource("console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
-                .Append(_output)
+                .Append(_output_cache)
                 .Append("<span id=\"cursor\">&nbsp;</span></div></body></html>").ToString();
         }
 
@@ -123,11 +123,11 @@ namespace RmSolution.DataAccess
         {
             byte[] symb = _htmlkeys.TryGetValue(input, out byte[] bytes) ? bytes : Encoding.UTF8.GetBytes(input);
             _sock.Send(symb);
-            if (input == "Enter" && _output.Length > 32768)
+            if (input == "Enter" && _output_cache.Length > 32768)
                 for (int i = 0; i < 32768; i++)
-                    if (_output[i] == '<' && _output[++i] == 'b' && _output[++i] == 'r' && _output[++i] == '/' && _output[++i] == '>')
+                    if (_output_cache[i] == '<' && _output_cache[++i] == 'b' && _output_cache[++i] == 'r' && _output_cache[++i] == '/' && _output_cache[++i] == '>')
                     {
-                        _output.Remove(0, i + 1);
+                        _output_cache.Remove(0, i + 1);
                         break;
                     }
 
@@ -142,18 +142,8 @@ namespace RmSolution.DataAccess
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
-            int start;
-            for (start = 0; start < cnt; start++)
-            {
-                if (buf[start] == 255/*IAC*/)
-                {
-                    start += 2;
-                    continue;
-                }
-                break;
-            }
             var output = ToHtmlText(buf, cnt);
-            _output.Append(output);
+            _output_cache.Append(output);
             return Encoding.UTF8.GetBytes(output);
         }
 
