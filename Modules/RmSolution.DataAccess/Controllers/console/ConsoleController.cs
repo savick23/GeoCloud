@@ -15,8 +15,6 @@ namespace RmSolution.DataAccess
         const string SESSION = "_sid";
         static Dictionary<string, HttpConsoleHelper> _telnet = new();
 
-        static TelnetHtmlStream? _stream;
-
         public ConsoleController(IRuntime runtime) : base(runtime)
         {
         }
@@ -30,15 +28,14 @@ namespace RmSolution.DataAccess
             {
                 seckey = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString(SESSION, seckey);
-                _telnet.Add(seckey, new HttpConsoleHelper());
-                _stream = new TelnetHtmlStream(_telnet[seckey]);
+                _telnet.Add(seckey, new HttpConsoleHelper("127.0.0.1", 23));
             }
             else seckey = HttpContext.Session.GetString(SESSION);
 
             return new ContentResult()
             {
                 ContentType = "text/html",
-                Content = _telnet[seckey].GetPageContent()
+                Content = _telnet[seckey].GetPageContent("РМ ГЕО 3.1 - Консоль")
             };
         });
 
@@ -56,6 +53,7 @@ namespace RmSolution.DataAccess
 
         /// <summary> http://localhost:8087/api/console/read </summary>
         [HttpGet("console/[action]")]
-        public async Task<ActionResult> Read() => await Task.Run(() => File(_stream, "application/octet-stream", false));
+        public async Task<ActionResult> Read() => await Task.Run(() =>
+            File(_telnet[HttpContext.Session.GetString(SESSION)].Output, "application/octet-stream", false));
     }
 }

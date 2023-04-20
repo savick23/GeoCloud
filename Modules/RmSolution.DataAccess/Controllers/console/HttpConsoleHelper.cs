@@ -9,11 +9,13 @@ namespace RmSolution.DataAccess
     using System.Reflection;
     using System.Net.Sockets;
     using System.Net;
+    using Microsoft.AspNetCore.DataProtection;
+    using System.IO;
     #endregion Using
 
     public class HttpConsoleHelper
     {
-        #region Declarations
+        #region Constants
 
         static readonly Dictionary<string, byte[]> _htmlkeys = new()
         {
@@ -63,16 +65,30 @@ namespace RmSolution.DataAccess
             { "\u001b[39;49m", "color:white" }
         };
 
+        #endregion Constants
+
+        #region Declarations
+
+        string _host;
+        int _port;
         Socket _sock;
         /// <summary> Кэш консольного вывода.</summary>
         readonly StringBuilder _output = new();
 
+        public TelnetHtmlStream? Output { get; private set; }
+
         #endregion Declarations
 
-        public string GetPageContent()
+        public HttpConsoleHelper(string host, int port = 23)
+        {
+            _host = host;
+            _port = port;
+        }
+
+        public string GetPageContent(string title)
         {
             Connect();
-            return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>РМ ГЕО 3.1 - Консоль</title><style type=\"text/css\">")
+            return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>").Append(title).Append("</title><style type=\"text/css\">")
                 .Append(GetResource("console.css")).Append("</style><script>")
                 .Append(GetResource("console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
                 .Append(_output)
@@ -94,11 +110,14 @@ namespace RmSolution.DataAccess
             if (_sock == null)
             {
                 _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _sock.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 23));
+                _sock.Connect(new IPEndPoint(IPAddress.Parse(_host), _port));
+                Output = new TelnetHtmlStream(this);
             }
         }
 
         #endregion Private methods
+
+        #region Telnet read/write/encoding methods
 
         public bool Write(string input)
         {
@@ -197,5 +216,7 @@ namespace RmSolution.DataAccess
             }
             return res.ToString();
         }
+
+        #endregion Telnet read/write/encoding methods
     }
 }
