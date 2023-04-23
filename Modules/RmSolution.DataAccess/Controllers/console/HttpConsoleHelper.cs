@@ -50,21 +50,6 @@ namespace RmSolution.DataAccess
             { "F20", "\u001b[34~"u8.ToArray() }
         };
 
-        static readonly Dictionary<string, string> _appearance = new()
-        {
-            { "\u001b[30m", "color:black" },
-            { "\u001b[30m;1m", "color:darkgrey" },
-            { "\u001b[31;1m", "color:red" },
-            { "\u001b[32;1m", "color:green" },
-            { "\u001b[33;1m", "color:yellow" },
-            { "\u001b[34;1m", "color:blue" },
-            { "\u001b[35;1m", "color:magenta" },
-            { "\u001b[36;1m", "color:cyan" },
-            { "\u001b[37;1m", "color:white" },
-            { "\u001b[37;0m", "color:whitesmoke" },
-            { "\u001b[39;49m", "color:white" }
-        };
-
         #endregion Constants
 
         #region Declarations
@@ -72,8 +57,6 @@ namespace RmSolution.DataAccess
         string _host;
         int _port;
         Socket _sock;
-        /// <summary> Кэш консольного вывода.</summary>
-        readonly StringBuilder _output_cache = new();
 
         public TelnetHtmlStream? Output { get; private set; }
 
@@ -91,7 +74,7 @@ namespace RmSolution.DataAccess
             return new StringBuilder("<!DOCTYPE html><html lang=\"ru\"><head><meta charset=\"utf-8\"><title>").Append(title).Append("</title><style type=\"text/css\">")
                 .Append(GetResource("console.css")).Append("</style><script>")
                 .Append(GetResource("console.js")).Append("</script></head><body onload=\"start()\" onkeydown=\"onKeyDown(event)\"><div id=\"console\">")
-                .Append(_output_cache)
+                .Append(Output?.ToString())
                 .Append("<span id=\"cursor\">&nbsp;</span></div></body></html>").ToString();
         }
 
@@ -117,20 +100,12 @@ namespace RmSolution.DataAccess
 
         #endregion Private methods
 
-        #region Telnet read/write/encoding methods
+        #region Telnet read/write methods
 
         public bool Write(string input)
         {
-            byte[] symb = _htmlkeys.TryGetValue(input, out byte[] bytes) ? bytes : Encoding.UTF8.GetBytes(input);
-            _sock.Send(symb);
-            if (input == "Enter" && _output_cache.Length > 32768)
-                for (int i = 0; i < 32768; i++)
-                    if (_output_cache[i] == '<' && _output_cache[++i] == 'b' && _output_cache[++i] == 'r' && _output_cache[++i] == '/' && _output_cache[++i] == '>')
-                    {
-                        _output_cache.Remove(0, i + 1);
-                        break;
-                    }
-
+            _sock.Send(_htmlkeys.TryGetValue(input, out byte[] bytes) ? bytes : Encoding.UTF8.GetBytes(input));
+            Output?.Flush();
             return true;
         }
 
@@ -142,71 +117,9 @@ namespace RmSolution.DataAccess
             while ((cnt = _sock.Receive(buf, 0, buf.Length, SocketFlags.None)) > 0)
                 if (_sock.Available == 0) break;
 
-            var output = ToHtmlText(buf, cnt);
-            _output_cache.Append(output);
-            return Encoding.UTF8.GetBytes(output);
+            return buf[..cnt];
         }
 
-        static string ToHtmlText(byte[] buffer, int count)
-        {
-            var res = new StringBuilder();
-            bool isspan = false;
-            for (int i = 0; i < count; i++)
-            {
-                var c = buffer[i];
-                switch (c)
-                {
-                    case 32:
-                        res.Append("&nbsp;");
-                        break;
-
-                    case 13:
-                        if (buffer[i + 1] == 10)
-                        {
-                            res.Append("<br/>");
-                            i++;
-                        }
-                        break;
-
-                    case 27:
-                        for (int j = i + 1; j < count; j++)
-                        {
-                            if (buffer[j] == 109) // m
-                            {
-                                if (isspan)
-                                    res.Append("</span>");
-                                else
-                                    res.Append("<span style=\"").Append(_appearance[Encoding.UTF8.GetString(buffer[i..(j + 1)])]).Append("\">");
-
-                                i += j - i;
-                                isspan = !isspan;
-                                break;
-                            }
-                        }
-                        break;
-
-                    case 255: /*IAC*/
-                        i += 2;
-                        break;
-
-                    case 208: // UTF-8 (RU)
-                    case 209: // UTF-8 (RU)
-                        res.Append(Encoding.UTF8.GetString(buffer, i++, 2));
-                        break;
-
-                    case 226: // mnemo
-                        res.Append(Encoding.UTF8.GetString(buffer, i, 3));
-                        i += 2;
-                        break;
-
-                    default:
-                        res.Append((char)c);
-                        break;
-                }
-            }
-            return res.ToString();
-        }
-
-        #endregion Telnet read/write/encoding methods
+        #endregion Telnet read/write methods
     }
 }
