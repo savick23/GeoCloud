@@ -8,10 +8,14 @@ namespace RmSolution.Devices
 {
     #region Using
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.Metrics;
     using System.Globalization;
     using System.Linq;
+    using System.Runtime.Intrinsics.Arm;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Threading.Channels;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
     #endregion Using
@@ -22,6 +26,9 @@ namespace RmSolution.Devices
     public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
         #region Declarations
+
+        /// <summary> Standard intensity of beep expressed as a percentage.</summary>
+        const short IOS_BEEP_STDINTENS = 100;
 
         /// <summary> При посылке в начале строки (не обязательно), отчищает входной буфер команд на устройстве.</summary>
         readonly static byte[] LF = new byte[] { 0x0a };
@@ -124,6 +131,126 @@ namespace RmSolution.Devices
                 { "Температура прибора, °C", CSV_GetIntTemp() }
             };
         }
+
+        #region BASIC APPLICATIONS (BAP CONF)
+
+        /// <summary> Getting the EDM type.</summary>
+        /// <remarks> Gets the current EDM type for distance measurements (Reflector (IR) or Reflectorless (RL)).</remarks>
+        /// <returns> Actual target type.</returns>
+        /// <example> mod3 call 000001 BAP_GetTargetType </example>
+        [COMF]
+        public BAP_TARGET_TYPE? BAP_GetTargetType()
+        {
+            var resp = Request(RequestString("%R1Q,17022:"));
+            if (resp.ReturnCode == GRC.OK)
+                return (BAP_TARGET_TYPE)resp.Value[0];
+
+            return null;
+        }
+
+        /// <summary> Setting the EDM type.</summary>
+        /// <remarks> Sets the current EDM type for distance measurements (Reflector (IR) or Reflectorless (RL)).<br/>For each EDM type the last used EDM mode is remembered and activated if the EDM type is changed.<br/>If EDM type IR is selected the last used Automation mode is automatically activated.<br/>BAP_SetMeasPrg can also change the target type.<br/>EDM type RL is not available on all instrument types.</remarks>
+        /// <param name="targetType"> Target type </param>
+        /// <example> mod3 call 000001 BAP_SetTargetType </example>
+        [COMF]
+        public bool BAP_SetTargetType(BAP_TARGET_TYPE targetType)
+        {
+            var resp = Request(RequestString("%R1Q,17021:", targetType));
+            return resp.ReturnCode == GRC.OK;
+        }
+
+        /// <summary> Getting the default prism type.</summary>
+        /// <remarks> Gets the current prism type.</remarks>
+        /// <returns> Actual prism type.</returns>
+        /// <example> mod3 call 000001 BAP_GetPrismType </example>
+        [COMF]
+        public BAP_PRISMTYPE? BAP_GetPrismType()
+        {
+            var resp = Request(RequestString("%R1Q,17009:"));
+            if (resp.ReturnCode == GRC.OK)
+                return (BAP_PRISMTYPE)resp.Value[0];
+
+            return null;
+        }
+
+        /// <summary> Setting the default prism type.</summary>
+        /// <remarks> Sets the prism type for measurements with a reflector. It overwrites the prism constant, set by TMC_SetPrismCorr.</remarks>
+        /// <param name="prismType"> Prism type </param>
+        /// <example> mod3 call 000001 BAP_SetPrismType </example>
+        [COMF]
+        public bool BAP_SetPrismType(BAP_PRISMTYPE prismType)
+        {
+            var resp = Request(RequestString("%R1Q,17008:", prismType));
+            return resp.ReturnCode == GRC.OK;
+        }
+
+        /// <summary> Getting the default or user prism type.</summary>
+        /// <remarks> Gets the current prism type and name.</remarks>
+        /// <example> mod3 call 000001 BAP_GetPrismType2 </example>
+        [COMF]
+        public KeyValuePair<long, string>? BAP_GetPrismType2()
+        {
+            var resp = Request(RequestString("%R1Q,17031:"));
+            if (resp.ReturnCode == GRC.OK)
+                return new KeyValuePair<long, string>(resp.Value[0], resp.Value[1].ToString());
+
+            return null;
+        }
+
+        #endregion BASIC APPLICATIONS (BAP CONF)
+
+        #region BASIC MAN MACHINE INTERFACE (BMM COMF)
+
+        /// <summary> Outputing an alarm signal (triple beep).</summary>
+        /// <remarks> This function produces a triple beep with the configured intensity and frequency, which cannot be changed. If there is a continuous signal active, it will be stopped before.</remarks>
+        /// <example> mod3 call 000001 BMM_BeepAlarm </example>
+        public ZResponse BMM_BeepAlarm()
+        {
+            var resp = Request(RequestString("%R1Q,11004:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        /// <summary> Outputing an alarm signal (single beep).</summary>
+        /// <remarks> This function produces a single beep with the configured intensity and frequency, which cannot be changed. If a continuous signal is active, it will be stopped first.</remarks>
+        /// <example> mod3 call 000001 BMM_BeepNormal </example>
+        public ZResponse BMM_BeepNormal()
+        {
+            var resp = Request(RequestString("%R1Q,11003:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        /// <summary> Starting a continuous beep signal.</summary>
+        /// <remarks> This function switches on the beep-signal with the intensity nIntens. If a continuous signal is active, it will be stopped first.Turn off the beeping device with IOS_BeepOff.</remarks>
+        /// <param name="intens">Intensity of the beep-signal (volume) expressed as a percentage(0-100 %).</param>
+        /// <example> mod3 call 000001 IOS_BeepOn </example>
+        public ZResponse IOS_BeepOn(int intens = IOS_BEEP_STDINTENS)
+        {
+            var resp = Request(RequestString("%R1Q,20001:", intens));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        /// <summary> Stopping an active beep signal.</summary>
+        /// <remarks> This function switches off the beep-signal.</remarks>
+        /// <example> mod3 call 000001 IOS_BeepOff </example>
+        public ZResponse IOS_BeepOff()
+        {
+            var resp = Request(RequestString("%R1Q,20000:"));
+            if (resp.ReturnCode == GRC.OK)
+            {
+            }
+            return resp;
+        }
+
+        #endregion BASIC MAN MACHINE INTERFACE (BMM COMF)
 
         #region COMMUNICATIONS (COM COMF)
 

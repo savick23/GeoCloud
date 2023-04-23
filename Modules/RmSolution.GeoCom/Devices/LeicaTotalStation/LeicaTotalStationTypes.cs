@@ -26,6 +26,46 @@ namespace RmSolution.Devices.Leica
         COM_TPS_STARTUP_REMOTE = 1
     }
 
+    /// <summary> Target types.</summary>
+    public enum BAP_TARGET_TYPE
+    {
+        /// <summary> With reflector </summary>
+        BAP_REFL_USE = 0,
+        /// <summary> Without reflector </summary>
+        BAP_REFL_LESS = 1
+    }
+
+    /// <summary> Prism types.</summary>
+    public enum BAP_PRISMTYPE
+    {
+        /// <summary> Leica Circular Prism </summary>
+        BAP_PRISM_ROUND = 0,
+        /// <summary> Leica Mini Prism </summary>
+        BAP_PRISM_MINI = 1,
+        /// <summary> Leica Reflector Tape </summary>
+        BAP_PRISM_TAPE = 2,
+        /// <summary> Leica 360º Prism </summary>
+        BAP_PRISM_360 = 3,
+        /// <summary> not supported by TPS1200 </summary>
+        BAP_PRISM_USER1 = 4,
+        /// <summary> not supported by TPS1200 </summary>
+        BAP_PRISM_USER2 = 5,
+        /// <summary> not supported by TPS1200 </summary>
+        BAP_PRISM_USER3 = 6,
+        /// <summary> Leica Mini 360º Prism </summary>
+        BAP_PRISM_360_MINI = 7,
+        /// <summary> Leica Mini Zero Prism </summary>
+        BAP_PRISM_MINI_ZERO = 8,
+        /// <summary> User Defined Prism </summary>
+        BAP_PRISM_USER = 9,
+        /// <summary> Leica HDS Target </summary>
+        BAP_PRISM_NDS_TAPE = 10,
+        /// <summary> GRZ121 360º Prism for Machine Guidance </summary>
+        BAP_PRISM_GRZ121_ROUND = 11,
+        /// <summary> MPR122 360º Prism for Machine Guidance </summary>
+        BAP_PRISM_MA_MPR122 = 12
+    };
+
     /// <summary> TPS Device Precision Class </summary>
     public enum TPS_DEVICE_CLASS
     {

@@ -1,5 +1,14 @@
 ﻿Поддерживаемые функции:
 ----------------------------------------------
+BAP_GetTargetType
+BAP_SetTargetType
+BAP_GetPrismType
+BAP_SetPrismType
+BAP_GetPrismType2
+BMM_BeepAlarm
+BMM_BeepNormal
+IOS_BeepOn
+IOS_BeepOff
 COM_GetSWVersion
 COM_SwitchOnTPS
 COM_SwitchOffTPS
