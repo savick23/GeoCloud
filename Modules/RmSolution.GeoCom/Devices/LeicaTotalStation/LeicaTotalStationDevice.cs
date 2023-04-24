@@ -29,6 +29,8 @@ namespace RmSolution.Devices
 
         /// <summary> Standard intensity of beep expressed as a percentage.</summary>
         const short IOS_BEEP_STDINTENS = 100;
+        /// <summary> Prism name length.</summary>
+        const int BAP_PRISMNAME_LEN = 16;
 
         /// <summary> При посылке в начале строки (не обязательно), отчищает входной буфер команд на устройстве.</summary>
         readonly static byte[] LF = new byte[] { 0x0a };
@@ -188,11 +190,47 @@ namespace RmSolution.Devices
         /// <remarks> Gets the current prism type and name.</remarks>
         /// <example> mod3 call 000001 BAP_GetPrismType2 </example>
         [COMF]
-        public KeyValuePair<long, string>? BAP_GetPrismType2()
+        public KeyValuePair<BAP_PRISMTYPE, string>? BAP_GetPrismType2()
         {
             var resp = Request(RequestString("%R1Q,17031:"));
             if (resp.ReturnCode == GRC.OK && resp.Values.Length == 2)
-                return new KeyValuePair<long, string>((long)resp.Values[0], resp.Values[1].ToString());
+                return new KeyValuePair<BAP_PRISMTYPE, string>((BAP_PRISMTYPE)resp.Values[0], resp.Values[1].ToString());
+
+            return null;
+        }
+
+        /// <summary> Setting the default prism type.</summary>
+        /// <remarks> Sets the prism type for measurements with a reflector. It overwrites the prism constant, set by TMC_SetPrismCorr.</remarks>
+        /// <param name="prismType"> Prism type </param>
+        /// <param name="prismName"> Prism name. Required if prism type is BAP_PRISM_USER.</param>
+        /// <example> mod3 call 000001 BAP_SetPrismType2 </example>
+        [COMF]
+        public bool BAP_SetPrismType2(BAP_PRISMTYPE prismType, string prismName)
+        {
+            var resp = Request(RequestString("%R1Q,17030:", prismType, prismName));
+            return resp.ReturnCode == GRC.IVPARAM
+                ? throw new LeicaException(resp.ReturnCode, "Prism type is not available, i.e. a user prism is not defined.")
+                : resp.ReturnCode == GRC.OK;
+        }
+
+        /// <summary> Getting the default prism definition.</summary>
+        /// <remarks> Get the definition of a default prism.</remarks>
+        /// <param name="prismType"> Prism type </param>
+        /// <example> mod3 call 000001 BAP_GetPrismDef </example>
+        [COMF]
+        public BAP_PRISMDEF? BAP_GetPrismDef(BAP_PRISMTYPE prismType)
+        {
+            var resp = Request(RequestString("%R1Q,17023:"));
+            if (resp.ReturnCode == GRC.IVPARAM)
+                throw new LeicaException(resp.ReturnCode, "Invalid prism type.");
+
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 3)
+                return new BAP_PRISMDEF()
+                {
+                    Name = resp.Values[0].ToString(),
+                    AddConst = double.Parse(resp.Values[1].ToString()),
+                    ReflType = (BAP_REFLTYPE)resp.Values[2]
+                };
 
             return null;
         }
@@ -501,14 +539,17 @@ namespace RmSolution.Devices
         static string ToByte(int n) => string.Concat('\'', n.ToString("x2"), '\'');
 
         /// <summary> Формирование ASCII строки данных для отправки на устройство.</summary>
-        static byte[] RequestString(params object[] data) =>
-            LF.Concat(Encoding.ASCII.GetBytes(string.Concat(data.Select(p =>
+        static byte[] RequestString(string command, params object[] data) =>
+            LF.Concat(Encoding.ASCII.GetBytes(command + string.Join(',', data.Where(p => p != null).Select(p =>
             {
                 if (p.GetType().IsEnum)
-                    return (int)p;
+                    return (long)p; // Типы прибора Leica x64
 
                 if (p is DateTime dt)
                     return string.Join(',', dt.Year, ToByte(dt.Month), ToByte(dt.Day), ToByte(dt.Hour), ToByte(dt.Minute), ToByte(dt.Second));
+
+                if (p is string)
+                    return string.Concat('"', p, '"');
 
                 return p;
             }
@@ -580,6 +621,7 @@ namespace RmSolution.Devices
                         .Select(ret =>
                             ret.StartsWith('"'/*string*/) ? (object)ret[1..^1] :
                             ret.StartsWith('\''/*byte*/) ? long.Parse(ret[1..^1], NumberStyles.HexNumber) :
+                            ret.Contains('.') ? double.Parse(ret, CultureInfo.InvariantCulture) :
                             long.TryParse(ret, out var val) ? val : -1L
                         ).ToArray();
 

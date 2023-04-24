@@ -5,6 +5,8 @@ BAP_SetTargetType
 BAP_GetPrismType
 BAP_SetPrismType
 BAP_GetPrismType2
+BAP_SetPrismType2
+BAP_GetPrismDef
 BMM_BeepAlarm
 BMM_BeepNormal
 IOS_BeepOn

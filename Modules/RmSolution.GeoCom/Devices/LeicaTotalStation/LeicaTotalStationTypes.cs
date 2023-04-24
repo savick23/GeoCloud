@@ -8,6 +8,8 @@ namespace RmSolution.Devices.Leica
     using System;
     #endregion Using
 
+    #region Enums
+
     /// <summary> Stop Mode </summary>
     public enum COM_TPS_STOP_MODE : long
     {
@@ -34,6 +36,37 @@ namespace RmSolution.Devices.Leica
         /// <summary> Without reflector </summary>
         BAP_REFL_LESS = 1
     }
+
+    /// <summary> On/off switch type </summary>
+    public enum ON_OFF_TYPE : long
+    {
+        OFF = 0,
+        ON = 1
+    }
+
+    /// <summary> Intensity of Electronic Guidelight </summary>
+    public enum EDM_EGLINTENSITY_TYPE : long
+    {
+        OFF = 0,
+        LOW = 1,
+        MID = 2,
+        HIGH = 3
+    }
+
+    /// <summary> Reflector type definition.</summary>
+    public enum BAP_REFLTYPE : long
+    {
+        /// <summary> reflector not defined </summary>
+        BAP_REFL_UNDEF = 0,
+        /// <summary> reflector prism </summary>
+        BAP_REFL_PRISM = 1,
+        /// <summary> reflector tape </summary>
+        BAP_REFL_TAPE = 2
+    };
+
+    #endregion Enums
+
+    #region Structures
 
     /// <summary> Prism types.</summary>
     public enum BAP_PRISMTYPE : long
@@ -234,19 +267,30 @@ namespace RmSolution.Devices.Leica
         { }
     }
 
-    /// <summary> On/off switch type </summary>
-    public enum ON_OFF_TYPE : long
+    /// <summary> Prism definition.</summary>
+    public struct BAP_PRISMDEF
     {
-        OFF = 0,
-        ON = 1
+        /// <summary> Name (16 characters).</summary>
+        public string Name;
+        /// <summary> Prism correction.</summary>
+        public double AddConst;
+        /// <summary> Reflector type.</summary>
+        public BAP_REFLTYPE ReflType;
     }
 
-    /// <summary> Intensity of Electronic Guidelight </summary>
-    public enum EDM_EGLINTENSITY_TYPE : long
+    #endregion Structures
+
+    #region Exceptions
+
+    public class LeicaException : Exception
     {
-        OFF = 0,
-        LOW = 1,
-        MID = 2,
-        HIGH = 3
+        public GRC Code { get; }
+
+        public LeicaException(GRC returnCode, string message) : base(message)
+        {
+            Code = returnCode;
+        }
     }
+
+    #endregion Exceptions
 }

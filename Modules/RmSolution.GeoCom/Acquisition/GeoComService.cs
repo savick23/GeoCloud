@@ -218,7 +218,7 @@ namespace RmSolution.GeoCom
         void CallDeviceFunction(string idDevice, string[] args)
         {
             var dev = (IDeviceConnection)FindDevice(idDevice);
-            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public) is MethodInfo call
+            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase) is MethodInfo call
                 && (call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttributes(typeof(COMFAttribute)) != null))
             {
                 var parameters = call.GetParameters();
@@ -230,6 +230,8 @@ namespace RmSolution.GeoCom
                     var val = args[i + 1];
                     if (prm.ParameterType.IsEnum)
                         prms[i] = Enum.TryParse(prm.ParameterType, val, true, out var eval) ? eval : Activator.CreateInstance(prm.ParameterType);
+                    else
+                        prms[i] = val;
 
                     i++;
                 }
