@@ -257,6 +257,21 @@ namespace RmSolution.Devices.Leica
         TPS_REFLESS_R1000 = 4
     }
 
+    /// <summary> ATR low vis mode definition.</summary>
+    public enum BAP_ATRSETTING : long
+    {
+        /// <summary> ATR is using no special flags or modes.</summary>
+        BAP_ATRSET_NORMAL = 0,
+        /// <summary> ATR low vis mode on.</summary>
+        BAP_ATRSET_LOWVIS_ON = 1,
+        /// <summary> ATR low vis mode always on.</summary>
+        BAP_ATRSET_LOWVIS_AON = 2,
+        /// <summary> ATR high reflectivity mode on.</summary>
+        BAP_ATRSET_SRANGE_ON = 3,
+        /// <summary> ATR high reflectivity mode always on.</summary>
+        BAP_ATRSET_SRANGE_AON = 4
+    }
+
     #endregion Enums
 
     #region Structures
@@ -325,18 +340,4 @@ namespace RmSolution.Devices.Leica
     }
 
     #endregion Structures
-
-    #region Exceptions
-
-    public class LeicaException : Exception
-    {
-        public GRC Code { get; }
-
-        public LeicaException(GRC returnCode, string message) : base(message)
-        {
-            Code = returnCode;
-        }
-    }
-
-    #endregion Exceptions
 }

@@ -13,6 +13,9 @@ BAP_GetMeasPrg
 BAP_SetMeasPrg
 BAP_MeasDistanceAngle
 BAP_SearchTarget
+BAP_GetATRSetting
+BAP_SetATRSetting
+BAP_GetRedATRFov
 BMM_BeepAlarm
 BMM_BeepNormal
 IOS_BeepOn

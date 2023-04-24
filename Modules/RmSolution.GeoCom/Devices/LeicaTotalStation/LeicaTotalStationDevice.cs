@@ -383,6 +383,43 @@ namespace RmSolution.Devices
             return false;
         }
 
+        /// <summary> Getting the current ATR low vis mode.</summary>
+        /// <remarks> Gets the current low vis mode.</remarks>
+        /// <example> mod3 call 000001 BAP_GetATRSetting </example>
+        [COMF]
+        public BAP_ATRSETTING? BAP_GetATRSetting()
+        {
+            var resp = Request(RequestString("%R1Q,17034:"));
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
+                return (BAP_ATRSETTING)resp.Values[0];
+
+            return null;
+        }
+
+        /// <summary> Setting the current ATR low vis mode.</summary>
+        /// <remarks> Sets the current low vis mode.</remarks>
+        /// <example> mod3 call 000001 BAP_SetATRSetting </example>
+        [COMF]
+        public bool BAP_SetATRSetting(BAP_ATRSETTING ATRSetting)
+        {
+            var resp = Request(RequestString("%R1Q,17035:", ATRSetting));
+            return resp.ReturnCode == GRC.OK;
+        }
+
+        /// <summary> Getting the reduced ATR field of view.</summary>
+        /// <remarks> Get reduced ATR field of view mode.</remarks>
+        /// <returns> ON: ATR uses reduced field of view(about 1/9).<br/>OFF: ATR uses full field of view.</returns>
+        /// <example> mod3 call 000001 BAP_GetRedATRFov </example>
+        [COMF]
+        public ON_OFF_TYPE? BAP_GetRedATRFov()
+        {
+            var resp = Request(RequestString("%R1Q,17036:"));
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
+                return (ON_OFF_TYPE)resp.Values[0];
+
+            return null;
+        }
+
         #endregion BASIC APPLICATIONS (BAP CONF)
 
         #region BASIC MAN MACHINE INTERFACE (BMM COMF)
