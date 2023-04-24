@@ -10,6 +10,9 @@ BAP_GetPrismDef
 BAP_GetUserPrismDef
 BAP_SetUserPrismDef
 BAP_GetMeasPrg
+BAP_SetMeasPrg
+BAP_MeasDistanceAngle
+BAP_SearchTarget
 BMM_BeepAlarm
 BMM_BeepNormal
 IOS_BeepOn

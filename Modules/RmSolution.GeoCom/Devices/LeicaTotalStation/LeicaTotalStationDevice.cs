@@ -292,6 +292,97 @@ namespace RmSolution.Devices
             return null;
         }
 
+        /// <summary> Setting the distance measurement program.</summary>
+        /// <remarks> Defines the distance measurement program i.e. for BAP_MeasDistanceAngle.<br/>RL EDM type programs are not available on all instrument types.<br/>Changing the measurement programs may change the EDM type as well(Reflector (IR) and Reflectorless (RL)).</remarks>
+        /// <example> mod3 call 000001 BAP_SetMeasPrg </example>
+        [COMF]
+        public bool BAP_SetMeasPrg(BAP_USER_MEASPRG measPrg)
+        {
+            var resp = Request(RequestString("%R1Q,17019:", measPrg));
+            return (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Measurement program is not available."),
+                _ => resp.ReturnCode == GRC.OK
+            };
+        }
+
+        /// <summary> Measuring Hz,V angles and a single distance.</summary>
+        /// <remarks> This function measures angles and a single distance depending on the mode DistMode. Note that this function is not suited for continuous measurements(LOCK mode and TRK mode). This command uses the current automation settings.</remarks>
+        /// <param name="distMode"> BAP_DEF_DIST uses the predefined distance measurement program as defined in BAP_SetMeasPrg.</param>
+        /// <returns> Horizontal angel [rad]<br/>Vertical angel [rad]<br/>Slopedistance [rad]<br/>Actual distance measurement mode.</returns>
+        /// <example> mod3 call 000001 BAP_MeasDistanceAngle </example>
+        [COMF]
+        public BAP_MEASURE_PRG? BAP_MeasDistanceAngle(BAP_MEASURE_PRG distMode, out double Hz, out double V, out double dist)
+        {
+            var resp = Request(RequestString("%R1Q,17017:", distMode));
+            switch (resp.ReturnCode)
+            {
+                case GRC.IVPARAM: throw new LeicaException(resp.ReturnCode, "Wrong value for DistMode!");
+                case GRC.ABORT: throw new LeicaException(resp.ReturnCode, "Measurement aborted!");
+                case GRC.SHUT_DOWN: throw new LeicaException(resp.ReturnCode, "System has been stopped!");
+                case GRC.COM_TIMEDOUT: throw new LeicaException(resp.ReturnCode, "Error, communication timeout. (possibly increase COM timeout, see COM_SetTimeout)");
+
+                case GRC.AUT_ANGLE_ERROR: throw new LeicaException(resp.ReturnCode, "Angle measurement error.");
+                case GRC.AUT_BAD_ENVIRONMENT: throw new LeicaException(resp.ReturnCode, "Bad Environment conditions.");
+                case GRC.AUT_CALACC: throw new LeicaException(resp.ReturnCode, "ATR-calibration failed.");
+                case GRC.AUT_DETECTOR_ERROR: throw new LeicaException(resp.ReturnCode, "Error in target acquisition.");
+                case GRC.AUT_DEV_ERROR: throw new LeicaException(resp.ReturnCode, "Deviation measurement error.");
+                case GRC.AUT_INCACC: throw new LeicaException(resp.ReturnCode, "Position not exactly reached.");
+                case GRC.AUT_MOTOR_ERROR: throw new LeicaException(resp.ReturnCode, "Motorization error.");
+                case GRC.AUT_MULTIPLE_TARGETS: throw new LeicaException(resp.ReturnCode, "Multiple targets detected.");
+                case GRC.AUT_NO_TARGET: throw new LeicaException(resp.ReturnCode, "No target detected.");
+                case GRC.AUT_TIMEOUT: throw new LeicaException(resp.ReturnCode, "Position not reached.");
+
+                case GRC.TMC_DIST_PPM: throw new LeicaException(resp.ReturnCode, "PPM or MM should be switched off when EDM is on -> no results!");
+                case GRC.TMC_DIST_ERROR: throw new LeicaException(resp.ReturnCode, "Error occured during distance measurement!");
+                case GRC.TMC_ANGLE_ERROR: throw new LeicaException(resp.ReturnCode, "Error occured while slope was measured!");
+                case GRC.TMC_BUSY: throw new LeicaException(resp.ReturnCode, "TMC is busy!");
+                case GRC.TMC_ANGLE_OK: throw new LeicaException(resp.ReturnCode, "Angle without coordinates!");
+                case GRC.TMC_ACCURACY_GUARANTEE: throw new LeicaException(resp.ReturnCode, "Info, accuracy cannot be guaranteed.");
+                case GRC.TMC_ANGLE_NO_ACC_GUARANTY: throw new LeicaException(resp.ReturnCode, "Info, only angle measurement valid, accuracy cannot be guaranteed.");
+                case GRC.TMC_ANGLE_NOT_FULL_CORR: throw new LeicaException(resp.ReturnCode, "Warning, only angle measurement valid, accuracy cannot be guaranteed.");
+                case GRC.TMC_NO_FULL_CORRECTION: throw new LeicaException(resp.ReturnCode, "Warning, measurement without full correction.");
+                case GRC.TMC_SIGNAL_ERROR: throw new LeicaException(resp.ReturnCode, "Error, no signal on EDM (only in signal mode).");
+
+                case GRC.OK:
+                    if (resp.Values.Length == 4)
+                    {
+                        Hz = double.Parse(resp.Values[0].ToString());
+                        V = double.Parse(resp.Values[1].ToString());
+                        dist = double.Parse(resp.Values[2].ToString());
+                        return (BAP_MEASURE_PRG)resp.Values[3];
+                    }
+                    break;
+            }
+            Hz = V = dist = 0;
+            return null;
+        }
+
+        /// <summary> Searching the target.</summary>
+        /// <remarks> This function searches for a target in the configured or defined ATR SearchWindow. The functionality is only available for automated instruments.</remarks>
+        /// <param name="dummy"> It’s reserved for future use, set bDummy always to FALSE.</param>
+        /// <example> mod3 call 000001 BAP_SearchTarget </example>
+        [COMF]
+        public bool BAP_SearchTarget(bool dummy = false)
+        {
+            var resp = Request(RequestString("%R1Q,17020:", dummy));
+            switch (resp.ReturnCode)
+            {
+                case GRC.AUT_BAD_ENVIRONMENT: throw new LeicaException(resp.ReturnCode, "Bad Environment conditions.");
+                case GRC.AUT_DEV_ERROR: throw new LeicaException(resp.ReturnCode, "Deviation measurement error.");
+                case GRC.AUT_ACCURACY: throw new LeicaException(resp.ReturnCode, "Position not exactly reached.");
+                case GRC.AUT_MOTOR_ERROR: throw new LeicaException(resp.ReturnCode, "Motorization error.");
+                case GRC.AUT_MULTIPLE_TARGETS: throw new LeicaException(resp.ReturnCode, "Multiple targets detected.");
+                case GRC.AUT_NO_TARGET: throw new LeicaException(resp.ReturnCode, "No target detected.");
+                case GRC.AUT_TIMEOUT: throw new LeicaException(resp.ReturnCode, "Time out, no target found.");
+                case GRC.ABORT: throw new LeicaException(resp.ReturnCode, "Error, searching aborted.");
+                case GRC.FATAL: throw new LeicaException(resp.ReturnCode, "Fatal Error.");
+                case GRC.OK:
+                    return true;
+            }
+            return false;
+        }
+
         #endregion BASIC APPLICATIONS (BAP CONF)
 
         #region BASIC MAN MACHINE INTERFACE (BMM COMF)
@@ -613,6 +704,9 @@ namespace RmSolution.Devices
 
                 if (p is double pd)
                     return pd.ToString(CultureInfo.InvariantCulture);
+
+                if (p is bool pb)
+                    return pb ? "1" : "0";
 
                 return p;
             }

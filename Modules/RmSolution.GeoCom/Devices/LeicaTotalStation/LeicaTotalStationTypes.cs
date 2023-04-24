@@ -64,10 +64,6 @@ namespace RmSolution.Devices.Leica
         BAP_REFL_TAPE = 2
     };
 
-    #endregion Enums
-
-    #region Structures
-
     /// <summary> Prism types.</summary>
     public enum BAP_PRISMTYPE : long
     {
@@ -127,6 +123,21 @@ namespace RmSolution.Devices.Leica
         /// <summary> IR Precise (TS30,TM30) </summary>
         BAP_SINGLE_REF_PRECISE = 11
     };
+
+    /// <summary> Measurement Modes.</summary>
+    public enum BAP_MEASURE_PRG
+    {
+        /// <summary> no measurements, take last one </summary>
+        BAP_NO_MEAS = 0,
+        /// <summary> no dist. measurement, angles only </summary>
+        BAP_NO_DIST = 1,
+        /// <summary> default distance measurements, pre-defined using BAP_SetMeasPrg </summary>
+        BAP_DEF_DIST = 2,
+        /// <summary> clear distances </summary>
+        BAP_CLEAR_DIST = 5,
+        /// <summary> stop tracking </summary>
+        BAP_STOP_TRK = 6
+    }
 
     /// <summary> TPS Device Precision Class </summary>
     public enum TPS_DEVICE_CLASS : long
@@ -246,6 +257,10 @@ namespace RmSolution.Devices.Leica
         TPS_REFLESS_R1000 = 4
     }
 
+    #endregion Enums
+
+    #region Structures
+
     /// <summary> TPS Device Configuration Type </summary>
     public struct TPS_DEVICE
     {
@@ -256,7 +271,7 @@ namespace RmSolution.Devices.Leica
     };
 
     /// <summary> General Date and Time </summary>
-    internal struct DATIME
+    public struct DATIME
     {
         public DATE_TYPE Date;
         public TIME_TYPE Time;
