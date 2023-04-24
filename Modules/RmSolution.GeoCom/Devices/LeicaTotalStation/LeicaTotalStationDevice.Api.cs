@@ -1,6 +1,7 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: LeicaTotalStationDevice – Тахеометр Leica. Встроенные функции прибора.
+// Документация: Leica TPS1200+ Leica TS30/TM30 GeoCOM Reference Manual Version 1.50 
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Devices
 {
@@ -12,8 +13,11 @@ namespace RmSolution.Devices
     using System.Diagnostics.Metrics;
     using System.Globalization;
     using System.Reflection;
+    using System.Reflection.PortableExecutable;
+    using System.Runtime.Intrinsics.Arm;
     using System.Runtime.Intrinsics.X86;
     using System.Security.Principal;
+    using System.Text;
     using RmSolution.Devices.Leica;
     using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
@@ -136,16 +140,19 @@ namespace RmSolution.Devices
         public bool AUT_SetTimeout(AUT_TIMEOUT timeoutPar) => AUT_SetTimeout(timeoutPar.PosTimeout[MOT_HZ_AXLE], timeoutPar.PosTimeout[MOT_V_AXLE]);
 
         /// <summary> Turning the telescope to a specified position.</summary>
-        /// <remarks> This procedure turns the telescope absolute to the in Hz and V specified position, taking tolerance settings for positioning(see AUT_POSTOL) into account.Any active control function is terminated by this function call.<br/>
-        /// If the position mode is set to normal (PosMode = AUT_NORMAL) it is assumed that the current value of the compensator measurement is valid.Positioning precise(PosMode = AUT_PRECISE) forces a new compensator measurement at the specified position and includes this information for positioning.<br/>
-        /// If ATR mode is activated and the ATR mode is set to AUT_TARGET, the instrument tries to position onto a target in the destination area.<br/>
+        /// <remarks> This procedure turns the telescope absolute to the in Hz and V specified position, taking tolerance settings for positioning(see AUT_POSTOL) into account.Any active control function is terminated by this function call.<br/><br/>
+        /// If the position mode is set to normal (PosMode = AUT_NORMAL) it is assumed that the current value of the compensator measurement is valid.Positioning precise(PosMode = AUT_PRECISE) forces a new compensator measurement at the specified position and includes this information for positioning.<br/><br/>
+        /// If ATR mode is activated and the ATR mode is set to AUT_TARGET, the instrument tries to position onto a target in the destination area.<br/><br/>
         /// If LOCK mode is activated and the ATR mode is set to AUT_TARGET, the instrument tries to lock onto a target in the destination area.</remarks>
         /// <param name="Hz"> Horizontal (instrument) position [rad].</param>
         /// <param name="V"> Vertical (telescope) position [rad].</param>
-        /// <param name="POSMode"> Position mode:<br/>AUT_NORMAL: (default) uses the current value of the compensator(no compensator measurement while positioning). For positioning distances >25GON AUT_NORMAL might tend to inaccuracy.<br/>
+        /// <param name="POSMode"> Position mode:<br/>
+        /// AUT_NORMAL: (default) uses the current value of the compensator(no compensator measurement while positioning). For positioning distances >25GON AUT_NORMAL might tend to inaccuracy.<br/>
         /// AUT_PRECISE: tries to measure exact inclination of target. Tend to longer position time (check AUT_TIMEOUT and/or COM-time out if necessary).<br/>
         /// AUT_Fast: for TS30 / TM30 instruments, positions with the last valid inclination and an increased positioning tolerance.Suitable in combination with ATRMode AUT_Target.</param>
-        /// <param name="ATRMode">Mode of ATR:<br/>AUT_POSITION: (default) conventional position using values Hz and V.<br/>AUT_TARGET: tries to position onto a target in the destination area.This mode is only possible if ATR exists and is activated.</param>
+        /// <param name="ATRMode">Mode of ATR:<br/>
+        /// AUT_POSITION: (default) conventional position using values Hz and V.<br/>
+        /// AUT_TARGET: tries to position onto a target in the destination area.This mode is only possible if ATR exists and is activated.</param>
         /// <param name="dummy"> It’s reserved for future use, set bDummy always to FALSE.</param>
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_MakePositioning </example>
@@ -170,6 +177,75 @@ namespace RmSolution.Devices
                 GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat positioning."),
                 GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
 
+                _ => Successful(resp.ReturnCode)
+            };
+        }
+
+        /// <summary> Turning the telescope to the other face.</summary>
+        /// <remarks> This procedure turns the telescope to the other face. If another function is active, for example locking onto a target, then this function is terminated and the procedure is executed.<br/><br/>
+        /// If the position mode is set to normal (PosMode = AUT_NORMAL) it is allowed that the current value of the compensator measurement is inexact. Positioning precise (PosMode = AUT_PRECISE) forces a new compensator measurement.If this measurement is not possible, the position does not take place.<br/><br/>
+        /// If <i>ATR</i> mode is activated and the ATR mode is set to AUT_TARGET, the instrument tries to position onto a target in the destination area.<br/><br/>
+        /// If <i>LOCK</i> mode is activated and the ATR mode is set to AUT_TARGET, the instrument tries to lock onto a target in the destination area.</remarks>
+        /// <param name="POSMode"> Position mode:<br/>
+        /// AUT_NORMAL: uses the current value of the compensator. For positioning distances >25GON AUT_NORMAL might tend to inaccuracy.<br/>
+        /// AUT_PRECISE: tries to measure exact inclination of target. Tends to long position time (check AUT_TIMEOUT and/or COM-time out if necessary).</param>
+        /// <param name="ATRMode"> Mode of ATR:<br/>
+        /// AUT_POSITION: conventional position to other face.<br/>
+        /// AUT_TARGET: tries to position onto a target in the destination area.This set is only possible if ATR exists and is activated.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_ChangeFace </example>
+        [COMF]
+        public bool AUT_ChangeFace(AUT_POSMODE POSMode, AUT_ATRMODE ATRMode, bool dummy = false)
+        {
+            var resp = Request(RequestString("%R1Q,9028:", POSMode, ATRMode, dummy));
+            return (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
+                GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
+                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Error with angle measurement occurs if the instrument is not levelled properly during positioning."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication timeout. (perhaps increase COM timeout,\r\nsee COM_SetTimeout)."),
+                // Additionally with position mode AUT_TARGET -->
+                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+                GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
+                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+                GRC.AUT_ACCURACY => throw new LeicaException(resp.ReturnCode, "Inexact fine position, repeat positioning."),
+                GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error\r\ndetected, repeat change face."),
+                GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
+
+                _ => Successful(resp.ReturnCode)
+            };
+        }
+
+        /// <summary> Automatic target positioning.</summary>
+        /// <remarks> This procedure precisely positions the telescope crosshairs onto the target prism and measures the ATR Hz and V deviations.If the target is not within the visible area of the ATR sensor (Field of View) a target search will be executed.The target search range is limited by the parameter dSrchV in V- direction and by parameter dSrchHz in Hz - direction.If no target found the instrument turns back to the initial start position.<br/><br/>
+        /// A current Fine Adjust LockIn towards a target is terminated by this procedure call. After positioning, the lock mode is active.The timeout of this operation is set to 5s, regardless of the general position timeout settings.The positioning tolerance is depends on the previously set up the fine adjust mode (see AUT_SetFineAdjustMoed and AUT_GetFineAdjustMode).<br/><br/>
+        /// Tolerance settings(with AUT_SetTol and AUT_ReadTol) have no influence to this operation.The tolerance settings as well as the ATR measure precision depends on the instrument’s class and the used EDM measure mode(The EDM measure modes are handled by the subsystem TMC).</remarks>
+        /// <param name="srchHz"> Search range Hz-axis [rad].</param>
+        /// <param name="srchV"> Search range V-axis [rad].</param>
+        /// <param name="dummy"> It’s reserved for future use, set bDummy always to FALSE.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_FineAdjust </example>
+        [COMF]
+        public bool AUT_FineAdjust(double srchHz, double srchV, bool dummy = false)
+        {
+            var resp = Request(RequestString("%R1Q,9037:", srchHz, srchV, dummy));
+            return (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
+                GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. The position fault lies above 100[cc]. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
+                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+                GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
+                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+                GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat fine positioning."),
+                GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Error in target acquisition."),
+                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
                 _ => Successful(resp.ReturnCode)
             };
         }

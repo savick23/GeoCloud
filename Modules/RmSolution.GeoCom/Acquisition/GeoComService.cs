@@ -3,12 +3,11 @@
 // Описание: GeoComService - Сервер сбора геоданных.
 // Тунель к COM-порту: 109.74.129.114:32325
 // HTTP API: 109.74.129.114:32328
-// Документация: tps1200_series.pdf
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.GeoCom
 {
-    using System.Data;
     #region Using
+    using System.Data;
     using System.IO.Ports;
     using System.Reflection;
     using System.Text;
@@ -16,7 +15,6 @@ namespace RmSolution.GeoCom
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
-    using RmSolution.Devices.Leica;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -90,6 +88,8 @@ namespace RmSolution.GeoCom
             }
             return base.ExecuteProcess();
         }
+
+        #region Private methods
 
         /// <summary> Выполнить консольную команду.</summary>
         void DoCommand(long idTerminal, string[] args)
@@ -240,7 +240,7 @@ namespace RmSolution.GeoCom
                 dt.Columns.AddRange(new DataColumn[] { new DataColumn("name", typeof(string)) });
                 var t = dev.GetType().GetMethods().Where(call => call.GetCustomAttributes(typeof(COMFAttribute)) != null);
                 dev.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                    .Where(call => call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttribute<COMFAttribute>() != null)
+                    .Where(call => call.GetCustomAttribute<COMFAttribute>() != null)
                     .OrderBy(call => call.Name).ToList()
                     .ForEach(call => dt.Rows.Add(call.Name));
 
@@ -252,8 +252,9 @@ namespace RmSolution.GeoCom
         /// <summary> Выполнить функцию (инструкцию) на устройстве.</summary>
         void CallDeviceFunction(string idDevice, string[] args)
         {
-            if (TryFindDevice(idDevice, out var dev) && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase) is MethodInfo call
-                && (call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttributes<COMFAttribute>() != null))
+            if (TryFindDevice(idDevice, out var dev) && args.Length > 0
+                && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase) is MethodInfo call
+                && call.GetCustomAttributes<COMFAttribute>() != null)
             {
                 var parameters = call.GetParameters();
                 var prms = new object[parameters.Length];
@@ -284,6 +285,8 @@ namespace RmSolution.GeoCom
                 }
             }
         }
+
+        #endregion Private methods
     }
 
     public class GeoComAdapterSet
