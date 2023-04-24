@@ -23,7 +23,7 @@ namespace RmSolution.Devices
     public class COMFAttribute : Attribute { }
 
     /// <summary> Тахеометр Leica.</summary>
-    public class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
+    public partial class LeicaTotalStationDevice : IDevice, IDeviceContext, IDisposable
     {
         #region Declarations
 
@@ -261,9 +261,7 @@ namespace RmSolution.Devices
         {
             var resp = Request(RequestString("%R1Q,110:"));
             if (resp.ReturnCode == GRC.OK)
-            {
                 var ver = new Version((int)resp.Value[0], (int)resp.Value[1], (int)resp.Value[2]);
-            }
             return resp;
         }
 
@@ -313,9 +311,7 @@ namespace RmSolution.Devices
         {
             var resp = Request(RequestString("%R1Q,113:"));
             if (resp.ReturnCode == GRC.OK)
-            {
                 var binAvailable = resp.Value[0] == 0; // binary operation enabled / ASCII operation enabled
-            }
             return resp;
         }
 
@@ -467,9 +463,7 @@ namespace RmSolution.Devices
         {
             var resp = Request(RequestString("%R1Q,1058:"));
             if (resp.ReturnCode == GRC.OK)
-            {
                 var intensity = (EDM_EGLINTENSITY_TYPE)resp.Value[0];
-            }
             return resp;
         }
 
@@ -510,7 +504,6 @@ namespace RmSolution.Devices
             byte[]? resp;
             TimeSpan executed;
             lock (_lockRoot)
-            {
                 try
                 {
                     Open();
@@ -536,7 +529,6 @@ namespace RmSolution.Devices
                 {
                     Close();
                 }
-            }
             return new ZResponse(resp, executed);
         }
 
@@ -544,7 +536,7 @@ namespace RmSolution.Devices
 
         #region Nested types
 
-        public class ZResponse
+        public partial class ZResponse
         {
             public readonly byte[]? Data;
             public readonly string? Response;
@@ -554,18 +546,23 @@ namespace RmSolution.Devices
             /// <summary> Время выполнения комнады, мс.</summary>
             public TimeSpan? Executed;
 
+            [GeneratedRegex("(?<=:)\\d+")]
+            private static partial Regex getReturnCode();
+            [GeneratedRegex("(?<=:\\d+,).*")]
+            private static partial Regex GetText();
+
             public ZResponse(byte[]? data, TimeSpan executed)
             {
                 if (data != null)
                 {
                     Data = data;
                     Response = Encoding.ASCII.GetString(data);
-                    ReturnCode = int.TryParse(Regex.Match(Response, @"(?<=:)\d+").Value, out var ret) ? (GRC)ret : GRC.UNDEFINED;
+                    ReturnCode = int.TryParse(getReturnCode().Match(Response).Value, out var ret) ? (GRC)ret : GRC.UNDEFINED;
 
                     if (GRC_Resources.Errors.TryGetValue(ReturnCode, out var msg))
                         throw new Exception(string.Concat("[", (int)ReturnCode, "] ", msg));
 
-                    Text = Regex.Match(Response, @"(?<=:\d+,).*").Value;
+                    Text = GetText().Match(Response).Value;
                     if (Text.StartsWith('"'/*string*/))
                         Text = Text[1..^1];
                     else
