@@ -9,7 +9,7 @@ namespace RmSolution.Devices.Leica
     #endregion Using
 
     /// <summary> General Return Code </summary>
-    public enum GRC
+    public enum GRC : long
     {
         #region TPS 0x0
 

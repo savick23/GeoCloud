@@ -6,8 +6,8 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.GeoCom
 {
-    using System.Text;
     #region Using
+    using System.Text;
     using System.Threading.Tasks;
     using RmSolution.Devices;
     using RmSolution.Runtime;

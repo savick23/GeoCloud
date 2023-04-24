@@ -9,7 +9,7 @@ namespace RmSolution.Devices.Leica
     #endregion Using
 
     /// <summary> Stop Mode </summary>
-    public enum COM_TPS_STOP_MODE
+    public enum COM_TPS_STOP_MODE : long
     {
         /// <summary> Power down instrument </summary>
         COM_TPS_STOP_SHUT_DOWN = 0,
@@ -18,7 +18,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Start Mode </summary>
-    public enum COM_TPS_STARTUP_MODE
+    public enum COM_TPS_STARTUP_MODE : long
     {
         /// <summary> Not supported by TPS1200 </summary>
         COM_TPS_STARTUP_LOCAL = 0,
@@ -27,7 +27,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Target types.</summary>
-    public enum BAP_TARGET_TYPE
+    public enum BAP_TARGET_TYPE : long
     {
         /// <summary> With reflector </summary>
         BAP_REFL_USE = 0,
@@ -36,7 +36,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Prism types.</summary>
-    public enum BAP_PRISMTYPE
+    public enum BAP_PRISMTYPE : long
     {
         /// <summary> Leica Circular Prism </summary>
         BAP_PRISM_ROUND = 0,
@@ -67,7 +67,7 @@ namespace RmSolution.Devices.Leica
     };
 
     /// <summary> TPS Device Precision Class </summary>
-    public enum TPS_DEVICE_CLASS
+    public enum TPS_DEVICE_CLASS : long
     {
         /// <summary> TPS1000 family member, 1 mgon, 3" </summary>
         TPS_CLASS_1100 = 0,
@@ -110,7 +110,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> TPS Device Configuration Type </summary>
-    public enum TPS_DEVICE_TYPE
+    public enum TPS_DEVICE_TYPE : long
     {
         #region TPS1x00 common
 
@@ -170,7 +170,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Reflectorless Class </summary>
-    public enum TPS_REFLESS_CLASS
+    public enum TPS_REFLESS_CLASS : long
     {
         /// <summary> None </summary>
         TPS_REFLESS_NONE = 0,
@@ -235,14 +235,14 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> On/off switch type </summary>
-    public enum ON_OFF_TYPE
+    public enum ON_OFF_TYPE : long
     {
         OFF = 0,
         ON = 1
     }
 
     /// <summary> Intensity of Electronic Guidelight </summary>
-    public enum EDM_EGLINTENSITY_TYPE
+    public enum EDM_EGLINTENSITY_TYPE : long
     {
         OFF = 0,
         LOW = 1,
