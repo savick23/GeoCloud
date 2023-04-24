@@ -272,6 +272,26 @@ namespace RmSolution.Devices.Leica
         BAP_ATRSET_SRANGE_AON = 4
     }
 
+    /// <summary> Position Precision.</summary>
+    public enum AUT_POSMODE
+    {
+        AUT_NORMAL = 0, // fast positioning mode
+        AUT_PRECISE = 1, // exact positioning mode
+                         // note: can distinctly claim more time
+                         // for the positioning
+        AUT_Fast = 2
+    }
+
+    /// <summary> Automatic Target Recognition Mode.</summary>
+    /// <remarks> Possible modes of the target recognition.</remarks>
+    public enum AUT_ATRMODE
+    {
+        /// <summary> Positioning to the hz- and v-angle.</summary>
+        AUT_POSITION = 0,
+        /// <summary> Positioning to a target in the environment of the hz- and v-angle.</summary>
+        AUT_TARGET = 1
+    }
+
     #endregion Enums
 
     #region Structures
@@ -342,11 +362,15 @@ namespace RmSolution.Devices.Leica
     /// <summary> Positioning Tolerance.</summary>
     public struct AUT_POSTOL
     {
-        /// <summary> Number of axis.</summary>
-        public const int MOT_AXES = 2;
-
         /// <summary> Positioning tolerance for Hz and V [rad].</summary>
         public double[] PosTol;
+    }
+
+    /// <summary> Maximum Position Time [s].</summary>
+    public struct AUT_TIMEOUT
+    {
+        /// <summary> Max. positioning time [sec].</summary>
+        public double[] PosTimeout;
     }
 
     #endregion Structures

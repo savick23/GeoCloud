@@ -144,9 +144,12 @@ namespace RmSolution.Devices
         bool SetComf(string command, params object[] parameters)
         {
             var resp = Request(RequestString(command, parameters));
-            return resp.ReturnCode == GRC.OK ? true
-                : throw new LeicaException(resp.ReturnCode, typeof(GRC).GetField(resp.ReturnCode.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description ?? "<нет описания>");
+            return Successful(resp.ReturnCode);
         }
+
+        static bool Successful(GRC returnCode) =>
+            returnCode == GRC.OK ? true :
+                throw new LeicaException(returnCode, typeof(GRC).GetField(returnCode.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description ?? "<нет описания>");
 
         static string ToByte(int n) => string.Concat('\'', n.ToString("x2"), '\'');
 

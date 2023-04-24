@@ -2,6 +2,9 @@
 ----------------------------------------------
 AUT_ReadTol
 AUT_SetTol
+AUT_ReadTimeout
+AUT_SetTimeout
+AUT_MakePositioning
 BAP_GetTargetType
 BAP_SetTargetType
 BAP_GetPrismType
