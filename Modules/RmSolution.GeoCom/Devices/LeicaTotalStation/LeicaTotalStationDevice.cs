@@ -208,9 +208,11 @@ namespace RmSolution.Devices
         public bool BAP_SetPrismType2(BAP_PRISMTYPE prismType, string prismName)
         {
             var resp = Request(RequestString("%R1Q,17030:", prismType, prismName));
-            return resp.ReturnCode == GRC.IVPARAM
-                ? throw new LeicaException(resp.ReturnCode, "Prism type is not available, i.e. a user prism is not defined.")
-                : resp.ReturnCode == GRC.OK;
+            return (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Prism type is not available, i.e. a user prism is not defined."),
+                _ => resp.ReturnCode == GRC.OK
+            };
         }
 
         /// <summary> Getting the default prism definition.</summary>
@@ -220,7 +222,7 @@ namespace RmSolution.Devices
         [COMF]
         public BAP_PRISMDEF? BAP_GetPrismDef(BAP_PRISMTYPE prismType)
         {
-            var resp = Request(RequestString("%R1Q,17023:"));
+            var resp = Request(RequestString("%R1Q,17023:", prismType));
             if (resp.ReturnCode == GRC.IVPARAM)
                 throw new LeicaException(resp.ReturnCode, "Invalid prism type.");
 
@@ -231,6 +233,61 @@ namespace RmSolution.Devices
                     AddConst = double.Parse(resp.Values[1].ToString()),
                     ReflType = (BAP_REFLTYPE)resp.Values[2]
                 };
+
+            return null;
+        }
+
+        /// <summary> Getting the user prism definition.</summary>
+        /// <remarks> Gets definition of a defined user prism.</remarks>
+        /// <param name="prismName"> Prism name </param>
+        /// <example> mod3 call 000001 BAP_GetUserPrismDef </example>
+        [COMF]
+        public BAP_PRISMDEF? BAP_GetUserPrismDef(string prismName)
+        {
+            var resp = Request(RequestString("%R1Q,17033:", prismName));
+            if (resp.ReturnCode == GRC.IVPARAM)
+                throw new LeicaException(resp.ReturnCode, "Invalid prism definition.");
+
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 3)
+                return new BAP_PRISMDEF()
+                {
+                    AddConst = double.Parse(resp.Values[0].ToString()),
+                    ReflType = (BAP_REFLTYPE)resp.Values[1],
+                    Creator = resp.Values[2].ToString()
+                };
+
+            return null;
+        }
+
+        /// <summary> Getting the default prism definition.</summary>
+        /// <remarks> Get the definition of a default prism.</remarks>
+        /// <param name="prismName"> Prism name </param>
+        /// <param name="addConst"> Prism correction [m] </param>
+        /// <param name="reflType"> Reflector type </param>
+        /// <param name="creator"> Name of creator </param>
+        /// <example> mod3 call 000001 BAP_SetUserPrismDef </example>
+        [COMF]
+        public bool BAP_SetUserPrismDef(string prismName, double addConst, BAP_REFLTYPE reflType, string creator)
+        {
+            var resp = Request(RequestString("%R1Q,17023:", prismName, addConst, reflType, creator));
+            return (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid prism definition."),
+                GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Prism definition is not set."),
+                _ => resp.ReturnCode == GRC.OK
+            };
+        }
+
+        /// <summary> Getting the actual distance measurement program.</summary>
+        /// <remarks> Gets the current distance measurement program.</remarks>
+        /// <returns> Actual measurement program </returns>
+        /// <example> mod3 call 000001 BAP_GetMeasPrg </example>
+        [COMF]
+        public BAP_USER_MEASPRG? BAP_GetMeasPrg()
+        {
+            var resp = Request(RequestString("%R1Q,17018:"));
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
+                return (BAP_USER_MEASPRG)resp.Values[0];
 
             return null;
         }
@@ -550,6 +607,12 @@ namespace RmSolution.Devices
 
                 if (p is string)
                     return string.Concat('"', p, '"');
+
+                if (p is float pf)
+                    return pf.ToString(CultureInfo.InvariantCulture);
+
+                if (p is double pd)
+                    return pd.ToString(CultureInfo.InvariantCulture);
 
                 return p;
             }

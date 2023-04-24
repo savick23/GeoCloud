@@ -99,6 +99,35 @@ namespace RmSolution.Devices.Leica
         BAP_PRISM_MA_MPR122 = 12
     };
 
+    /// <summary> Distance measurement programs.</summary>
+    public enum BAP_USER_MEASPRG : long
+    {
+        /// <summary> IR Standard </summary>
+        BAP_SINGLE_REF_STANDARD = 0,
+        /// <summary> IR Fast </summary>
+        BAP_SINGLE_REF_FAST = 1,
+        /// <summary> LO Standard </summary>
+        BAP_SINGLE_REF_VISIBLE = 2,
+        /// <summary> RL Standard </summary>
+        BAP_SINGLE_RLESS_VISIBLE = 3,
+        /// <summary> IR Tracking </summary>
+        BAP_CONT_REF_STANDARD = 4,
+        /// <summary> not supported by TPS1200 </summary>
+        BAP_CONT_REF_FAST = 5, // 
+        /// <summary> RL Fast Tracking </summary>
+        BAP_CONT_RLESS_VISIBLE = 6,
+        /// <summary> IR Average </summary>
+        BAP_AVG_REF_STANDARD = 7,
+        /// <summary> LO Average </summary>
+        BAP_AVG_REF_VISIBLE = 8,
+        /// <summary> RL Average </summary>
+        BAP_AVG_RLESS_VISIBLE = 9,
+        /// <summary> IR Synchro Tracking </summary>
+        BAP_CONT_REF_SYNCHRO = 10,
+        /// <summary> IR Precise (TS30,TM30) </summary>
+        BAP_SINGLE_REF_PRECISE = 11
+    };
+
     /// <summary> TPS Device Precision Class </summary>
     public enum TPS_DEVICE_CLASS : long
     {
@@ -276,6 +305,8 @@ namespace RmSolution.Devices.Leica
         public double AddConst;
         /// <summary> Reflector type.</summary>
         public BAP_REFLTYPE ReflType;
+        /// <summary> Name of creator.</summary>
+        public string Creator;
     }
 
     #endregion Structures
