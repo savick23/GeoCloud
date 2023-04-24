@@ -69,7 +69,9 @@ namespace RmSolution.Devices
         }
 
         /// <summary> Setting the positioning tolerances.</summary>
-        /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><b>Note</b>: The maximum resolution of the angle measurement system depends on the instrument accuracy class. If smaller positioning tolerances are required, the positioning time can increase drastically.</remarks>
+        /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><br/>
+        /// <b>Note:</b> The maximum resolution of the angle measurement system depends on the instrument accuracy class. If smaller positioning tolerances are required, the positioning time can increase drastically.</remarks>
+        /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_SetTol 0 0 </example>
         [COMF]
         public bool AUT_SetTol(double toleranceHz, double toleranceV)
@@ -85,7 +87,8 @@ namespace RmSolution.Devices
         }
 
         /// <summary> Setting the positioning tolerances.</summary>
-        /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><b>Note</b>: The maximum resolution of the angle measurement system depends on the instrument accuracy class. If smaller positioning tolerances are required, the positioning time can increase drastically.</remarks>
+        /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><br/>
+        /// <b>Note:</b> The maximum resolution of the angle measurement system depends on the instrument accuracy class. If smaller positioning tolerances are required, the positioning time can increase drastically.</remarks>
         /// <param name="tolPar"> The values for the positioning tolerances in Hz and V direction[rad].</param>
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_SetTol </example>
@@ -236,6 +239,7 @@ namespace RmSolution.Devices
             return (resp.ReturnCode) switch
             {
                 GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
                 GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. The position fault lies above 100[cc]. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
                 GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
                 GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
@@ -248,6 +252,51 @@ namespace RmSolution.Devices
                 GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
                 _ => Successful(resp.ReturnCode)
             };
+        }
+
+        /// <summary> Performing an automatic target search.</summary>
+        /// <remarks> This procedure performs an automatically target search within a given area. The search is terminated once the prism appears in the field of view of the ATR sensor.If no prism is found within the specified area, the instrument turns back to the initial start position.For an exact positioning onto the prism centre, use fine adjust (see AUT_FineAdjust) afterwards.<br/><br/>
+        /// <b>Note:</b> If you expand the search range of the function AUT_FineAdjust, then you have a target search and a fine positioning in one function.</remarks>
+        /// <param name="Hz_Area"> Horizontal search region [rad].</param>
+        /// <param name="V_Area"> Vertical search region [rad].</param>
+        /// <param name="dummy"> It’s reserved for future use, set bDummy always to FALSE.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_Search </example>
+        [COMF]
+        public bool AUT_Search(double Hz_Area, double V_Area, bool dummy = false)
+        {
+            var resp = Request(RequestString("%R1Q,9029:", Hz_Area, V_Area, dummy));
+            return (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
+                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+                GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "AZE error, at repeated occur call service."),
+                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
+                _ => Successful(resp.ReturnCode)
+            };
+        }
+
+        /// <summary> Getting the fine adjust positioning mode.</summary>
+        /// <remarks> This function returns the current activated fine adjust positioning mode. This command is valid for all instruments, but has only effects for instruments equipped with ATR.</remarks>
+        /// <returns> Current fine adjust positioning mode.</returns>
+        /// <example> mod3 call 000001 AUT_GetFineAdjustMode </example>
+        [COMF]
+        public AUT_ADJMODE? AUT_GetFineAdjustMode()
+        {
+            var resp = Request(RequestString("%R1Q,9030:"));
+            switch (resp.ReturnCode)
+            {
+                case GRC.NA:
+                    throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available.");
+                case GRC.OK:
+                    return (AUT_ADJMODE)resp.Values[0];
+            };
+            return null;
         }
 
         #endregion AUTOMATION (AUT CONF)

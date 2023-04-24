@@ -125,7 +125,7 @@ namespace RmSolution.Devices.Leica
     };
 
     /// <summary> Measurement Modes.</summary>
-    public enum BAP_MEASURE_PRG
+    public enum BAP_MEASURE_PRG : long
     {
         /// <summary> no measurements, take last one </summary>
         BAP_NO_MEAS = 0,
@@ -273,7 +273,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Position Precision.</summary>
-    public enum AUT_POSMODE
+    public enum AUT_POSMODE :long
     {
         AUT_NORMAL = 0, // fast positioning mode
         AUT_PRECISE = 1, // exact positioning mode
@@ -284,12 +284,24 @@ namespace RmSolution.Devices.Leica
 
     /// <summary> Automatic Target Recognition Mode.</summary>
     /// <remarks> Possible modes of the target recognition.</remarks>
-    public enum AUT_ATRMODE
+    public enum AUT_ATRMODE : long
     {
         /// <summary> Positioning to the hz- and v-angle.</summary>
         AUT_POSITION = 0,
         /// <summary> Positioning to a target in the environment of the hz- and v-angle.</summary>
         AUT_TARGET = 1
+    }
+
+    /// <summary> Fine-adjust Position Mode.</summary>
+    /// <remarks> Possible settings of the positioning tolerance relating the angle- or the point- accuracy at the fine adjust.</remarks>
+    public enum AUT_ADJMODE : long
+    {
+        /// <summary> Angle tolerance.</summary>
+        AUT_NORM_MODE = 0,
+        /// <summary> Point tolerance.</summary>
+        AUT_POINT_MODE = 1,
+        /// <summary> System independent positioning tolerance. Set with AUT_SetTol.</summary>
+        AUT_DEFINE_MODE = 2
     }
 
     #endregion Enums
@@ -318,7 +330,7 @@ namespace RmSolution.Devices.Leica
         /// <summary> year </summary>
         public short Year;
         /// <summary> month in year 1..12 </summary>
-        public byte Month; 
+        public byte Month;
         /// <summary> day in month 1..31 </summary>
         public byte Day;
     }
