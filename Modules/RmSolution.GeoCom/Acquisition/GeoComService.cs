@@ -137,6 +137,7 @@ namespace RmSolution.GeoCom
                     Runtime.Send(MSG.Terminal, ProcessId, 0, Devices.ToDictionary(k => k.Code, v => string.Concat(v.Name)));
                     break;
 
+                case "CONF":
                 case "CONFIG":
                     if (args.Length > 1)
                         ReadDeviceConfig(args[1], args.Skip(2).ToArray());
@@ -165,9 +166,6 @@ namespace RmSolution.GeoCom
             device = Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
             return device != null;
         }
-
-        IDevice? FindDevice(string idDevice) =>
-            TryFindDevice(idDevice, out var dev) ? dev : null;
 
         void SendToCom(string portName, string[] args)
         {
@@ -237,12 +235,14 @@ namespace RmSolution.GeoCom
             if (TryFindDevice(idDevice, out var dev))
             {
                 var dt = new DataTable();
-                dt.Columns.AddRange(new DataColumn[] { new DataColumn("name", typeof(string)) });
-                var t = dev.GetType().GetMethods().Where(call => call.GetCustomAttributes(typeof(COMFAttribute)) != null);
+                dt.Columns.AddRange(new DataColumn[] { new DataColumn("return", typeof(string)), new DataColumn("name", typeof(string)), new DataColumn("arguments", typeof(string)) });
                 dev.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
                     .Where(call => call.GetCustomAttribute<COMFAttribute>() != null)
                     .OrderBy(call => call.Name).ToList()
-                    .ForEach(call => dt.Rows.Add(call.Name));
+                    .ForEach(call => dt.Rows.Add(
+                        call.ReturnType.GenericTypeArguments.FirstOrDefault()?.Name ?? call.ReturnType.Name,
+                        call.Name,
+                        string.Join(", ", call.GetParameters().Select(p => string.Concat(p.HasDefaultValue ? "[" : "", p.ParameterType.GenericTypeArguments.FirstOrDefault()?.Name ?? p.ParameterType.Name, p.HasDefaultValue ? "] " : " ", p.Name)))));
 
                 Runtime.Send(MSG.Terminal, ProcessId, 0, dt);
             }
