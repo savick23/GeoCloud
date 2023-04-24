@@ -12,6 +12,13 @@ namespace RmSolution.Devices.Leica
     /// <summary> General Return Code </summary>
     public enum GRC : long
     {
+        #region CUSTOM
+
+        /// <summary> [128] Недопустимая длинна наименования призмы.</summary>
+        PRISM_NAME_LEN_INVALID = 0x0080,
+
+        #endregion CUSTOM
+
         #region TPS 0x0
 
         /// <summary> [0] Function successfully completed.</summary>

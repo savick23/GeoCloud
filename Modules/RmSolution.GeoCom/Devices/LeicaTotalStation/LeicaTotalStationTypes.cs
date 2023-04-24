@@ -339,5 +339,15 @@ namespace RmSolution.Devices.Leica
         public string Creator;
     }
 
+    /// <summary> Positioning Tolerance.</summary>
+    public struct AUT_POSTOL
+    {
+        /// <summary> Number of axis.</summary>
+        public const int MOT_AXES = 2;
+
+        /// <summary> Positioning tolerance for Hz and V [rad].</summary>
+        public double[] PosTol;
+    }
+
     #endregion Structures
 }

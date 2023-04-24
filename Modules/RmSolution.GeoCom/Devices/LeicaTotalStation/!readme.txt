@@ -1,5 +1,7 @@
 ﻿Поддерживаемые функции:
 ----------------------------------------------
+AUT_ReadTol
+AUT_SetTol
 BAP_GetTargetType
 BAP_SetTargetType
 BAP_GetPrismType
