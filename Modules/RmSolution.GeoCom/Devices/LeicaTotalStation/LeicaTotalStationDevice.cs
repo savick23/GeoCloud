@@ -1,6 +1,7 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: LeicaTotalStationDevice – Тахеометр Leica.
+// Документация: Leica TPS1200+ Leica TS30/TM30 GeoCOM Reference Manual Version 1.50 
 // Протокол: GEOCOM Leica
 // Вызов функции прибора с консоли: mod3 call 000001 COM_GetSWVersion
 //--------------------------------------------------------------------------------------------------
@@ -9,17 +10,23 @@ namespace RmSolution.Devices
     #region Using
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics.Metrics;
+    using System.Drawing;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.Intrinsics.Arm;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Channels;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
+    using RmSolution.Runtime;
     #endregion Using
 
+    /// <summary> Communication; a module, which handles the basic communication parameters. Most of these functions relate to both client and server side.</summary>
+    [AttributeUsage(AttributeTargets.Method)]
     public class COMFAttribute : Attribute { }
 
     /// <summary> Тахеометр Leica.</summary>
@@ -309,6 +316,9 @@ namespace RmSolution.Devices
         /// <summary> Measuring Hz,V angles and a single distance.</summary>
         /// <remarks> This function measures angles and a single distance depending on the mode DistMode. Note that this function is not suited for continuous measurements(LOCK mode and TRK mode). This command uses the current automation settings.</remarks>
         /// <param name="distMode"> BAP_DEF_DIST uses the predefined distance measurement program as defined in BAP_SetMeasPrg.</param>
+        /// <param name="Hz"> [out] Horizontal angle [rad]x, depends on DistMode.</param>
+        /// <param name="V"> [out] Vertical angle [rad]x, depends on DistMode.</param>
+        /// <param name="dist"> [out] Slopedistance [m]x, depends on DistMode.</param>
         /// <returns> Horizontal angel [rad]<br/>Vertical angel [rad]<br/>Slopedistance [rad]<br/>Actual distance measurement mode.</returns>
         /// <example> mod3 call 000001 BAP_MeasDistanceAngle </example>
         [COMF]
@@ -361,6 +371,7 @@ namespace RmSolution.Devices
         /// <summary> Searching the target.</summary>
         /// <remarks> This function searches for a target in the configured or defined ATR SearchWindow. The functionality is only available for automated instruments.</remarks>
         /// <param name="dummy"> It’s reserved for future use, set bDummy always to FALSE.</param>
+        /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 BAP_SearchTarget </example>
         [COMF]
         public bool BAP_SearchTarget(bool dummy = false)
@@ -387,38 +398,29 @@ namespace RmSolution.Devices
         /// <remarks> Gets the current low vis mode.</remarks>
         /// <example> mod3 call 000001 BAP_GetATRSetting </example>
         [COMF]
-        public BAP_ATRSETTING? BAP_GetATRSetting()
-        {
-            var resp = Request(RequestString("%R1Q,17034:"));
-            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
-                return (BAP_ATRSETTING)resp.Values[0];
-
-            return null;
-        }
+        public BAP_ATRSETTING? BAP_GetATRSetting() => GetComf<BAP_ATRSETTING>("%R1Q,17034:");
 
         /// <summary> Setting the current ATR low vis mode.</summary>
         /// <remarks> Sets the current low vis mode.</remarks>
+        /// <param name="ATRSetting"> ATR low vis mode.</param>
+        /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 BAP_SetATRSetting </example>
         [COMF]
-        public bool BAP_SetATRSetting(BAP_ATRSETTING ATRSetting)
-        {
-            var resp = Request(RequestString("%R1Q,17035:", ATRSetting));
-            return resp.ReturnCode == GRC.OK;
-        }
+        public bool BAP_SetATRSetting(BAP_ATRSETTING ATRSetting) => SetComf("%R1Q,17035:", ATRSetting);
 
         /// <summary> Getting the reduced ATR field of view.</summary>
         /// <remarks> Get reduced ATR field of view mode.</remarks>
         /// <returns> ON: ATR uses reduced field of view(about 1/9).<br/>OFF: ATR uses full field of view.</returns>
         /// <example> mod3 call 000001 BAP_GetRedATRFov </example>
         [COMF]
-        public ON_OFF_TYPE? BAP_GetRedATRFov()
-        {
-            var resp = Request(RequestString("%R1Q,17036:"));
-            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
-                return (ON_OFF_TYPE)resp.Values[0];
+        public ON_OFF_TYPE? BAP_GetRedATRFov() => GetComf<ON_OFF_TYPE>("%R1Q,17036:");
 
-            return null;
-        }
+        /// <summary> Setting the reduced ATR field of view.</summary>
+        /// <remarks> Set reduced ATR field of view mode.</remarks>
+        /// <param name="redFov"> true/false.</param>
+        /// <example> mod3 call 000001 BAP_SetRedATRFov </example>
+        [COMF]
+        public bool BAP_SetRedATRFov(ON_OFF_TYPE redFov) => SetComf("%R1Q,17037:", redFov);
 
         #endregion BASIC APPLICATIONS (BAP CONF)
 
@@ -720,12 +722,31 @@ namespace RmSolution.Devices
         #endregion ELECTRONIC DISTANCE MEASUREMENT (EDM COMF)
 
         #region Private methods
+#pragma warning disable CS8604
+
+        /// <summary> Вызов функции на устройстве с вовзратом единственного параметра.</summary>
+        T? GetComf<T>(string command, params object[] parameters)
+        {
+            var resp = Request(RequestString(command, parameters));
+            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
+                return (T)resp.Values[0];
+
+            return default;
+        }
+
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
+        bool SetComf(string command, params object[] parameters)
+        {
+            var resp = Request(RequestString(command, parameters));
+            return resp.ReturnCode == GRC.OK ? true
+                : throw new LeicaException(resp.ReturnCode, typeof(GRC).GetField(resp.ReturnCode.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description ?? "<нет описания>");
+        }
 
         static string ToByte(int n) => string.Concat('\'', n.ToString("x2"), '\'');
 
         /// <summary> Формирование ASCII строки данных для отправки на устройство.</summary>
-        static byte[] RequestString(string command, params object[] data) =>
-            LF.Concat(Encoding.ASCII.GetBytes(command + string.Join(',', data.Where(p => p != null).Select(p =>
+        static byte[] RequestString(string command, params object[] parameters) =>
+            LF.Concat(Encoding.ASCII.GetBytes(command + string.Join(',', parameters.Where(p => p != null).Select(p =>
             {
                 if (p.GetType().IsEnum)
                     return (long)p; // Типы прибора Leica x64
@@ -782,6 +803,7 @@ namespace RmSolution.Devices
             return new ZResponse(resp, executed);
         }
 
+#pragma warning restore CS8604
         #endregion Private methods
 
         #region Nested types

@@ -6,6 +6,7 @@ namespace RmSolution.Devices.Leica
 {
     #region Using
     using System;
+    using System.ComponentModel;
     #endregion Using
 
     /// <summary> General Return Code </summary>
@@ -14,16 +15,22 @@ namespace RmSolution.Devices.Leica
         #region TPS 0x0
 
         /// <summary> [0] Function successfully completed.</summary>
+        [Description("Function successfully completed.")]
         OK = 0x0000,
         /// <summary> [1] Unknown error, result unspecified.</summary>
+        [Description("Unknown error, result unspecified.")]
         UNDEFINED = 0x0001,
         /// <summary> [2] Invalid parameter detected. Result unspecified.</summary>
+        [Description("Invalid parameter detected. Result unspecified.")]
         IVPARAM = 0x0002,
         /// <summary> [3] Invalid result.</summary>
+        [Description("Invalid result.")]
         IVRESULT = 0x0003,
         /// <summary> [4] Fatal error.</summary>
+        [Description("Fatal error.")]
         FATAL = 0x0004,
         /// <summary> [5] Not implemented yet.</summary>
+        [Description("Not implemented yet.")]
         NOT_IMPL = 0x0005,
         /// <summary> [6] Function execution timed out. Result unspecified.</summary>
         TIME_OUT = 0x0006,

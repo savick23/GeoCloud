@@ -16,6 +16,7 @@ BAP_SearchTarget
 BAP_GetATRSetting
 BAP_SetATRSetting
 BAP_GetRedATRFov
+BAP_SetRedATRFov
 BMM_BeepAlarm
 BMM_BeepNormal
 IOS_BeepOn
