@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.GeoCom
 {
+    using System.Data;
     #region Using
     using System.IO.Ports;
     using System.Reflection;
@@ -137,11 +138,19 @@ namespace RmSolution.GeoCom
                     break;
 
                 case "CONFIG":
-                    ReadDeviceConfig(args[1], args.Skip(2).ToArray());
+                    if (args.Length > 1)
+                        ReadDeviceConfig(args[1], args.Skip(2).ToArray());
+                    break;
+
+                case "FUNC":
+                case "FUNCTIONS":
+                    if (args.Length > 1)
+                        ShowDeviceFunctions(args[1], args.Skip(2).ToArray());
                     break;
 
                 case "CALL":
-                    CallDeviceFunction(args[1], args.Skip(2).ToArray());
+                    if (args.Length > 1)
+                        CallDeviceFunction(args[1], args.Skip(2).ToArray());
                     break;
 
                 default:
@@ -150,11 +159,15 @@ namespace RmSolution.GeoCom
             }
         }
 
-        IDevice? FindDevice(string idDevice)
+        bool TryFindDevice(string idDevice, out IDevice device)
         {
             idDevice = idDevice.ToUpper();
-            return Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
+            device = Devices.First(d => d.Code.ToUpper() == idDevice || d.Name.ToUpper() == idDevice);
+            return device != null;
         }
+
+        IDevice? FindDevice(string idDevice) =>
+            TryFindDevice(idDevice, out var dev) ? dev : null;
 
         void SendToCom(string portName, string[] args)
         {
@@ -202,11 +215,15 @@ namespace RmSolution.GeoCom
         {
             try
             {
-                var cfg = ((LeicaTotalStationDevice?)FindDevice(idDevice))?.ReadConfig();
-                if (cfg != null)
-                    Runtime.Send(MSG.Terminal, ProcessId, 0, cfg.ToDictionary(k => k.Key, v => v.Value.ToString()));
-                else
-                    Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + idDevice + " не найдено!");
+                if (TryFindDevice(idDevice, out var dev) && dev is LeicaTotalStationDevice stdev)
+                {
+                    var cfg = stdev.ReadConfig();
+                    if (cfg != null)
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, cfg.ToDictionary(k => k.Key, v => v.Value.ToString()));
+                    else
+                        Runtime.Send(MSG.Terminal, ProcessId, 0, "Ошибка чтения конфигурации устройства " + idDevice + ".");
+                }
+                else Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + idDevice + " не найдено!");
             }
             catch (Exception ex)
             {
@@ -214,12 +231,29 @@ namespace RmSolution.GeoCom
             }
         }
 
+        /// <summary> Возвращает список всех доступных функций.</summary>
+        void ShowDeviceFunctions(string idDevice, string[] args)
+        {
+            if (TryFindDevice(idDevice, out var dev))
+            {
+                var dt = new DataTable();
+                dt.Columns.AddRange(new DataColumn[] { new DataColumn("name", typeof(string)) });
+                var t = dev.GetType().GetMethods().Where(call => call.GetCustomAttributes(typeof(COMFAttribute)) != null);
+                dev.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(call => call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttribute<COMFAttribute>() != null)
+                    .OrderBy(call => call.Name).ToList()
+                    .ForEach(call => dt.Rows.Add(call.Name));
+
+                Runtime.Send(MSG.Terminal, ProcessId, 0, dt);
+            }
+            else Runtime.Send(MSG.Terminal, ProcessId, 0, "Устройство " + idDevice + " не найдено!");
+        }
+
         /// <summary> Выполнить функцию (инструкцию) на устройстве.</summary>
         void CallDeviceFunction(string idDevice, string[] args)
         {
-            var dev = (IDeviceConnection)FindDevice(idDevice);
-            if (dev != null && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase) is MethodInfo call
-                && (call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttributes(typeof(COMFAttribute)) != null))
+            if (TryFindDevice(idDevice, out var dev) && args.Length > 0 && dev.GetType().GetMethod(args[0], BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase) is MethodInfo call
+                && (call.ReturnType == typeof(LeicaTotalStationDevice.ZResponse) || call.GetCustomAttributes<COMFAttribute>() != null))
             {
                 var parameters = call.GetParameters();
                 var prms = new object[parameters.Length];
