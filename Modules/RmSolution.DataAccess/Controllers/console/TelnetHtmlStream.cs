@@ -35,6 +35,8 @@ namespace RmSolution.DataAccess
 
         HttpConsoleHelper _sock;
         long _length = 0;
+        /// <summary> Количество вводимых символов в строке.</summary>
+        int _count = 0;
 
         /// <summary> Кэш консольного вывода.</summary>
         readonly StringBuilder _output_cache = new();
@@ -87,7 +89,7 @@ namespace RmSolution.DataAccess
                     }
         }
 
-        static string ToHtmlText(byte[] buffer)
+        string ToHtmlText(byte[] buffer)
         {
             var cnt = buffer.Length;
             var res = new StringBuilder();
@@ -99,6 +101,7 @@ namespace RmSolution.DataAccess
                 {
                     case 32:
                         res.Append("&nbsp;");
+                        _count++;
                         break;
 
                     case 13:
@@ -106,6 +109,7 @@ namespace RmSolution.DataAccess
                         {
                             res.Append("<br/>");
                             i++;
+                            _count = 0;
                         }
                         break;
 
@@ -123,6 +127,13 @@ namespace RmSolution.DataAccess
                                 isspan = !isspan;
                                 break;
                             }
+                            else if (buffer[j] == 91)
+                            {
+                                i += 2;
+                                res.Append('\u001b').Append((char)buffer[j + 1]).Append((char)_count);
+                                _count = 0;
+                                break;
+                            }
                         }
                         break;
 
@@ -132,20 +143,27 @@ namespace RmSolution.DataAccess
 
                     case 208: // UTF-8 (RU)
                     case 209: // UTF-8 (RU)
-                        res.Append(Encoding.UTF8.GetString(buffer, i++, 2));
+                        res.Append(Count(Encoding.UTF8.GetString(buffer, i++, 2)));
                         break;
 
                     case 226: // mnemo
-                        res.Append(Encoding.UTF8.GetString(buffer, i, 3));
+                        res.Append(Count(Encoding.UTF8.GetString(buffer, i, 3)));
                         i += 2;
                         break;
 
                     default:
                         res.Append((char)c);
+                        _count++;
                         break;
                 }
             }
             return res.ToString();
+        }
+
+        string Count(string text)
+        {
+            _count += text.Length;
+            return text;
         }
 
         public override string ToString() =>

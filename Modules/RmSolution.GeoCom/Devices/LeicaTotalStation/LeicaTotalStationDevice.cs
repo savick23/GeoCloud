@@ -131,25 +131,38 @@ namespace RmSolution.Devices
 #pragma warning disable CS8604
 
         /// <summary> Вызов функции на устройстве с вовзратом единственного параметра.</summary>
-        T? GetComf<T>(string command, params object[] parameters)
-        {
-            var resp = Request(RequestString(command, parameters));
-            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
-                return (T)resp.Values[0];
-
-            return default;
-        }
+        T? GetComf<T>(string command, params object[] parameters) =>
+            Call(command, parameters, (resp) => resp.ReturnCode == GRC.OK && resp.Values.Length == 1 ? (T)resp.Values[0] : default);
 
         /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
-        bool SetComf(string command, params object[] parameters)
-        {
-            var resp = Request(RequestString(command, parameters));
-            return Successful(resp.ReturnCode);
-        }
+        bool SetComf(string command, params object[] parameters) =>
+            Call(command, parameters, (resp) => Successful(resp.ReturnCode));
 
+        T Call<T>(string command, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command)));
+
+        T Call<T>(string command, object p1, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1)));
+
+        T Call<T>(string command, object p1, object p2, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1, p2)));
+
+        T Call<T>(string command, object p1, object p2, object p3, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1, p2, p3)));
+
+        T Call<T>(string command, object p1, object p2, object p3, object p4, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1, p2, p3, p4)));
+
+        T Call<T>(string command, object p1, object p2, object p3, object p4, object p5, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1, p2, p3, p4, p5)));
+
+        /// <summary> Возвращает истину в случа успешного выполнения или общие исключения.</summary>
         static bool Successful(GRC returnCode) =>
-            returnCode == GRC.OK ? true :
-                throw new LeicaException(returnCode, typeof(GRC).GetField(returnCode.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description ?? "<нет описания>");
+            (returnCode) switch {
+                GRC.OK => true,
+                GRC.NA => throw new LeicaException(returnCode, "GeoCOM Robotic license key not available."),
+                _ => throw new LeicaException(returnCode, typeof(GRC).GetField(returnCode.ToString()).GetCustomAttribute<DescriptionAttribute>()?.Description ?? "<нет описания>")
+            };
 
         static string ToByte(int n) => string.Concat('\'', n.ToString("x2"), '\'');
 

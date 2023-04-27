@@ -39,6 +39,15 @@ function cursor() {
     $("console").insertAdjacentHTML("beforeend", "<span id=\"cursor\">&nbsp;</span>");
 }
 
+function delleft(count) {
+    if (count !== 0) {
+        let rng = document.createRange();
+        rng.setEndBefore($("cursor"));
+        rng.setStart($("console"), rng.endOffset - count);
+        rng.deleteContents();
+    }
+}
+
 function start() {
     fetch("console/read").then((resp) => {
         const rd = resp.body.getReader();
@@ -51,13 +60,15 @@ function start() {
                             return;
                         }
                         if (value.length > 1 || value[0] !== 0) {
-                            if (value[0] === 8) {
-                                let rng = document.createRange();
-                                rng.setEndBefore($("cursor"));
-                                rng.setStart($("console"), rng.endOffset - 1);
-                                rng.deleteContents();
+                            if (value[0] === 8)
+                                delleft(1);
+                            else {
+                                if (value[0] === 27) {
+                                    delleft(value[2]);
+                                    value = value.slice(3);
+                                }
+                                $("cursor").insertAdjacentHTML("beforebegin", utf8String(value));
                             }
-                            else $("cursor").insertAdjacentHTML("beforebegin", utf8String(value));
                         }
                         push();
                     });

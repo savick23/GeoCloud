@@ -11,6 +11,7 @@ namespace RmSolution.Devices
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
     using System.Diagnostics.Metrics;
+    using System.Drawing;
     using System.Globalization;
     using System.Reflection;
     using System.Reflection.PortableExecutable;
@@ -18,6 +19,7 @@ namespace RmSolution.Devices
     using System.Runtime.Intrinsics.X86;
     using System.Security.Principal;
     using System.Text;
+    using System.Threading;
     using RmSolution.Devices.Leica;
     using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
@@ -50,23 +52,12 @@ namespace RmSolution.Devices
         /// <remarks> This command reads the current setting for the positioning tolerances of the Hz- and V- instrument axis.<br/>This command is valid for motorized instruments only.</remarks>
         /// <example> mod3 call 000001 AUT_ReadTol </example>
         [COMF]
-        public AUT_POSTOL? AUT_ReadTol()
-        {
-            var resp = Request(RequestString("%R1Q,9008:"));
-            switch (resp.ReturnCode)
+        public AUT_POSTOL? AUT_ReadTol() => Call("%R1Q,9008:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES
+            ? new AUT_POSTOL()
             {
-                case GRC.NA:
-                    throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available.");
-                case GRC.OK:
-                    if (resp.Values.Length == MOT_AXES)
-                        return new AUT_POSTOL()
-                        {
-                            PosTol = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
-                        };
-                    break;
-            };
-            return null;
-        }
+                PosTol = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
+            }
+            : default);
 
         /// <summary> Setting the positioning tolerances.</summary>
         /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><br/>
@@ -74,17 +65,12 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_SetTol 0 0 </example>
         [COMF]
-        public bool AUT_SetTol(double toleranceHz, double toleranceV)
+        public bool AUT_SetTol(double toleranceHz, double toleranceV) => Call("%R1Q,9007:", toleranceHz, toleranceV, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9007:", toleranceHz, toleranceV));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameters. One or both tolerance values not within the boundaries(1.57079E-06[rad] =1[cc]to 1.57079E-04[rad] =100[cc])."),
-                GRC.MOT_UNREADY => throw new LeicaException(resp.ReturnCode, "Instrument has no motorization."),
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameters. One or both tolerance values not within the boundaries(1.57079E-06[rad] =1[cc]to 1.57079E-04[rad] =100[cc])."),
+            GRC.MOT_UNREADY => throw new LeicaException(resp.ReturnCode, "Instrument has no motorization."),
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Setting the positioning tolerances.</summary>
         /// <remarks> This command sets new values for the positioning tolerances of the Hz- and V- instrument axes. This command is valid for motorized instruments only.<br/>The tolerances must be in the range of 1[cc] ( =1.57079 E-06[rad] ) to 100[cc] ( =1.57079 E-04[rad]).<br/><br/>
@@ -100,39 +86,23 @@ namespace RmSolution.Devices
         /// <returns> The values for the positioning time out in Hz and V direction [sec].</returns>
         /// <example> mod3 call 000001 AUT_ReadTimeout </example>
         [COMF]
-        public AUT_TIMEOUT? AUT_ReadTimeout()
-        {
-            var resp = Request(RequestString("%R1Q,9012:"));
-            switch (resp.ReturnCode)
+        public AUT_TIMEOUT? AUT_ReadTimeout() => Call("%R1Q,9012:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES
+            ? new AUT_TIMEOUT()
             {
-                case GRC.NA:
-                    throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available.");
-                case GRC.OK:
-                    if (resp.Values.Length == MOT_AXES)
-                        return new AUT_TIMEOUT()
-                        {
-                            PosTimeout = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
-                        };
-                    break;
-            };
-            return null;
-        }
+                PosTimeout = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
+            }
+            : default);
 
         /// <summary> Setting the timeout for positioning.</summary>
         /// <remarks> This command set the positioning timeout (set maximum time to perform a positioning). The timeout is reset on 7[sec] after each power on.</remarks>
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_SetTimeout </example>
         [COMF]
-        public bool AUT_SetTimeout(double timeoutHz, double timeoutV)
+        public bool AUT_SetTimeout(double timeoutHz, double timeoutV) => Call("%R1Q,9011:", timeoutHz, timeoutV, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9011:", timeoutHz, timeoutV));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "One or both time out values not within the boundaries (7[sec] to 60[sec])."),
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "One or both time out values not within the boundaries (7[sec] to 60[sec])."),
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Setting the timeout for positioning.</summary>
         /// <remarks> This command set the positioning timeout (set maximum time to perform a positioning). The timeout is reset on 7[sec] after each power on.</remarks>
@@ -160,29 +130,24 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_MakePositioning </example>
         [COMF]
-        public bool AUT_MakePositioning(double Hz, double V, AUT_POSMODE POSMode, AUT_ATRMODE ATRMode, bool dummy = false)
+        public bool AUT_MakePositioning(double Hz, double V, AUT_POSMODE POSMode, AUT_ATRMODE ATRMode, bool dummy = false) => Call("%R1Q,9027:", Hz, V, POSMode, ATRMode, dummy, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9027:", Hz, V, POSMode, ATRMode, dummy));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter (e.g. no valid position)."),
-                GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Time out while positioning of one or both axes. (perhaps increase AUT time out, see AUT_SetTimeout)."),
-                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
-                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Error with angle measurement occurs if the instrument is not levelled properly during positioning."),
-                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
-                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication timeout. (perhaps increase COM timeout, see COM_SetTimeout)."),
-                // Additionally with position mode AUT_TARGET -->
-                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
-                GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
-                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
-                GRC.AUT_ACCURACY => throw new LeicaException(resp.ReturnCode, "Inexact fine position, repeat positioning."),
-                GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat positioning."),
-                GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter (e.g. no valid position)."),
+            GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Time out while positioning of one or both axes. (perhaps increase AUT time out, see AUT_SetTimeout)."),
+            GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+            GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Error with angle measurement occurs if the instrument is not levelled properly during positioning."),
+            GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+            GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication timeout. (perhaps increase COM timeout, see COM_SetTimeout)."),
+            // Additionally with position mode AUT_TARGET -->
+            GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+            GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
+            GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+            GRC.AUT_ACCURACY => throw new LeicaException(resp.ReturnCode, "Inexact fine position, repeat positioning."),
+            GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat positioning."),
+            GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
 
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Turning the telescope to the other face.</summary>
         /// <remarks> This procedure turns the telescope to the other face. If another function is active, for example locking onto a target, then this function is terminated and the procedure is executed.<br/><br/>
@@ -198,30 +163,25 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_ChangeFace </example>
         [COMF]
-        public bool AUT_ChangeFace(AUT_POSMODE POSMode, AUT_ATRMODE ATRMode, bool dummy = false)
+        public bool AUT_ChangeFace(AUT_POSMODE POSMode, AUT_ATRMODE ATRMode, bool dummy = false) => Call("%R1Q,9028:", POSMode, ATRMode, dummy, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9028:", POSMode, ATRMode, dummy));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
-                GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
-                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
-                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Error with angle measurement occurs if the instrument is not levelled properly during positioning."),
-                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
-                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
-                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication timeout. (perhaps increase COM timeout,\r\nsee COM_SetTimeout)."),
-                // Additionally with position mode AUT_TARGET -->
-                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
-                GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
-                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
-                GRC.AUT_ACCURACY => throw new LeicaException(resp.ReturnCode, "Inexact fine position, repeat positioning."),
-                GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error\r\ndetected, repeat change face."),
-                GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
+            GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
+            GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+            GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Error with angle measurement occurs if the instrument is not levelled properly during positioning."),
+            GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+            GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+            GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication timeout. (perhaps increase COM timeout,\r\nsee COM_SetTimeout)."),
+            // Additionally with position mode AUT_TARGET -->
+            GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+            GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
+            GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+            GRC.AUT_ACCURACY => throw new LeicaException(resp.ReturnCode, "Inexact fine position, repeat positioning."),
+            GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error\r\ndetected, repeat change face."),
+            GRC.AUT_NOT_ENABLED => throw new LeicaException(resp.ReturnCode, "ATR mode not enabled, enable ATR mode."),
 
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Automatic target positioning.</summary>
         /// <remarks> This procedure precisely positions the telescope crosshairs onto the target prism and measures the ATR Hz and V deviations.If the target is not within the visible area of the ATR sensor (Field of View) a target search will be executed.The target search range is limited by the parameter dSrchV in V- direction and by parameter dSrchHz in Hz - direction.If no target found the instrument turns back to the initial start position.<br/><br/>
@@ -233,26 +193,21 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_FineAdjust </example>
         [COMF]
-        public bool AUT_FineAdjust(double srchHz, double srchV, bool dummy = false)
+        public bool AUT_FineAdjust(double srchHz, double srchV, bool dummy = false) => Call("%R1Q,9037:", srchHz, srchV, dummy, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9037:", srchHz, srchV, dummy));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
-                GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. The position fault lies above 100[cc]. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
-                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
-                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
-                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
-                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
-                GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
-                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
-                GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat fine positioning."),
-                GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Error in target acquisition."),
-                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
+            GRC.AUT_TIMEOUT => throw new LeicaException(resp.ReturnCode, "Timeout while positioning of one or both axes. The position fault lies above 100[cc]. (perhaps increase AUT timeout, see AUT_SetTimeout)."),
+            GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+            GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+            GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+            GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+            GRC.AUT_MULTIPLE_TARGETS => throw new LeicaException(resp.ReturnCode, "Multiple targets found."),
+            GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+            GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "During the determination of the angle deviation error detected, repeat fine positioning."),
+            GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Error in target acquisition."),
+            GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Performing an automatic target search.</summary>
         /// <remarks> This procedure performs an automatically target search within a given area. The search is terminated once the prism appears in the field of view of the ATR sensor.If no prism is found within the specified area, the instrument turns back to the initial start position.For an exact positioning onto the prism centre, use fine adjust (see AUT_FineAdjust) afterwards.<br/><br/>
@@ -263,41 +218,47 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_Search </example>
         [COMF]
-        public bool AUT_Search(double Hz_Area, double V_Area, bool dummy = false)
+        public bool AUT_Search(double Hz_Area, double V_Area, bool dummy = false) => Call("%R1Q,9029:", Hz_Area, V_Area, dummy, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9029:", Hz_Area, V_Area, dummy));
-            return (resp.ReturnCode) switch
-            {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available."),
-                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
-                GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
-                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
-                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
-                GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
-                GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
-                GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "AZE error, at repeated occur call service."),
-                GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
-                _ => Successful(resp.ReturnCode)
-            };
-        }
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid parameter."),
+            GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+            GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal error."),
+            GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Function aborted."),
+            GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target found."),
+            GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Inadequate environment conditions."),
+            GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "AZE error, at repeated occur call service."),
+            GRC.COM_TIMEDOUT => throw new LeicaException(resp.ReturnCode, "Communication time out. (perhaps increase COM timeout, see COM_SetTimeout)."),
+            _ => Successful(resp.ReturnCode)
+        });
 
         /// <summary> Getting the fine adjust positioning mode.</summary>
         /// <remarks> This function returns the current activated fine adjust positioning mode. This command is valid for all instruments, but has only effects for instruments equipped with ATR.</remarks>
         /// <returns> Current fine adjust positioning mode.</returns>
         /// <example> mod3 call 000001 AUT_GetFineAdjustMode </example>
         [COMF]
-        public AUT_ADJMODE? AUT_GetFineAdjustMode()
+        public AUT_ADJMODE? AUT_GetFineAdjustMode() => Call("%R1Q,9030:", (resp) => Successful(resp.ReturnCode) ? (AUT_ADJMODE)resp.Values[0] : default);
+
+        /// <summary> Setting the fine adjust positioning mode.</summary>
+        /// <remarks> This function sets the positioning tolerances (default values for both modes) relating the angle accuracy or the point accuracy for the fine adjust.This command is valid for all instruments, but has only effects for instruments equipped with ATR.If a target is very near or held by hand, it’s recommended to set the adjust-mode to AUT_POINT_MODE.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_SetFineAdjustMode </example>
+        [COMF]
+        public bool AUT_SetFineAdjustMode(AUT_ADJMODE adjMode) => Call("%R1Q,9031:", adjMode, (resp) => (resp.ReturnCode) switch
         {
-            var resp = Request(RequestString("%R1Q,9030:"));
-            switch (resp.ReturnCode)
-            {
-                case GRC.NA:
-                    throw new LeicaException(resp.ReturnCode, "GeoCOM Robotic license key not available.");
-                case GRC.OK:
-                    return (AUT_ADJMODE)resp.Values[0];
-            };
-            return null;
-        }
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid mode."),
+            _ => Successful(resp.ReturnCode)
+        });
+
+        /// <summary> Starting the target tracking.</summary>
+        /// <remarks> This function sets the positioning tolerances (default values for both modes) relating the angle accuracy or the point accuracy for the fine adjust.This command is valid for all instruments, but has only effects for instruments equipped with ATR.If a target is very near or held by hand, it’s recommended to set the adjust-mode to AUT_POINT_MODE.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_LockIn </example>
+        [COMF]
+        public bool AUT_LockIn() => Call("%R1Q,9013:", (resp) => (resp.ReturnCode) switch
+        {
+            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid mode."),
+            _ => Successful(resp.ReturnCode)
+        });
 
         #endregion AUTOMATION (AUT CONF)
 

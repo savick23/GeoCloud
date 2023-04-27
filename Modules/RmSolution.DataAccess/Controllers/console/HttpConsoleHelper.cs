@@ -9,7 +9,6 @@ namespace RmSolution.DataAccess
     using System.Reflection;
     using System.Net.Sockets;
     using System.Net;
-    using Microsoft.AspNetCore.DataProtection;
     using System.IO;
     #endregion Using
 
