@@ -308,6 +308,21 @@ namespace RmSolution.Devices.Leica
 
     #region Structures
 
+    /// <summary> Search Area.</summary>
+    public struct AUT_SEARCH_AREA
+    {
+        /// <summary> Hz angle of search area – center [rad].</summary>
+        public double CenterHz;
+        /// <summary> V angle of search area – center [rad].</summary>
+        public double CenterV;
+        /// <summary> Width of search area [rad].</summary>
+        public double RangeHz;
+        /// <summary> Maximal height of search area [rad].</summary>
+        public double RangeV;
+        /// <summary> TRUE: user defined search area is active.</summary>
+        public bool Enabled;
+    }
+
     /// <summary> TPS Device Configuration Type </summary>
     public struct TPS_DEVICE
     {

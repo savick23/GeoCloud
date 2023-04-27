@@ -250,15 +250,43 @@ namespace RmSolution.Devices
         });
 
         /// <summary> Starting the target tracking.</summary>
-        /// <remarks> This function sets the positioning tolerances (default values for both modes) relating the angle accuracy or the point accuracy for the fine adjust.This command is valid for all instruments, but has only effects for instruments equipped with ATR.If a target is very near or held by hand, it’s recommended to set the adjust-mode to AUT_POINT_MODE.</remarks>
+        /// <remarks> If LOCK mode is activated (AUS_SetUserLockState) then the function starts the target tracking. The AUT_LockIn command is only possible if a AUT_FineAdjust command has been previously sent and successfully executed.</remarks>
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 AUT_LockIn </example>
         [COMF]
         public bool AUT_LockIn() => Call("%R1Q,9013:", (resp) => (resp.ReturnCode) switch
         {
-            GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid mode."),
+            GRC.AUT_MOTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Instrument has no ‘motorization’."),
+            GRC.AUT_DETECTOR_ERROR => throw new LeicaException(resp.ReturnCode, "Error in target acquisition, at repeated occur call service."),
+            GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No target detected, no previous Fine Adjust."),
+            GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Bad environment conditions."),
+            GRC.ATA_STRANGE_LIGHT => throw new LeicaException(resp.ReturnCode, "No target detected, no previous Fine Adjust."),
             _ => Successful(resp.ReturnCode)
         });
+
+        /// <summary> Getting the dimensions of the PowerSearch window.</summary>
+        /// <remarks> This function returns the current position and size of the PowerSearch Window. This command is valid for all instruments, but has only effects for instruments equipped with PowerSearch.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_GetSearchArea </example>
+        [COMF]
+        public AUT_SEARCH_AREA? AUT_GetSearchArea() => Call("%R1Q,9042:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 5
+            ? new AUT_SEARCH_AREA()
+            {
+                CenterHz = (long)resp.Values[0],
+                CenterV = (long)resp.Values[1],
+                RangeHz = (long)resp.Values[2],
+                RangeV = (long)resp.Values[3],
+                Enabled = resp.Values[4].Equals(1L)
+            }
+            : default);
+
+        /// <summary> Setting the PowerSearch window.</summary>
+        /// <remarks> This function defines the position and dimensions and activates the PowerSearch window. This command is valid for all instruments, but has only effects for instruments equipped with PowerSearch.</remarks>
+        /// <param name="area"> User defined searching area.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 AUT_SetSearchArea </example>
+        [COMF]
+        public bool AUT_SetSearchArea(AUT_SEARCH_AREA area) => Call("%R1Q,9043:", area.CenterHz, area.CenterV, area.RangeHz, area.RangeV, area.Enabled, (resp) => Successful(resp.ReturnCode));
 
         #endregion AUTOMATION (AUT CONF)
 
