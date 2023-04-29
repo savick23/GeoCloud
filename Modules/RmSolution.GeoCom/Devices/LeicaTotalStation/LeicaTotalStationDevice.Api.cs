@@ -48,10 +48,82 @@ namespace RmSolution.Devices
 
         #endregion Constants
 
+        #region GENERAL GEOCOM FUNCTIONS
+
+
+        #endregion GENERAL GEOCOM FUNCTIONS
+
+        #region ALT USER (AUS CONF)
+
+        /// <summary> Getting the status of the ATR mode.</summary>
+        /// <remarks> Get the current status of the ATR mode on automated instrument models. This command does not indicate whether the ATR has currently acquired a prism.Note the difference between GetUserATR and GetUserLOCK state.</remarks>
+        /// <returns> State of the ATR mode.</returns>
+        /// <example> mod3 call 000001 AUS_GetUserAtrState </example>
+        [COMF]
+        public ON_OFF_TYPE? AUS_GetUserAtrState() =>
+            Call("%R1Q,18006:", (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "ATR not available; no automated instrument."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (ON_OFF_TYPE)resp.Values[0] : default
+            });
+
+        /// <summary> Getting the status of the ATR mode.</summary>
+        /// <remarks> Get the current status of the ATR mode on automated instrument models. This command does not indicate whether the ATR has currently acquired a prism.Note the difference between GetUserATR and GetUserLOCK state.</remarks>
+        /// <returns> State of the ATR mode.</returns>
+        /// <example> mod3 call 000001 AUS_SetUserAtrState </example>
+        [COMF]
+        public ON_OFF_TYPE? AUS_SetUserAtrState() =>
+            Call("%R1Q,18005:", (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "ATR not available; no automated instrument."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (ON_OFF_TYPE)resp.Values[0] : default
+            });
+
+        /// <summary> Getting the status of the LOCK mode.</summary>
+        /// <remarks> This command gets the current status of the LOCK mode. This command is valid for automated instruments only.TheGetUserLockState command does not indicate if the instrument is currently locked to a prism.For this function the MotReadLockStatus has to be used.</remarks>
+        /// <returns> State of the LOCK mode.</returns>
+        /// <example> mod3 call 000001 AUS_GetUserLockState </example>
+        [COMF]
+        public ON_OFF_TYPE? AUS_GetUserLockState() =>
+            Call("%R1Q,18008:", (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "ATR not available; no automated instrument."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (ON_OFF_TYPE)resp.Values[0] : default
+            });
+
+        /// <summary> Setting the status of the LOCK mode.</summary>
+        /// <remarks> Activates or deactivates the LOCK mode.<br/>Status ON: The LOCK mode is activated. This does not mean that the instrument is locked onto a prism. In order to lock and follow a moving target, see the function AUT_LockIn.<br/>
+        /// Status OFF: The LOCK mode is deactivated. A moving target, which is being tracked, will be aborted and the manual drive wheel is activated.<br/>
+        /// This command is valid for automated instruments only.</remarks>
+        /// <param name="onOff"> State of the ATR lock switch.</param>
+        /// <returns> State of the LOCK mode.</returns>
+        /// <example> mod3 call 000001 AUS_SetUserLockState </example>
+        [COMF]
+        public bool AUS_SetUserLockState(bool onOff) =>
+            Call("%R1Q,8007:", onOff, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "ATR not available; no automated instrument."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Setting the status of the LOCK mode.</summary>
+        /// <remarks> Activates or deactivates the LOCK mode.<br/>Status ON: The LOCK mode is activated. This does not mean that the instrument is locked onto a prism. In order to lock and follow a moving target, see the function AUT_LockIn.<br/>
+        /// Status OFF: The LOCK mode is deactivated. A moving target, which is being tracked, will be aborted and the manual drive wheel is activated.<br/>
+        /// This command is valid for automated instruments only.</remarks>
+        /// <param name="onOff"> State of the ATR lock switch.</param>
+        /// <returns> State of the LOCK mode.</returns>
+        /// <example> mod3 call 000001 AUS_SetUserLockState </example>
+        [COMF]
+        public bool AUS_SetUserLockState(ON_OFF_TYPE onOff) =>
+            AUS_SetUserLockState(onOff == ON_OFF_TYPE.ON);
+
+        #endregion ALT USER (AUS CONF)
+
         #region AUTOMATION (AUT CONF)
 
         /// <summary> Reading the current setting for the positioning tolerances.</summary>
         /// <remarks> This command reads the current setting for the positioning tolerances of the Hz- and V- instrument axis.<br/>This command is valid for motorized instruments only.</remarks>
+        /// <returns> State of the ATR mode.</returns>
         /// <example> mod3 call 000001 AUT_ReadTol </example>
         [COMF]
         public AUT_POSTOL? AUT_ReadTol() =>
