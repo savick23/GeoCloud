@@ -21,6 +21,7 @@ namespace RmSolution.Devices
     using System.Security.Principal;
     using System.Text;
     using System.Threading;
+    using RmSolution.Data;
     using RmSolution.Devices.Leica;
     using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
@@ -397,63 +398,40 @@ namespace RmSolution.Devices
         /// <returns> Actual target type.</returns>
         /// <example> mod3 call 000001 BAP_GetTargetType </example>
         [COMF]
-        public BAP_TARGET_TYPE? BAP_GetTargetType()
-        {
-            var resp = Request(RequestString("%R1Q,17022:"));
-            if (resp.ReturnCode == GRC.OK)
-                return (BAP_TARGET_TYPE)resp.Values[0];
-
-            return null;
-        }
+        public BAP_TARGET_TYPE? BAP_GetTargetType() =>
+            Call("%R1Q,17022:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (BAP_TARGET_TYPE)resp.Values[0] : default);
 
         /// <summary> Setting the EDM type.</summary>
         /// <remarks> Sets the current EDM type for distance measurements (Reflector (IR) or Reflectorless (RL)).<br/>For each EDM type the last used EDM mode is remembered and activated if the EDM type is changed.<br/>If EDM type IR is selected the last used Automation mode is automatically activated.<br/>BAP_SetMeasPrg can also change the target type.<br/>EDM type RL is not available on all instrument types.</remarks>
         /// <param name="targetType"> Target type </param>
         /// <example> mod3 call 000001 BAP_SetTargetType </example>
         [COMF]
-        public bool BAP_SetTargetType(BAP_TARGET_TYPE targetType)
-        {
-            var resp = Request(RequestString("%R1Q,17021:", targetType));
-            return Successful(resp.ReturnCode);
-        }
-
+        public bool BAP_SetTargetType(BAP_TARGET_TYPE targetType) =>
+            Call("%R1Q,17021:", targetType, (resp) => Successful(resp.ReturnCode));
+ 
         /// <summary> Getting the default prism type.</summary>
         /// <remarks> Gets the current prism type.</remarks>
         /// <returns> Actual prism type.</returns>
         /// <example> mod3 call 000001 BAP_GetPrismType </example>
         [COMF]
-        public BAP_PRISMTYPE? BAP_GetPrismType()
-        {
-            var resp = Request(RequestString("%R1Q,17009:"));
-            if (resp.ReturnCode == GRC.OK)
-                return (BAP_PRISMTYPE)resp.Values[0];
-
-            return null;
-        }
+        public BAP_PRISMTYPE? BAP_GetPrismType() =>
+            Call("%R1Q,17009:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (BAP_PRISMTYPE)resp.Values[0] : default);
 
         /// <summary> Setting the default prism type.</summary>
         /// <remarks> Sets the prism type for measurements with a reflector. It overwrites the prism constant, set by TMC_SetPrismCorr.</remarks>
         /// <param name="prismType"> Prism type </param>
         /// <example> mod3 call 000001 BAP_SetPrismType </example>
         [COMF]
-        public bool BAP_SetPrismType(BAP_PRISMTYPE prismType)
-        {
-            var resp = Request(RequestString("%R1Q,17008:", prismType));
-            return Successful(resp.ReturnCode);
-        }
+        public bool BAP_SetPrismType(BAP_PRISMTYPE prismType) =>
+            Call("%R1Q,17008:", prismType, (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Getting the default or user prism type.</summary>
         /// <remarks> Gets the current prism type and name.</remarks>
         /// <example> mod3 call 000001 BAP_GetPrismType2 </example>
         [COMF]
-        public KeyValuePair<BAP_PRISMTYPE, string>? BAP_GetPrismType2()
-        {
-            var resp = Request(RequestString("%R1Q,17031:"));
-            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 2)
-                return new KeyValuePair<BAP_PRISMTYPE, string>((BAP_PRISMTYPE)resp.Values[0], resp.Values[1].ToString());
-
-            return null;
-        }
+        public KeyValuePair<BAP_PRISMTYPE, string>? BAP_GetPrismType2() =>
+            Call("%R1Q,17031:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 2
+                ? new KeyValuePair<BAP_PRISMTYPE, string>((BAP_PRISMTYPE)resp.Values[0], resp.Values[1].ToString()) : default);
 
         /// <summary> Setting the default prism type.</summary>
         /// <remarks> Sets the prism type for measurements with a reflector. It overwrites the prism constant, set by TMC_SetPrismCorr.</remarks>
@@ -526,44 +504,32 @@ namespace RmSolution.Devices
         /// <param name="creator"> Name of creator </param>
         /// <example> mod3 call 000001 BAP_SetUserPrismDef </example>
         [COMF]
-        public bool BAP_SetUserPrismDef(string prismName, double addConst, BAP_REFLTYPE reflType, string creator)
-        {
-            var resp = Request(RequestString("%R1Q,17023:", prismName, addConst, reflType, creator));
-            return (resp.ReturnCode) switch
+        public bool BAP_SetUserPrismDef(string prismName, double addConst, BAP_REFLTYPE reflType, string creator) =>
+            Call("%R1Q,17023:", prismName, addConst, reflType, creator, (resp) => (resp.ReturnCode) switch
             {
                 GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Invalid prism definition."),
                 GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Prism definition is not set."),
                 _ => Successful(resp.ReturnCode)
-            };
-        }
+            });
 
         /// <summary> Getting the actual distance measurement program.</summary>
         /// <remarks> Gets the current distance measurement program.</remarks>
         /// <returns> Actual measurement program </returns>
         /// <example> mod3 call 000001 BAP_GetMeasPrg </example>
         [COMF]
-        public BAP_USER_MEASPRG? BAP_GetMeasPrg()
-        {
-            var resp = Request(RequestString("%R1Q,17018:"));
-            if (resp.ReturnCode == GRC.OK && resp.Values.Length == 1)
-                return (BAP_USER_MEASPRG)resp.Values[0];
-
-            return null;
-        }
+        public BAP_USER_MEASPRG? BAP_GetMeasPrg() =>
+            Call("%R1Q,17018:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (BAP_USER_MEASPRG)resp.Values[0] : default);
 
         /// <summary> Setting the distance measurement program.</summary>
         /// <remarks> Defines the distance measurement program i.e. for BAP_MeasDistanceAngle.<br/>RL EDM type programs are not available on all instrument types.<br/>Changing the measurement programs may change the EDM type as well(Reflector (IR) and Reflectorless (RL)).</remarks>
         /// <example> mod3 call 000001 BAP_SetMeasPrg </example>
         [COMF]
-        public bool BAP_SetMeasPrg(BAP_USER_MEASPRG measPrg)
-        {
-            var resp = Request(RequestString("%R1Q,17019:", measPrg));
-            return (resp.ReturnCode) switch
+        public bool BAP_SetMeasPrg(BAP_USER_MEASPRG measPrg) =>
+            Call("%R1Q,17019:", measPrg, (resp) => (resp.ReturnCode) switch
             {
                 GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Measurement program is not available."),
                 _ => Successful(resp.ReturnCode)
-            };
-        }
+            });
 
         /// <summary> Measuring Hz,V angles and a single distance.</summary>
         /// <remarks> This function measures angles and a single distance depending on the mode DistMode. Note that this function is not suited for continuous measurements(LOCK mode and TRK mode). This command uses the current automation settings.</remarks>
@@ -626,10 +592,8 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 BAP_SearchTarget </example>
         [COMF]
-        public bool BAP_SearchTarget(bool dummy = false)
-        {
-            var resp = Request(RequestString("%R1Q,17020:", dummy));
-            return (resp.ReturnCode) switch
+        public bool BAP_SearchTarget(bool dummy = false) =>
+            Call("%R1Q,17020:", dummy, (resp) => (resp.ReturnCode) switch
             {
                 GRC.AUT_BAD_ENVIRONMENT => throw new LeicaException(resp.ReturnCode, "Bad Environment conditions."),
                 GRC.AUT_DEV_ERROR => throw new LeicaException(resp.ReturnCode, "Deviation measurement error."),
@@ -641,8 +605,7 @@ namespace RmSolution.Devices
                 GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Error, searching aborted."),
                 GRC.FATAL => throw new LeicaException(resp.ReturnCode, "Fatal Error."),
                 _ => Successful(resp.ReturnCode)
-            };
-        }
+            });
 
         /// <summary> Getting the current ATR low vis mode.</summary>
         /// <remarks> Gets the current low vis mode.</remarks>
@@ -680,54 +643,30 @@ namespace RmSolution.Devices
         /// <remarks> This function produces a triple beep with the configured intensity and frequency, which cannot be changed. If there is a continuous signal active, it will be stopped before.</remarks>
         /// <example> mod3 call 000001 BMM_BeepAlarm </example>
         [COMF]
-        public ZResponse BMM_BeepAlarm()
-        {
-            var resp = Request(RequestString("%R1Q,11004:"));
-            if (resp.ReturnCode == GRC.OK)
-            {
-            }
-            return resp;
-        }
+        public bool BMM_BeepAlarm() =>
+            Call("%R1Q,11004:", (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Outputing an alarm signal (single beep).</summary>
         /// <remarks> This function produces a single beep with the configured intensity and frequency, which cannot be changed. If a continuous signal is active, it will be stopped first.</remarks>
         /// <example> mod3 call 000001 BMM_BeepNormal </example>
         [COMF]
-        public ZResponse BMM_BeepNormal()
-        {
-            var resp = Request(RequestString("%R1Q,11003:"));
-            if (resp.ReturnCode == GRC.OK)
-            {
-            }
-            return resp;
-        }
+        public bool BMM_BeepNormal() =>
+            Call("%R1Q,11003:", (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Starting a continuous beep signal.</summary>
         /// <remarks> This function switches on the beep-signal with the intensity nIntens. If a continuous signal is active, it will be stopped first.Turn off the beeping device with IOS_BeepOff.</remarks>
         /// <param name="intens">Intensity of the beep-signal (volume) expressed as a percentage(0-100 %).</param>
         /// <example> mod3 call 000001 IOS_BeepOn </example>
         [COMF]
-        public ZResponse IOS_BeepOn(int intens = IOS_BEEP_STDINTENS)
-        {
-            var resp = Request(RequestString("%R1Q,20001:", intens));
-            if (resp.ReturnCode == GRC.OK)
-            {
-            }
-            return resp;
-        }
+        public bool IOS_BeepOn(int intens = IOS_BEEP_STDINTENS) =>
+            Call("%R1Q,20001:", intens , (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Stopping an active beep signal.</summary>
         /// <remarks> This function switches off the beep-signal.</remarks>
         /// <example> mod3 call 000001 IOS_BeepOff </example>
         [COMF]
-        public ZResponse IOS_BeepOff()
-        {
-            var resp = Request(RequestString("%R1Q,20000:"));
-            if (resp.ReturnCode == GRC.OK)
-            {
-            }
-            return resp;
-        }
+        public bool IOS_BeepOff() =>
+            Call("%R1Q,20000:", (resp) => Successful(resp.ReturnCode));
 
         #endregion BASIC MAN MACHINE INTERFACE (BMM COMF)
 

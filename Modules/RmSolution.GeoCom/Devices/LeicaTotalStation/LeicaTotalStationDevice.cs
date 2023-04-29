@@ -132,7 +132,7 @@ namespace RmSolution.Devices
 
         /// <summary> Вызов функции на устройстве с вовзратом единственного параметра.</summary>
         T? GetComf<T>(string command, params object[] parameters) =>
-            Call(command, parameters, (resp) => resp.ReturnCode == GRC.OK && resp.Values.Length == 1 ? (T)resp.Values[0] : default);
+            Call(command, parameters, (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (T)resp.Values[0] : default);
 
         /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         bool SetComf(string command, params object[] parameters) =>
