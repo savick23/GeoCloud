@@ -21,8 +21,10 @@ namespace RmSolution.Devices
     using System.Security.Principal;
     using System.Text;
     using System.Threading;
+    using Microsoft.Extensions.Logging;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
+    using RmSolution.Runtime;
     using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
@@ -50,6 +52,25 @@ namespace RmSolution.Devices
 
         #region GENERAL GEOCOM FUNCTIONS
 
+        /// <summary> Getting the double precision setting.</summary>
+        /// <remarks> This function returns the precision - number of digits to the right of the decimal point - when double floatingpoint values are transmitted.The usage of this function is only meaningful if the communication is set to ASCII transmission mode.Precision is equal in both transmission directions.In the case of an ASCII request, the precision of the server side will be returned.</remarks>
+        /// <returns> Number of digits to the right of the decimal point. 0 <= digit <= 15 </returns>
+        /// <example> mod3 call 000001 COM_GetDoublePrecision </example>
+        [COMF]
+        public int COM_GetDoublePrecision() =>
+            Call("%R1Q,108:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (int)(long)resp.Values[0] : default);
+
+        /// <summary> Setting the double precision setting.</summary>
+        /// <remarks> This function sets the precision - number of digits to the right of the decimal - when double floating-point values are transmitted.The TPS’ system software always calculates with highest possible precision. The default precision is fifteen digits. However, if this precision is not needed then transmission of double data (ASCII transmission) can be speeded up by choosing a lower precision. Especially when many double values are transmitted this may enhance the operational speed.The usage of this function is only meaningful if the communication is set to ASCII transmission mode.In the case of an ASCII request, the precision of the server side will be set.Notice that trailing Zeros will not be sent by the server and values may be rounded. E.g. if precision is set to 3 and the exact value is 1.99975 the resulting value will be 2.0<br/><b>Note: </b>With this function it is possible to decrease the accuracy of the delivered values.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 COM_SetDoublePrecision </example>
+        [COMF]
+        public bool COM_SetDoublePrecision(int digit)
+        {
+            if (digit < 0 || digit > 15) throw new LeicaException(GRC.IVPARAM, "Invalid parameter detected. Result unspecified. 0 > Digits > 15");
+
+            return Call("%R1Q,107:", digit, (resp) => Successful(resp.ReturnCode));
+        }
 
         #endregion GENERAL GEOCOM FUNCTIONS
 
@@ -981,5 +1002,62 @@ namespace RmSolution.Devices
         }
 
         #endregion ELECTRONIC DISTANCE MEASUREMENT (EDM COMF)
+
+        #region FILE TRANSFER (FTR COMF)
+
+        /// <summary> Setup list.</summary>
+        /// <remarks> This command sets up the device, file type and search path. It has to be called before command FTR_List can be used.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 FTR_SetupList </example>
+        [COMF]
+        public bool FTR_SetupList(long deviceType, long fileType, string searchPath) =>
+            Call("%R1Q,23306:", deviceType, fileType, searchPath, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Device not available or can not get path."),
+                GRC.NOTOK => throw new LeicaException(resp.ReturnCode, "Setup already done or FTR_AbortList() not called."),
+                GRC.FTR_FILEACCESS => throw new LeicaException(resp.ReturnCode, "File access error."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> List file.</summary>
+        /// <remarks> This command gets one single file entry. The command FTR_List has to be called first.</remarks>
+        /// <param name="next"> True if first entry otherwise next entry.</param>
+        /// <param name="last"> True if last entry.</param>
+        /// <param name="DirInfo"> Info about file name, size and modification time and date. The entry is not valid if the file name is empty("").</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 FTR_List </example>
+        [COMF]
+        public bool FTR_List(bool next, out bool last, out FTR_DIRINFO DirInfo)
+        {
+            var resp = Call("%R1Q,23307:", next, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.FTR_MISSINGSETUP => throw new LeicaException(resp.ReturnCode, "Missing setup."),
+                GRC.FTR_INVALIDINPUT => throw new LeicaException(resp.ReturnCode, "First block is missing or last time was already last block."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            last = resp.Values[0].Equals(1L);
+            DirInfo = new FTR_DIRINFO()
+            {
+                FileName = resp.Values[1].ToString(),
+                FileSize = (long)resp.Values[2],
+                ModTime = new FTR_MODTIME((long)resp.Values[3], (long)resp.Values[4], (long)resp.Values[5], (long)resp.Values[6]),
+                ModDate = new FTR_MODDATE((long)resp.Values[7], (long)resp.Values[8], (long)resp.Values[9])
+            };
+            return true;
+        }
+
+        /// <summary> Abort list.</summary>
+        /// <remarks> This command aborts or ends file list command.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 FTR_AbortList </example>
+        [COMF]
+        public bool FTR_AbortList() =>
+            Call("%R1Q,23308:", (resp) => Successful(resp.ReturnCode));
+
+        #endregion FILE TRANSFER (FTR COMF)
+
+        #region CLIENT SPECIFIC GEOCOM FUNCTIONS
+        /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
+        #endregion CLIENT SPECIFIC GEOCOM FUNCTIONS
     }
 }

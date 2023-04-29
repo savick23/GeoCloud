@@ -409,5 +409,54 @@ namespace RmSolution.Devices.Leica
         public double[] PosTimeout;
     }
 
+    /// <summary> Modification time.</summary>
+    public struct FTR_MODTIME
+    {
+        /// <summary> hour.</summary>
+        public int Hour;
+        /// <summary> minute.</summary>
+        public int Minute;
+        /// <summary> second.</summary>
+        public int Second;
+        /// <summary> centisecond (0.01 sec).</summary>
+        public int Centisecond;
+
+        public FTR_MODTIME(long hour, long minute, long second, long centisecond)
+        {
+            Hour = (int)hour;
+            Minute = (int)minute;
+            Second = (int)second;
+            Centisecond = (int)centisecond;
+        }
+    }
+
+    /// <summary> Modification date.</summary>
+    public struct FTR_MODDATE
+    {
+        /// <summary> UTC date, day.</summary>
+        public int Day;
+        /// <summary> UTC date, month.</summary>
+        public int Month;
+        /// <summary> UTC date, year.</summary>
+        public int Year;
+
+        public FTR_MODDATE(long day, long month, long year)
+        {
+            Day = (int)day;
+            Month = (int)month;
+            Month = (int)year;
+        }
+    }
+
+    /// <summary> Directory info.</summary>
+    public struct FTR_DIRINFO
+    {
+        /// <summary> Max lenght 81 symbol.</summary>
+        public string FileName;
+        public long FileSize;
+        public FTR_MODTIME ModTime;
+        public FTR_MODDATE ModDate;
+    }
+
     #endregion Structures
 }
