@@ -308,6 +308,15 @@ namespace RmSolution.Devices.Leica
 
     #region Structures
 
+    /// <summary> Search Spiral.</summary>
+    public struct AUT_SEARCH_SPIRAL
+    {
+        /// <summary> width of search area [rad].</summary>
+        public double RangeHz;
+        /// <summary> maximal height of search area [rad].</summary>
+        public double RangeV;
+    }
+
     /// <summary> Search Area.</summary>
     public struct AUT_SEARCH_AREA
     {
