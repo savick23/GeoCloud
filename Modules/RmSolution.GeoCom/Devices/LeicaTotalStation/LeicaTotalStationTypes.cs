@@ -354,6 +354,15 @@ namespace RmSolution.Devices.Leica
         MOT_TERM = 7
     }
 
+    /// <summary> Controller Stop Mode.</summary>
+    public enum MOT_STOPMODE
+    {
+        /// <summary> Slow down with current acceleration.</summary>
+        MOT_NORMAL = 0,
+        /// <summary> Slow down by switch off power supply.</summary>
+        MOT_SHUTDOWN = 1
+    }
+
     #endregion Enums
 
     #region Structures

@@ -1204,6 +1204,34 @@ namespace RmSolution.Devices
                 _ => Successful(resp.ReturnCode)
             });
 
+        /// <summary> Stopping the motor controller.</summary>
+        /// <remarks> This command is used to stop movement and to stop the motor controller operation.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 MOT_StopController </example>
+        [COMF]
+        public bool MOT_StopController(MOT_STOPMODE stopMode) =>
+            Call("%R1Q,6002:", stopMode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.MOT_NOT_BUSY => throw new LeicaException(resp.ReturnCode, "No movement in progress (e.g. stop without start)."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Driving the instrument with a constant speed.</summary>
+        /// <remarks> This command is used to set up the velocity of motorization. This function is valid only if MOT_StartController(MOT_OCONST) has been called previously.RefOmega[0] denotes the horizontal and RefOmega[1] denotes the vertical velocity setting.</remarks>
+        /// <param name="hzSpeed"> The speed in horizontal and vertical direction in rad/s. The maximum speed is +/- 3.14 rad/s each for TM30 TS30 instruments and 0.79 rad/s each for TPS1200 instruments.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 MOT_SetVelocity </example>
+        [COMF]
+        public bool MOT_SetVelocity(double hzSpeed, double vSpeed) =>
+            Call("%R1Q,6004:", hzSpeed, vSpeed , (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "RefOmega.adValue[HZ] and/or RefOmega.adValue[V] values are not within the boundaries."),
+                GRC.MOT_NOT_CONFIG => throw new LeicaException(resp.ReturnCode, "System is not in state MOT_CONFIG or MOT_BUSY_OPEN_END (e.g. missing ‘start controller’)."),
+                GRC.MOT_NOT_OCONST => throw new LeicaException(resp.ReturnCode, "Drive is not in mode MOT_OCONST (set by MOT_StartController)."),
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "No motorization available (no automated instrument)."),
+                _ => Successful(resp.ReturnCode)
+            });
+
         #endregion MOTORISATION (MOT COMF)
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
