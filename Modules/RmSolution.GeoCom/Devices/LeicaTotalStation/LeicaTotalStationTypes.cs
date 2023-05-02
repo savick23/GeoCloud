@@ -363,6 +363,15 @@ namespace RmSolution.Devices.Leica
         MOT_SHUTDOWN = 1
     }
 
+    /// <summary> Automatic Shutdown Mechanism for the System.</summary>
+    public enum SUP_AUTO_POWER
+    {
+        /// <summary> Instrument remains on.</summary>
+        AUTO_POWER_DISABLED = 0,
+        /// <summary> Turns off mechanism.</summary>
+        AUTO_POWER_OFF = 2
+    }
+
     #endregion Enums
 
     #region Structures
@@ -546,6 +555,27 @@ namespace RmSolution.Devices.Leica
         /// <summary> File name prefix.</summary>
         public string FileNamePrefix;
     };
+
+    /// <summary> Calculated Co-ordinates based on a Distance Measurement.</summary>
+    public struct TMC_COORDINATE
+    {
+        /// <summary> E-Coordinate [m].</summary>
+        public double E;
+        /// <summary> N-Coordinate [m].</summary>
+        public double N;
+        /// <summary> H-Coordinate [m].</summary>
+        public double H;
+        /// <summary> Timestamp of dist. Measurement [ms].</summary>
+        public long CoordTime;
+        /// <summary> E-Coordinate (continuously) [m].</summary>
+        public double E_Cont;
+        /// <summary> N-Coordinate (continuously) [m].</summary>
+        public double N_Cont;
+        /// <summary> H-Coordinate (continuously) [m].</summary>
+        public double H_Cont;
+        /// <summary> Timestamp of measurement [ms].</summary>
+        public long CoordContTime;
+    }
 
     #endregion Structures
 }

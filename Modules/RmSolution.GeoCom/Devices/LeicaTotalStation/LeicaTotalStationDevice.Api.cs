@@ -10,6 +10,7 @@ namespace RmSolution.Devices
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
+    using System.Diagnostics;
     using System.Diagnostics.Metrics;
     using System.Drawing;
     using System.Globalization;
@@ -22,6 +23,7 @@ namespace RmSolution.Devices
     using System.Text;
     using System.Threading;
     using Microsoft.Extensions.Logging;
+    using Microsoft.VisualBasic;
     using Microsoft.VisualBasic.FileIO;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
@@ -1233,6 +1235,64 @@ namespace RmSolution.Devices
             });
 
         #endregion MOTORISATION (MOT COMF)
+
+        #region SUPERVISOR (SUP COMF)
+
+        /// <summary> Getting the power management configuration status.</summary>
+        /// <remarks> The returned settings are power off configuration and timing.</remarks>
+        /// <returns> AutoPower = Current activated shut down mechanism.<br/>Timeout = The timeout in ms. After this time the device switches in the mode defined by the value of AutoPower when no user activity(press a key, turn the device or communication via GeoCOM) occurs.</returns>
+        /// <example> mod3 call 000001 SUP_GetConfig </example>
+        [COMF]
+        public bool SUP_GetConfig(out bool reserved, out SUP_AUTO_POWER autoPower, out long timeout)
+        {
+            var resp = Call("%R1Q,14001:", resp => resp);
+            reserved = resp.Values[0].Equals(1L);
+            autoPower = (SUP_AUTO_POWER)resp.Values[1];
+            timeout = (long)resp.Values[2];
+            return true;
+        }
+
+        /// <summary> Setting the power management configuration.</summary>
+        /// <remarks> Set the auto power off mode to AUTO_POWER_DISABLED or AUTO_POWER_OFF and the corresponding timeout.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 SUP_SetConfig </example>
+        [COMF]
+        public bool SUP_SetConfig(bool reserved, SUP_AUTO_POWER autoPower, long timeout) =>
+            Call("%R1Q,14002:", reserved, autoPower, timeout, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Timeout parameter invalid."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        #endregion SUPERVISOR (SUP COMF)
+
+        #region THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
+
+        /// <summary> Getting the coordinates of a measured point.</summary>
+        /// <remarks> This function queries an angle measurement and, in dependence of the selected Mode, an inclination measurement and calculates the co-ordinates of the measured point with an already measured distance.A distance measurement has to be started in advance.The WaitTime is a delay to wait for the distance measurement to finish. Single and tracking measurements are supported. Information about a missing distance measurement and other information about the quality of the result is returned in the return- code.</remarks>
+        /// <param name="waitTime"> The delay to wait for the distance measurement to finish [ms].</param>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Calculated Cartesian co-ordinates.</returns>
+        /// <example> mod3 call 000001 TMC_GetCoordinate </example>
+        [COMF]
+        public TMC_COORDINATE? TMC_GetCoordinate(long waitTime, TMC_INCLINE_PRG mode) =>
+            Call("%R1Q,2082:", waitTime, mode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "No motorisation available (no automated instrument)."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 8 ? new TMC_COORDINATE()
+                {
+                    E = double.Parse(resp.Values[0].ToString()),
+                    N = double.Parse(resp.Values[1].ToString()),
+                    H = double.Parse(resp.Values[2].ToString()),
+                    CoordTime = (long)resp.Values[3],
+                    E_Cont = double.Parse(resp.Values[4].ToString()),
+                    N_Cont = double.Parse(resp.Values[5].ToString()),
+                    H_Cont = double.Parse(resp.Values[6].ToString()),
+                    CoordContTime = (long)resp.Values[7]
+                } : default
+            });
+
+        #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
