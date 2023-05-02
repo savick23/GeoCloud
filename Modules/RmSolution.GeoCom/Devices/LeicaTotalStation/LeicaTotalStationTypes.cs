@@ -305,20 +305,20 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> [File] Devicetype.</summary>
-    public enum FTR_DEVICETYPE
+    public enum FTR_DEVICETYPE : long
     {
         FTR_DEVICE_INTERNAL = 0,
         FTR_DEVICE_PCPARD = 1
     }
 
     /// <summary> [File] Filetype.</summary>
-    public enum FTR_FILETYPE
+    public enum FTR_FILETYPE : long
     {
         FTR_FILE_IMAGES = 170
     }
 
     /// <summary> Memory device type.</summary>
-    public enum IMG_MEM_TYPE
+    public enum IMG_MEM_TYPE : long
     {
         /// <summary> internal memory module (optional).</summary>
         IMG_INTERNAL_MEMORY = 0x0,
@@ -327,7 +327,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Lock Conditions.</summary>
-    public enum MOT_LOCK_STATUS
+    public enum MOT_LOCK_STATUS : long
     {
         /// <summary> Locked out.</summary>
         MOT_LOCKED_OUT = 0,
@@ -338,7 +338,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Controller Configuration.</summary>
-    public enum MOT_MODE
+    public enum MOT_MODE : long
     {
         /// <summary> Configured for relative postioning.</summary>
         MOT_POSIT = 0,
@@ -355,7 +355,7 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Controller Stop Mode.</summary>
-    public enum MOT_STOPMODE
+    public enum MOT_STOPMODE : long
     {
         /// <summary> Slow down with current acceleration.</summary>
         MOT_NORMAL = 0,
@@ -364,12 +364,22 @@ namespace RmSolution.Devices.Leica
     }
 
     /// <summary> Automatic Shutdown Mechanism for the System.</summary>
-    public enum SUP_AUTO_POWER
+    public enum SUP_AUTO_POWER : long
     {
         /// <summary> Instrument remains on.</summary>
         AUTO_POWER_DISABLED = 0,
         /// <summary> Turns off mechanism.</summary>
         AUTO_POWER_OFF = 2
+    }
+
+    public enum TMC_INCLINE_PRG : long
+    {
+        /// <summary> encoded as 0 </summary>
+        TMC_MEA_INC, 
+        /// <summary> encoded as 1 </summary>
+        TMC_AUTO_INC,
+        /// <summary> encoded as 2 </summary>
+        TMC_PLANE_INC
     }
 
     #endregion Enums
@@ -575,6 +585,12 @@ namespace RmSolution.Devices.Leica
         public double H_Cont;
         /// <summary> Timestamp of measurement [ms].</summary>
         public long CoordContTime;
+    }
+
+    public struct TMC_HZ_V_ANG
+    {
+        public double Hz;
+        public double V;
     }
 
     #endregion Structures

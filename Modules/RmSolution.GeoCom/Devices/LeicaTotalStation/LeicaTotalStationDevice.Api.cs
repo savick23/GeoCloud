@@ -1225,7 +1225,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 MOT_SetVelocity </example>
         [COMF]
         public bool MOT_SetVelocity(double hzSpeed, double vSpeed) =>
-            Call("%R1Q,6004:", hzSpeed, vSpeed , (resp) => (resp.ReturnCode) switch
+            Call("%R1Q,6004:", hzSpeed, vSpeed, (resp) => (resp.ReturnCode) switch
             {
                 GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "RefOmega.adValue[HZ] and/or RefOmega.adValue[V] values are not within the boundaries."),
                 GRC.MOT_NOT_CONFIG => throw new LeicaException(resp.ReturnCode, "System is not in state MOT_CONFIG or MOT_BUSY_OPEN_END (e.g. missing ‘start controller’)."),
@@ -1301,6 +1301,35 @@ namespace RmSolution.Devices
                     CoordContTime = (long)resp.Values[7]
                 } : default
             });
+
+        /// <summary> Returning an angle and distance measurement.</summary>
+        /// <remarks> This function returns the angles and distance measurement data. This command does not issue a new distance measurement.A distance measurement has to be started in advance.If a distance measurement is valid the function ignores WaitTime and returns the results.If no valid distance measurement is available and the distance measurement unit is not activated(by TMC_DoMeasure before the TMC_GetSimpleMea call) the angle measurement result is returned after the waittime.Information about distance measurement is returned in the return code.</remarks>
+        /// <param name="waitTime"> The delay to wait for the distance measurement to finish [ms].</param>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Result of the angle measurement [rad].<br/>Result of the distance measurement [m].</returns>
+        /// <example> mod3 call 000001 TMC_GetSimpleMea </example>
+        [COMF]
+        public bool TMC_GetSimpleMea(long waitTime, TMC_INCLINE_PRG mode, out TMC_HZ_V_ANG onlyAngle, out double slopeDistance)
+        {
+            var resp = Call("%R1Q,2108:", waitTime, mode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed, because the result is containing measurement data which accuracy could not be verified by the system. Co-ordinates are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NOT_FULL_CORR => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            onlyAngle = new TMC_HZ_V_ANG() { Hz = double.Parse(resp.Values[0].ToString()), V = double.Parse(resp.Values[1].ToString()) };
+            slopeDistance = double.Parse(resp.Values[2].ToString());
+            return true;
+        }
 
         #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
