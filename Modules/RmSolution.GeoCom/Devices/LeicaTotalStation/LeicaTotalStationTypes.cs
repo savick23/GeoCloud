@@ -337,6 +337,23 @@ namespace RmSolution.Devices.Leica
         MOT_PREDICTION = 2
     }
 
+    /// <summary> Controller Configuration.</summary>
+    public enum MOT_MODE
+    {
+        /// <summary> Configured for relative postioning.</summary>
+        MOT_POSIT = 0,
+        /// <summary> Configured for constant speed.</summary>
+        MOT_OCONST = 1,
+        /// <summary> Configured for manual positioning default setting.</summary>
+        MOT_MANUPOS = 2,
+        /// <summary> Configured as "Lock-In"-controller.</summary>
+        MOT_LOCK = 3,
+        /// <summary> Configured as "Brake"-controller do not use 5 and 6.</summary>
+        MOT_BREAK = 4,
+        /// <summary> Terminates the controller task.</summary>
+        MOT_TERM = 7
+    }
+
     #endregion Enums
 
     #region Structures

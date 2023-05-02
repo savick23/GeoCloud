@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Devices\LeicaTotalStation\LeicaTotalStationDevice.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Devices\LeicaTotalStation\LeicaTotalStationDevice.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
   </ItemGroup>
 

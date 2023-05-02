@@ -7,9 +7,13 @@ namespace RmSolution.Devices.Leica
     #region Using
     using System;
     using System.ComponentModel;
+    using System.Globalization;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     #endregion Using
 
     /// <summary> General Return Code </summary>
+    [JsonConverter(typeof(GrcJsonConverter))]
     public enum GRC : long
     {
         #region CUSTOM
@@ -556,4 +560,14 @@ namespace RmSolution.Devices.Leica
     }
 
     #endregion Exceptions
+
+    /// <summary> Конвертер текстового представления значения.</summary>
+    public class GrcJsonConverter : JsonConverter<GRC>
+    {
+        public override GRC Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            Enum.TryParse<GRC>(reader.GetString(), true, out var val) ? val : GRC.UNDEFINED;
+
+        public override void Write(Utf8JsonWriter writer, GRC value, JsonSerializerOptions options) =>
+            throw new NotImplementedException();
+    }
 }

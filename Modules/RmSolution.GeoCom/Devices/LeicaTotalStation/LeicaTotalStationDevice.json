@@ -1,0 +1,37 @@
+{
+  "functions":
+  [
+    {
+      "name": "MOT_ReadLockStatus",
+      "call": "%R1Q,6021:",
+      "return": [
+        {
+          "code": "NOT_IMPL",
+          "text": "No motorisation available (no automated instrument)."
+        }
+      ]
+    },
+    {
+      "name": "MOT_StartController",
+      "call": "%R1Q,6001:",
+      "return": [
+        {
+          "code": "IVPARAM",
+          "text": "The value of ControlMode is not MOT_OCONST."
+        },
+        {
+          "code": "NOT_IMPL",
+          "text": "No motorization available (no automated instrument)."
+        },
+        {
+          "code": "MOT_BUSY",
+          "text": "Subsystem is busy (e.g. controller already started)."
+        },
+        {
+          "code": "MOT_UNREADY",
+          "text": "Subsystem is not initialised."
+        }
+      ]
+    }
+  ]
+}

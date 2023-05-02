@@ -11,10 +11,12 @@ namespace RmSolution.GeoCom
     using System.IO.Ports;
     using System.Reflection;
     using System.Text;
+    using System.Text.Json;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using RmSolution.Data;
     using RmSolution.Devices;
+    using RmSolution.Devices.Leica;
     using RmSolution.Runtime;
     #endregion Using
 

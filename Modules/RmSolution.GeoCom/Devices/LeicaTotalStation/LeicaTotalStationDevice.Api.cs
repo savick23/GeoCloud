@@ -1144,7 +1144,7 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 IMG_SetTccConfig </example>
         [COMF]
-        public bool IMG_SetTccConfig(IMG_MEM_TYPE memType, long imageNumber, long quality, long subFunctNumber,string fileNamePrefix) =>
+        public bool IMG_SetTccConfig(IMG_MEM_TYPE memType, long imageNumber, long quality, long subFunctNumber, string fileNamePrefix) =>
             Call("%R1Q,23401:", imageNumber, quality, subFunctNumber, fileNamePrefix, (resp) => (resp.ReturnCode) switch
             {
                 GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
@@ -1182,13 +1182,26 @@ namespace RmSolution.Devices
         /// <returns> Lock information.</returns>
         /// <example> mod3 call 000001 MOT_ReadLockStatus </example>
         [COMF]
-        public MOT_LOCK_STATUS? MOT_ReadLockStatus(IMG_MEM_TYPE memTypes) =>
-            Call("%R1Q,6021:", memTypes, (resp) => (resp.ReturnCode) switch
+        public MOT_LOCK_STATUS? MOT_ReadLockStatus() =>
+            Call("%R1Q,6021:", (resp) => (resp.ReturnCode) switch
             {
-                GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
-                GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Not supported by Telescope Firmware."),
-                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available full."),
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "No motorisation available (no automated instrument)."),
                 _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (MOT_LOCK_STATUS)resp.Values[0] : default
+            });
+
+        /// <summary> Starting the motor controller.</summary>
+        /// <remarks> This command is used to enable remote or user interaction to the motor controller.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 MOT_StartController </example>
+        [COMF]
+        public bool MOT_StartController(MOT_MODE controlMode) =>
+            Call("%R1Q,6001:", controlMode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "The value of ControlMode is not MOT_OCONST."),
+                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "No motorization available (no automated instrument)."),
+                GRC.MOT_BUSY => throw new LeicaException(resp.ReturnCode, "Subsystem is busy (e.g. controller already started)."),
+                GRC.MOT_UNREADY => throw new LeicaException(resp.ReturnCode, "Subsystem is not initialised."),
+                _ => Successful(resp.ReturnCode)
             });
 
         #endregion MOTORISATION (MOT COMF)
@@ -1215,5 +1228,27 @@ namespace RmSolution.Devices
         }
 
         #endregion CLIENT SPECIFIC GEOCOM FUNCTIONS
+
+        #region Nested types
+
+        internal class GrcFunctionCollection
+        {
+            public GrcFunction[] Functions;
+        }
+
+        internal struct GrcFunction
+        {
+            public string Name;
+            public string Call;
+            public GrcReturn[] Return;
+        }
+
+        internal struct GrcReturn
+        {
+            public GRC Code;
+            public string Text;
+        }
+
+        #endregion Nested types
     }
 }
