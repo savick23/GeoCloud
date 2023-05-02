@@ -1278,7 +1278,17 @@ namespace RmSolution.Devices
         public TMC_COORDINATE? TMC_GetCoordinate(long waitTime, TMC_INCLINE_PRG mode) =>
             Call("%R1Q,2082:", waitTime, mode, (resp) => (resp.ReturnCode) switch
             {
-                GRC.NOT_IMPL => throw new LeicaException(resp.ReturnCode, "No motorisation available (no automated instrument)."),
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed, because the result is containing measurement data which accuracy could not be verified by the system. Co-ordinates are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NOT_FULL_CORR => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
                 _ => Successful(resp.ReturnCode) && resp.Values.Length == 8 ? new TMC_COORDINATE()
                 {
                     E = double.Parse(resp.Values[0].ToString()),
