@@ -1374,7 +1374,7 @@ namespace RmSolution.Devices
         /// <param name="mode"> Inclination sensor measurement mode.</param>
         /// <returns> Result of the angle measurement.</returns>
         /// <example> mod3 call 000001 TMC_GetAngle5 </example>
-                [COMF]
+        [COMF]
         public TMC_HZ_V_ANG? TMC_GetAngle5(TMC_INCLINE_PRG mode) =>
             Call("%R1Q,2107:", mode, (resp) => (resp.ReturnCode) switch
             {
@@ -1395,6 +1395,38 @@ namespace RmSolution.Devices
                     V = double.Parse(resp.Values[1].ToString())
                 } : default
             });
+
+        /// <summary> Returning a slope distance and hz-angle, v-angle.</summary>
+        /// <remarks> The function starts an EDM Tracking measurement and waits until a distance is measured. Then it returns the angle and the slope-distance, but no co-ordinates.If no distance can be measured, it returns the angle values(hz, v) and the corresponding return-code.<br/>In order to abort the current measuring program use the function TMC_DoMeasure.</remarks>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> <b>OnlyAngle</b> measured Hz- and V- angle.<br/><b>SlopeDistance</b> measured slope-distance.</returns>
+        /// <example> mod3 call 000001 TMC_QuickDist </example>
+        [COMF]
+        public bool TMC_QuickDist(out TMC_HZ_V_ANG onlyAngle, out double slopeDistance)
+        {
+           var resp = Call("%R1Q,2117:", (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed because the result consists of data which accuracy could not be verified by the system. Angle and distance data are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Angle and distance data are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError. This message is to be considered as a warning."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Perform a distance measurement previously."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Angle data are available but distance data are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            onlyAngle = new TMC_HZ_V_ANG()
+            {
+                Hz = double.Parse(resp.Values[0].ToString()),
+                V = double.Parse(resp.Values[1].ToString())
+            };
+            slopeDistance = double.Parse(resp.Values[2].ToString());
+            return true;
+        }
 
         #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
