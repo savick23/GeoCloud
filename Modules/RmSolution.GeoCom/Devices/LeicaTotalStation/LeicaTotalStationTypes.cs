@@ -374,13 +374,56 @@ namespace RmSolution.Devices.Leica
 
     public enum TMC_INCLINE_PRG : long
     {
-        /// <summary> encoded as 0 </summary>
-        TMC_MEA_INC, 
-        /// <summary> encoded as 1 </summary>
+        /// <summary> Use sensor (apriori sigma) </summary>
+        TMC_MEA_INC,
+        /// <summary> Automatic mode (sensor/plane) </summary>
         TMC_AUTO_INC,
-        /// <summary> encoded as 2 </summary>
+        /// <summary> Use plane (apriori sigma) </summary>
         TMC_PLANE_INC
     }
+
+    /// <summary> Actual Face.</summary>
+    public enum TMC_FACE : long
+    {
+        /// <summary> Pos 1 of telescope.</summary>
+        TMC_FACE_1 = 0,
+        /// <summary> Pos 2 of telescope.</summary>
+        TMC_FACE_2 = 1
+    }
+
+    public enum EDM_MODE : long
+    {
+        /// <summary> Init value.</summary>
+        EDM_MODE_NOT_USED = 0,
+        /// <summary> IR Standard Reflector Tape.</summary>
+        EDM_SINGLE_TAPE = 1,
+        /// <summary> IR Standard.</summary>
+        EDM_SINGLE_STANDARD = 2,
+        /// <summary> IR Fast.</summary>
+        EDM_SINGLE_FAST = 3,
+        /// <summary> LO Standard.</summary>
+        EDM_SINGLE_LRANGE = 4,
+        /// <summary> RL Standard.</summary>
+        EDM_SINGLE_SRANGE = 5,
+        /// <summary> Standard repeated measurement.</summary>
+        EDM_CONT_STANDARD = 6,
+        /// <summary> IR Tacking.</summary>
+        EDM_CONT_DYNAMIC = 7,
+        /// <summary> RL Tracking.</summary>
+        EDM_CONT_REFLESS = 8,
+        /// <summary> Fast repeated measurement.</summary>
+        EDM_CONT_FAST = 9,
+        /// <summary> IR Average.</summary>
+        EDM_AVERAGE_IR = 10,
+        /// <summary> RL Average.</summary>
+        EDM_AVERAGE_SR = 11,
+        /// <summary> LO Average.</summary>
+        EDM_AVERAGE_LR = 12,
+        /// <summary> IR Precise (TS30, TM30).</summary>
+        EDM_PRECISE_IR = 13,
+        /// <summary> IR Precise Reflector Tape (TS30, TM30).</summary>
+        EDM_PRECISE_TAPE = 14
+    };
 
     #endregion Enums
 
@@ -591,6 +634,36 @@ namespace RmSolution.Devices.Leica
     {
         public double Hz;
         public double V;
+    }
+
+    /// <summary> Inclination Data.</summary>
+    public struct TMC_INCLINE
+    {
+        /// <summary> Transverse axis incl. [rad].</summary>
+        public double CrossIncline;
+        /// <summary> Longitud. axis inclination [rad].</summary>
+        public double LengthIncline;
+        /// <summary> Inclination accuracy [rad].</summary>
+        public double AccuracyIncline;
+        /// <summary> Moment of measurement [ms].</summary>
+        public DateTime InclineTime;
+    }
+
+    /// <summary> Corrected Angle Data with Inclination Data.</summary>
+    public struct TMC_ANGLE
+    {
+        /// <summary> Horizontal angle [rad].</summary>
+        public double Hz;
+        /// <summary> Vertical angle [rad].</summary>
+        public double V;
+        /// <summary> Accuracy of angles [rad].</summary>
+        public double AngleAccuracy;
+        /// <summary> Moment of measurement [ms].</summary>
+        public DateTime AngleTime;
+        /// <summary> Corresponding inclination.</summary>
+        public TMC_INCLINE Incline;
+        /// <summary> Face position of telescope.</summary>
+        public TMC_FACE Face;
     }
 
     #endregion Structures

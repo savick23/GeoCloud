@@ -15,6 +15,7 @@ namespace RmSolution.Devices
     using System.Drawing;
     using System.Globalization;
     using System.Reflection;
+    using System.Reflection.Metadata;
     using System.Reflection.PortableExecutable;
     using System.Runtime.InteropServices;
     using System.Runtime.Intrinsics.Arm;
@@ -664,7 +665,7 @@ namespace RmSolution.Devices
                 case GRC.TMC_ANGLE_OK: throw new LeicaException(resp.ReturnCode, "Angle without coordinates!");
                 case GRC.TMC_ACCURACY_GUARANTEE: throw new LeicaException(resp.ReturnCode, "Info, accuracy cannot be guaranteed.");
                 case GRC.TMC_ANGLE_NO_ACC_GUARANTY: throw new LeicaException(resp.ReturnCode, "Info, only angle measurement valid, accuracy cannot be guaranteed.");
-                case GRC.TMC_ANGLE_NOT_FULL_CORR: throw new LeicaException(resp.ReturnCode, "Warning, only angle measurement valid, accuracy cannot be guaranteed.");
+                case GRC.TMC_ANGLE_NO_FULL_CORRECTION: throw new LeicaException(resp.ReturnCode, "Warning, only angle measurement valid, accuracy cannot be guaranteed.");
                 case GRC.TMC_NO_FULL_CORRECTION: throw new LeicaException(resp.ReturnCode, "Warning, measurement without full correction.");
                 case GRC.TMC_SIGNAL_ERROR: throw new LeicaException(resp.ReturnCode, "Error, no signal on EDM (only in signal mode).");
 
@@ -1282,7 +1283,7 @@ namespace RmSolution.Devices
                 GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
                 GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
                 GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
-                GRC.TMC_ANGLE_NOT_FULL_CORR => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
                 GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
                 GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
                 GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
@@ -1313,13 +1314,13 @@ namespace RmSolution.Devices
         {
             var resp = Call("%R1Q,2108:", waitTime, mode, (resp) => (resp.ReturnCode) switch
             {
-                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed, because the result is containing measurement data which accuracy could not be verified by the system. Co-ordinates are available."),
-                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
-                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed because the result consists of data which accuracy could not be verified by the system. Angle and distance data are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Angle and distance data are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError. This message is to be considered as a warning."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Perform a distance measurement previously."),
                 GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
-                GRC.TMC_ANGLE_NOT_FULL_CORR => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
                 GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
-                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Angle data are available but distance data are not available."),
                 GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
                 GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
                 GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
@@ -1330,6 +1331,70 @@ namespace RmSolution.Devices
             slopeDistance = double.Parse(resp.Values[2].ToString());
             return true;
         }
+
+        /// <summary> Returning a complete angle measurement.</summary>
+        /// <remarks> This function carries out an angle measurement and, in dependence of configuration, inclination measurement and returns the results.As shown the result is very comprehensive. For simple angle measurements use TMC_GetAngle5 or TMC_GetSimpleMea instead.<br/>Information about measurement is returned in the return code.</remarks>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Result of the angle measurement.</returns>
+        /// <example> mod3 call 000001 TMC_GetAngle1 </example>
+        [COMF]
+        public TMC_ANGLE? TMC_GetAngle1(TMC_INCLINE_PRG mode) =>
+            Call("%R1Q,2003:", mode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed because the result consists of data which accuracy could not be verified by the system. Angle and distance data are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Angle and distance data are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError. This message is to be considered as a warning."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Perform a distance measurement previously."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Angle data are available but distance data are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 9 ? new TMC_ANGLE()
+                {
+                    Hz = double.Parse(resp.Values[0].ToString()),
+                    V = double.Parse(resp.Values[1].ToString()),
+                    AngleAccuracy = double.Parse(resp.Values[2].ToString()),
+                    AngleTime = DateTime.FromFileTimeUtc((long)resp.Values[3]),
+                    Incline = new TMC_INCLINE()
+                    {
+                        CrossIncline = double.Parse(resp.Values[4].ToString()),
+                        LengthIncline = double.Parse(resp.Values[5].ToString()),
+                        AccuracyIncline = double.Parse(resp.Values[6].ToString()),
+                        InclineTime = DateTime.FromFileTimeUtc((long)resp.Values[7])
+                    },
+                    Face = (TMC_FACE)resp.Values[8]
+                } : default
+            });
+
+        /// <summary> Returning a simple angle measurement.</summary>
+        /// <remarks> This function carries out an angle measurement and returns the results. In contrast to the function TMC_GetAngle1 this function returns only the values of the angle. For simple angle measurements use TMC_GetSimpleMea instead.<br/>Information about measurement is returned in the return code.</remarks>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Result of the angle measurement.</returns>
+        /// <example> mod3 call 000001 TMC_GetAngle5 </example>
+                [COMF]
+        public TMC_HZ_V_ANG? TMC_GetAngle5(TMC_INCLINE_PRG mode) =>
+            Call("%R1Q,2107:", mode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed because the result consists of data which accuracy could not be verified by the system. Angle and distance data are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Angle and distance data are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError. This message is to be considered as a warning."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Perform a distance measurement previously."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Angle data are available but distance data are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 2 ? new TMC_HZ_V_ANG()
+                {
+                    Hz = double.Parse(resp.Values[0].ToString()),
+                    V = double.Parse(resp.Values[1].ToString())
+                } : default
+            });
 
         #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
@@ -1361,6 +1426,7 @@ namespace RmSolution.Devices
         internal class GrcFunctionCollection
         {
             public GrcFunction[] Functions;
+            public GrcReturn[] Return;
         }
 
         internal struct GrcFunction

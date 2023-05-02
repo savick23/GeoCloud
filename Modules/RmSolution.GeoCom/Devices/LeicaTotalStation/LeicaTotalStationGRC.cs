@@ -322,7 +322,7 @@ namespace RmSolution.Devices.Leica
         /// <summary> [1285] Warning: only angle measurement valid.</summary>
         TMC_ANGLE_OK = 0x0505,
         /// <summary> [1288] Warning: only angle measurement valid but without full correction.</summary>
-        TMC_ANGLE_NOT_FULL_CORR = 0x0508,
+        TMC_ANGLE_NO_FULL_CORRECTION = 0x0508,
         /// <summary> [1289] Info: only angle measurement valid but accuracy can not be guarantee.</summary>
         TMC_ANGLE_NO_ACC_GUARANTY = 0x0509,
         /// <summary> [1290] Error: no angle measurement.</summary>
