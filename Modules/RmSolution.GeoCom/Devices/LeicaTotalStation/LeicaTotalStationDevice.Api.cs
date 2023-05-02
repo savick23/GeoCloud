@@ -14,9 +14,11 @@ namespace RmSolution.Devices
     using System.Diagnostics.Metrics;
     using System.Drawing;
     using System.Globalization;
+    using System.Numerics;
     using System.Reflection;
     using System.Reflection.Metadata;
     using System.Reflection.PortableExecutable;
+    using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
     using System.Runtime.Intrinsics.Arm;
     using System.Runtime.Intrinsics.X86;
@@ -1466,6 +1468,32 @@ namespace RmSolution.Devices
 
         #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
+        #region MEASUREMENT CONTROL FUNCTIONS (TMC CONF)
+
+        /// <summary> Carrying out a distance measurement.</summary>
+        /// <remarks> This function carries out a distance measurement according to the TMC measurement mode like single distance, tracking,... . Please note that this command does not output any values (distances). In order to get the values you have to use other measurement functions such as TMC_GetCoordinate, TMC_GetSimpleMea, TMC_GetFullMeas or else TMC_GetAngle.<br/>The result of the distance measurement is kept in the instrument and is valid to the next TMC_DoMeasure command where a new distance is requested or the distance is clear by the measurement program TMC_CLEAR.<br/>
+        /// <b>Note:</b> If you perform a distance measurement with the measure program TMC_DEF_DIST, the distance sensor will work with the set EDM mode, see TMC_SetEdmMode.</remarks>
+        /// <param name="command"> TMC measurement mode.</param>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_DoMeasure </example>
+        [COMF]
+        public bool TMC_DoMeasure(TMC_MEASURE_PRG command, TMC_INCLINE_PRG mode) =>
+            Call("%R1Q,2008:", command, mode, (resp) => Successful(resp.ReturnCode));
+
+        /// <summary> Inputing a slope distance and height offset.</summary>
+        /// <remarks> This function is used to input manually measured slope distance and height offset for a following measurement. Additionally an inclination measurement and an angle measurement are carried out to determine the co-ordinates of target.The V-angle is corrected to π/2 or 3⋅π/2 in dependence of the instrument’s face because of the manual input.<br/>After this command the previous measured distance is cleared</remarks>
+        /// <param name="slopeDistance"> Slope distance [m].</param>
+        /// <param name="hgtOffset"> Height offset [m].</param>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetHandDist </example>
+        [COMF]
+        public bool TMC_SetHandDist(double slopeDistance, double hgtOffset, TMC_INCLINE_PRG mode) =>
+            Call("%R1Q,2019:", slopeDistance, hgtOffset, mode, (resp) => Successful(resp.ReturnCode));
+
+        #endregion MEASUREMENT CONTROL FUNCTIONS (TMC CONF)
+
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
 
@@ -1491,7 +1519,7 @@ namespace RmSolution.Devices
 
         #region Nested types
 
-        internal class GrcFunctionCollection
+        internal struct GrcFunctionCollection
         {
             public GrcFunction[] Functions;
             public GrcReturn[] Return;

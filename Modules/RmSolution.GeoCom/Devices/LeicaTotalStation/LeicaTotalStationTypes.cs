@@ -425,6 +425,27 @@ namespace RmSolution.Devices.Leica
         EDM_PRECISE_TAPE = 14
     };
 
+    /// <summary> TMC Measurement Mode.</summary>
+    public enum TMC_MEASURE_PRG : long
+    {
+        /// <summary> Stop measurement program.</summary>
+        TMC_STOP = 0,
+        /// <summary> Default DIST-measurement program.</summary>
+        TMC_DEF_DIST = 1,
+        /// <summary> TMC_STOP and clear data.</summary>
+        TMC_CLEAR = 3,
+        /// <summary> Signal measurement (test function).</summary>
+        TMC_SIGNAL = 4,
+        /// <summary> (Re)start measurement task.</summary>
+        TMC_DO_MEASURE = 6,
+        /// <summary> Distance-TRK measurement program.</summary>
+        TMC_RTRK_DIST = 8,
+        /// <summary> Reflectorless tracking.</summary>
+        TMC_RED_TRK_DIST = 10,
+        /// <summary> Frequency measurement (test).</summary>
+        TMC_FREQUENCY = 11
+    }
+
     #endregion Enums
 
     #region Structures
