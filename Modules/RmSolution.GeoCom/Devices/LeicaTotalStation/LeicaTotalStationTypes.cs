@@ -317,6 +317,15 @@ namespace RmSolution.Devices.Leica
         FTR_FILE_IMAGES = 170
     }
 
+    /// <summary> Memory device type.</summary>
+    public enum IMG_MEM_TYPE
+    {
+        /// <summary> internal memory module (optional).</summary>
+        IMG_INTERNAL_MEMORY = 0x0,
+        /// <summary> external pc card.</summary>
+        IMG_PC_CARD = 0x1
+    }
+
     #endregion Enums
 
     #region Structures
@@ -486,6 +495,20 @@ namespace RmSolution.Devices.Leica
             FTR_BLOCK_len = 0;
         }
     }
+
+    /// <summary> Image Parameters.</summary>
+    public struct IMG_TCC_CONFIG
+    {
+        public const int IMG_MAX_FILE_PREFIX_LEN = 20;
+        /// <summary> Actual image number.</summary>
+        public long ImageNumber;
+        /// <summary> Jpeg compression quality factor (0 – 100).s</summary>
+        public long Quality;
+        /// <summary> Binary combination of the following settings:<br/>1: Test image<br/>2: Automatic exposure time selection<br/>4: two-times sub-sampling<br/>8: four-times sub-sampling</summary>
+        public long SubFunctNumber;
+        /// <summary> File name prefix.</summary>
+        public string FileNamePrefix;
+    };
 
     #endregion Structures
 }

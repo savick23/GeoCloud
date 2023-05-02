@@ -1117,6 +1117,64 @@ namespace RmSolution.Devices
 
         #endregion FILE TRANSFER (FTR COMF)
 
+        #region IMAGE PROCESSING (IMG COMF)
+
+        /// <summary> Reading the actual image configuration.</summary>
+        /// <param name="memType"> Memory device type </param>
+        /// <returns> Number of deleted files.</returns>
+        /// <example> mod3 call 000001 IMG_GetTccConfig </example>
+        [COMF]
+        public IMG_TCC_CONFIG? IMG_GetTccConfig(IMG_MEM_TYPE memType) =>
+            Call("%R1Q,23400:", memType, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available or configuration file does not exist."),
+                GRC.IVVERSION => throw new LeicaException(resp.ReturnCode, "Configuration file version differs from that of system firmware."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? new IMG_TCC_CONFIG()
+                {
+                    ImageNumber = (long)resp.Values[0],
+                    Quality = (long)resp.Values[1],
+                    SubFunctNumber = (long)resp.Values[2],
+                    FileNamePrefix = resp.Values[3].ToString()
+                } : default
+            });
+
+        /// <summary> Setting the actual image configuration.</summary>
+        /// <param name="memType"> Memory device type </param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 IMG_SetTccConfig </example>
+        [COMF]
+        public bool IMG_SetTccConfig(IMG_MEM_TYPE memType, long imageNumber, long quality, long subFunctNumber,string fileNamePrefix) =>
+            Call("%R1Q,23401:", imageNumber, quality, subFunctNumber, fileNamePrefix, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available full. Any parameter is out of range."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Setting the actual image configuration.</summary>
+        /// <param name="memType"> Memory device type </param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 IMG_SetTccConfig </example>
+        [COMF]
+        public bool IMG_SetTccConfig(IMG_MEM_TYPE memType, IMG_TCC_CONFIG parameters) =>
+            IMG_SetTccConfig(memType, parameters.ImageNumber, parameters.Quality, parameters.SubFunctNumber, parameters.FileNamePrefix);
+
+        /// <summary> Capture a telescopic image.</summary>
+        /// <returns> Number of the currently captured image.</returns>
+        /// <example> mod3 call 000001 IMG_TakeTccImage </example>
+        [COMF]
+        public int? IMG_TakeTccImage(IMG_MEM_TYPE memTypes) =>
+            Call("%R1Q,23402:", memTypes, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
+                GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Not supported by Telescope Firmware."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available full."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (int)(long)resp.Values[0] : default
+            });
+
+        #endregion IMAGE PROCESSING (IMG COMF)
+
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
 
