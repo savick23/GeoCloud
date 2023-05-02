@@ -22,6 +22,7 @@ namespace RmSolution.Devices
     using System.Text;
     using System.Threading;
     using Microsoft.Extensions.Logging;
+    using Microsoft.VisualBasic.FileIO;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
     using RmSolution.Runtime;
@@ -452,7 +453,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 AUT_PS_SetRange </example>
         [COMF]
         public bool AUT_PS_SetRange(long minDist, long maxDist) =>
-            Call("%R1Q,9047:", minDist, maxDist , (resp) => Successful(resp.ReturnCode));
+            Call("%R1Q,9047:", minDist, maxDist, (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Starting PowerSearch.</summary>
         /// <remarks> This command starts PowerSearch inside the given PowerSearch window, defined by AUT_SetSearchArea and optional by AUT_PS_SetRange.</remarks>
@@ -464,7 +465,7 @@ namespace RmSolution.Devices
             {
                 GRC.AUT_NO_WORKING_AREA => throw new LeicaException(resp.ReturnCode, "Working area not defined."),
                 GRC.AUT_NO_TARGET => throw new LeicaException(resp.ReturnCode, "No Target found."),
-                 _ => Successful(resp.ReturnCode)
+                _ => Successful(resp.ReturnCode)
             });
 
         /// <summary> Starting PowerSearch.</summary>
@@ -501,7 +502,7 @@ namespace RmSolution.Devices
         [COMF]
         public bool BAP_SetTargetType(BAP_TARGET_TYPE targetType) =>
             Call("%R1Q,17021:", targetType, (resp) => Successful(resp.ReturnCode));
- 
+
         /// <summary> Getting the default prism type.</summary>
         /// <remarks> Gets the current prism type.</remarks>
         /// <returns> Actual prism type.</returns>
@@ -704,7 +705,7 @@ namespace RmSolution.Devices
         /// <remarks> Gets the current low vis mode.</remarks>
         /// <example> mod3 call 000001 BAP_GetATRSetting </example>
         [COMF]
-        public BAP_ATRSETTING? BAP_GetATRSetting() => GetComf<BAP_ATRSETTING>("%R1Q,17034:");
+        public BAP_ATRSETTING? BAP_GetATRSetting() => CallGet<BAP_ATRSETTING>("%R1Q,17034:");
 
         /// <summary> Setting the current ATR low vis mode.</summary>
         /// <remarks> Sets the current low vis mode.</remarks>
@@ -712,21 +713,21 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 BAP_SetATRSetting </example>
         [COMF]
-        public bool BAP_SetATRSetting(BAP_ATRSETTING ATRSetting) => SetComf("%R1Q,17035:", ATRSetting);
+        public bool BAP_SetATRSetting(BAP_ATRSETTING ATRSetting) => CallSet("%R1Q,17035:", ATRSetting);
 
         /// <summary> Getting the reduced ATR field of view.</summary>
         /// <remarks> Get reduced ATR field of view mode.</remarks>
         /// <returns> ON: ATR uses reduced field of view(about 1/9).<br/>OFF: ATR uses full field of view.</returns>
         /// <example> mod3 call 000001 BAP_GetRedATRFov </example>
         [COMF]
-        public ON_OFF_TYPE? BAP_GetRedATRFov() => GetComf<ON_OFF_TYPE>("%R1Q,17036:");
+        public ON_OFF_TYPE? BAP_GetRedATRFov() => CallGet<ON_OFF_TYPE>("%R1Q,17036:");
 
         /// <summary> Setting the reduced ATR field of view.</summary>
         /// <remarks> Set reduced ATR field of view mode.</remarks>
         /// <param name="redFov"> true/false.</param>
         /// <example> mod3 call 000001 BAP_SetRedATRFov </example>
         [COMF]
-        public bool BAP_SetRedATRFov(ON_OFF_TYPE redFov) => SetComf("%R1Q,17037:", redFov);
+        public bool BAP_SetRedATRFov(ON_OFF_TYPE redFov) => CallSet("%R1Q,17037:", redFov);
 
         #endregion BASIC APPLICATIONS (BAP CONF)
 
@@ -752,7 +753,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 IOS_BeepOn </example>
         [COMF]
         public bool IOS_BeepOn(int intens = IOS_BEEP_STDINTENS) =>
-            Call("%R1Q,20001:", intens , (resp) => Successful(resp.ReturnCode));
+            Call("%R1Q,20001:", intens, (resp) => Successful(resp.ReturnCode));
 
         /// <summary> Stopping an active beep signal.</summary>
         /// <remarks> This function switches off the beep-signal.</remarks>
@@ -1027,7 +1028,7 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 FTR_List </example>
         [COMF]
-        public bool FTR_List(bool next, out bool last, out FTR_DIRINFO DirInfo)
+        public bool FTR_List(bool next, out bool last, out FTR_DIRINFO dirInfo)
         {
             var resp = Call("%R1Q,23307:", next, (resp) => (resp.ReturnCode) switch
             {
@@ -1036,7 +1037,7 @@ namespace RmSolution.Devices
                 _ => Successful(resp.ReturnCode) ? resp : resp
             });
             last = resp.Values[0].Equals(1L);
-            DirInfo = new FTR_DIRINFO()
+            dirInfo = new FTR_DIRINFO()
             {
                 FileName = resp.Values[1].ToString(),
                 FileSize = (long)resp.Values[2],
@@ -1051,13 +1052,92 @@ namespace RmSolution.Devices
         /// <returns> Execution successful.</returns>
         /// <example> mod3 call 000001 FTR_AbortList </example>
         [COMF]
-        public bool FTR_AbortList() =>
-            Call("%R1Q,23308:", (resp) => Successful(resp.ReturnCode));
+        public bool FTR_AbortList() => CallSet("%R1Q,23308:");
+
+        /// <summary> Setup download.</summary>
+        /// <remarks> This command sets up the download of a file from the instrument. It has to be called before command FTR_Download can be used.</remarks>
+        /// <param name="deviceType"> Device type.</param>
+        /// <param name="fileType"> File type.</param>
+        /// <param name="fileNameSrc">File name with extension. If file type is FTR_FILE_UNKNOWN additional file path is required.</param>
+        /// <param name="blockSize"> Block size. Max value is FTR_MAX_BLOCKSIZE.</param>
+        /// <returns> Number of blocks required to upload the file.</returns>
+        /// <example> mod3 call 000001 FTR_SetupDownload </example>
+        [COMF]
+        public int? FTR_SetupDownload(FTR_DEVICETYPE deviceType, FTR_FILETYPE fileType, string fileNameSrc, int blockSize) =>
+            Call("%R1Q,23303:", deviceType, fileType, fileNameSrc, blockSize, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Device not available or can not get path."),
+                GRC.NOTOK => throw new LeicaException(resp.ReturnCode, "Setup already done or FTR_AbortDownload() not called."),
+                GRC.FTR_INVALIDINPUT => throw new LeicaException(resp.ReturnCode, "Block size too big."),
+                GRC.FTR_FILEACCESS => throw new LeicaException(resp.ReturnCode, "File access error."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (int)(long)resp.Values[0] : default
+            });
+
+        /// <summary> Download file.</summary>
+        /// <remarks> This command gets one single block of data. The command FTR_SetupDownload has to be called first.<br/>
+        /// <b>Note: </b> The maximum block number in C/VB is 65535/32767 therefore the file size is limited to 28MB/14MB. Visual Basic does not know data type unsigned integer.</remarks>
+        /// <param name="blockNumber"> Blocknumber. The lock number starts with 1. If block number is 0 then the download process is aborted.</param>
+        /// <returns> Block of data.</returns>
+        /// <example> mod3 call 000001 FTR_Download </example>
+        [COMF]
+        public int FTR_Download(int blockNumber, out string block)
+        {
+            var resp = Call("%R1Q,23304:", blockNumber, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.FTR_MISSINGSETUP => throw new LeicaException(resp.ReturnCode, "Missing setup."),
+                GRC.FTR_INVALIDINPUT => throw new LeicaException(resp.ReturnCode, "Block size too big."),
+                GRC.FTR_FILEACCESS => throw new LeicaException(resp.ReturnCode, "File access error."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            block = resp.Values[0].ToString();
+            return (int)(long)resp.Values[1];
+        }
+
+        /// <summary> Abort download.</summary>
+        /// <remarks> This command aborts or ends file download command.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 FTR_AbortDownload </example>
+        [COMF]
+        public bool FTR_AbortDownload() => CallSet("%R1Q,23305:");
+
+        /// <summary> Delete file.</summary>
+        /// <remarks> This command deletes one or more files. Wildcards may be used to delete multiple files. If deletion date is valid only files older than deletion date are deleted.</remarks>
+        /// <param name="deviceType"> Device type.</param>
+        /// <param name="fileType"> File type.</param>
+        /// <param name="delDate"> Deletion date. Valid if ucMonth is not 0.</param>
+        /// <returns> Number of deleted files.</returns>
+        /// <example> mod3 call 000001 FTR_Delete </example>
+        [COMF]
+        public int FTR_Delete(FTR_DEVICETYPE deviceType, FTR_FILETYPE fileType, DateTime delDate, string fileName) =>
+            Call("%R1Q,23309:", deviceType, fileType, delDate.Day, delDate.Month, delDate.Year, fileName, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "Device not available or can not get path."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (int)(long)resp.Values[0] : default
+            });
 
         #endregion FILE TRANSFER (FTR COMF)
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
+
+        /// <summary> [SAMPLE] </summary>
+        public string DownloadFile()
+        {
+            var numOfBlocks = FTR_SetupDownload(FTR_DEVICETYPE.FTR_DEVICE_PCPARD, FTR_FILETYPE.FTR_FILE_IMAGES, "image000.jpg", FTR_BLOCK.FTR_MAX_BLOCKSIZE);
+            string file = string.Empty;
+            for (int blockNumber = 1; blockNumber <= numOfBlocks; blockNumber++)
+            {
+                var cnt = FTR_Download(blockNumber, out var block);
+                if (cnt != 0)
+                {
+                    file += block;
+                    continue;
+                }
+                break;
+            }
+            return file;
+        }
+
         #endregion CLIENT SPECIFIC GEOCOM FUNCTIONS
     }
 }

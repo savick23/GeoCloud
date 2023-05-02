@@ -304,6 +304,19 @@ namespace RmSolution.Devices.Leica
         AUT_DEFINE_MODE = 2
     }
 
+    /// <summary> [File] Devicetype.</summary>
+    public enum FTR_DEVICETYPE
+    {
+        FTR_DEVICE_INTERNAL = 0,
+        FTR_DEVICE_PCPARD = 1
+    }
+
+    /// <summary> [File] Filetype.</summary>
+    public enum FTR_FILETYPE
+    {
+        FTR_FILE_IMAGES = 170
+    }
+
     #endregion Enums
 
     #region Structures
@@ -456,6 +469,22 @@ namespace RmSolution.Devices.Leica
         public long FileSize;
         public FTR_MODTIME ModTime;
         public FTR_MODDATE ModDate;
+    }
+
+    /// <summary> [File] Blocktype.</summary>
+    public struct FTR_BLOCK
+    {
+        /// <summary> File Transfer Blocksize.</summary>
+        public const int FTR_MAX_BLOCKSIZE = 450;
+
+        public byte[] FTR_BLOCK_val;
+        public int FTR_BLOCK_len;
+
+        public FTR_BLOCK()
+        {
+            FTR_BLOCK_val = new byte[FTR_MAX_BLOCKSIZE];
+            FTR_BLOCK_len = 0;
+        }
     }
 
     #endregion Structures

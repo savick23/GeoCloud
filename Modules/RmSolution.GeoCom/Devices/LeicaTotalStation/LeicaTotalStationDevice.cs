@@ -131,30 +131,40 @@ namespace RmSolution.Devices
 #pragma warning disable CS8604
 
         /// <summary> Вызов функции на устройстве с вовзратом единственного параметра.</summary>
-        T? GetComf<T>(string command, params object[] parameters) =>
+        T? CallGet<T>(string command, params object[] parameters) =>
             Call(command, parameters, (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (T)resp.Values[0] : default);
 
         /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
-        bool SetComf(string command, params object[] parameters) =>
+        bool CallSet(string command, params object[] parameters) =>
             Call(command, parameters, (resp) => Successful(resp.ReturnCode));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command)));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, object p1, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command, p1)));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, object p1, object p2, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command, p1, p2)));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, object p1, object p2, object p3, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command, p1, p2, p3)));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, object p1, object p2, object p3, object p4, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command, p1, p2, p3, p4)));
 
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
         T Call<T>(string command, object p1, object p2, object p3, object p4, object p5, Func<ZResponse, T> hander) =>
             hander.Invoke(Request(RequestString(command, p1, p2, p3, p4, p5)));
+
+        /// <summary> Вызов функции на устройстве с проверкой успешности выполнения и генерацией исключения в случае ошибки выполнения.</summary>
+        T Call<T>(string command, object p1, object p2, object p3, object p4, object p5, object p6, Func<ZResponse, T> hander) =>
+            hander.Invoke(Request(RequestString(command, p1, p2, p3, p4, p5, p6)));
 
         /// <summary> Возвращает истину в случа успешного выполнения или общие исключения.</summary>
         static bool Successful(GRC returnCode) =>
