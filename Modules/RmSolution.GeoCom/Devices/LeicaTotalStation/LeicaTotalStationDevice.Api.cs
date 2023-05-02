@@ -1428,6 +1428,42 @@ namespace RmSolution.Devices
             return true;
         }
 
+        /// <summary> Returning an angle, inclination and distance measurement.</summary>
+        /// <remarks> This function returns angle, inclination and distance measurement data including accuracy and distance measurement time.This command does not issue a new distance measurement.A distance measurement has to be started in advance.If a distance measurement is valid the function ignores WaitTime and returns the results. If no valid distance measurement is available and the distance measurement unit is not activated (by TMC_DoMeasure before the TMC_GetFullMeas call) the angle measurement result is returned after the waiting time.Information about distance measurement is returned in the return code.</remarks>
+        /// <param name="waitTime"> The delay to wait for the distance measurement to finish [ms].</param>
+        /// <param name="mode"> Inclination sensor measurement mode.</param>
+        /// <returns> <b>OnlyAngle</b> measured Hz- and V- angle.<br/><b>SlopeDistance</b> measured slope-distance.</returns>
+        /// <example> mod3 call 000001 TMC_GetFullMeas </example>
+        [COMF]
+        public bool TMC_GetFullMeas(long waitTime, TMC_INCLINE_PRG mode,
+            out double hzAngle, out double vAngle, out double accuracyAngle, out double crossIncl, out double lengthIncl, out double accuracyIncl, out double slopeDist, out double distTime)
+        {
+            var resp = Call("%R1Q,2167:", waitTime, mode, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed because the result consists of data which accuracy could not be verified by the system. Angle and distance data are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Angle and distance data are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError. This message is to be considered as a warning."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Perform a distance measurement previously."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Angle data are available but distance data are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            hzAngle = double.Parse(resp.Values[0].ToString());
+            vAngle = double.Parse(resp.Values[1].ToString());
+            accuracyAngle = double.Parse(resp.Values[2].ToString());
+            crossIncl = double.Parse(resp.Values[3].ToString());
+            lengthIncl = double.Parse(resp.Values[4].ToString());
+            accuracyIncl = double.Parse(resp.Values[5].ToString());
+            slopeDist = double.Parse(resp.Values[6].ToString());
+            distTime = double.Parse(resp.Values[7].ToString());
+            return true;
+        }
+
         #endregion THEODOLITE MEASUREMENT AND CALCULATION (TMC CONF)
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
