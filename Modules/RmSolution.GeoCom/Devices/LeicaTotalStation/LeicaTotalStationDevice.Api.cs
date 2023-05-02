@@ -1175,6 +1175,24 @@ namespace RmSolution.Devices
 
         #endregion IMAGE PROCESSING (IMG COMF)
 
+        #region MOTORISATION (MOT COMF)
+
+        /// <summary> Returning the condition of the LockIn control.</summary>
+        /// <remarks> This function returns the current condition of the LockIn control (see subsystem AUT for further information). This command is valid for automated instruments only.</remarks>
+        /// <returns> Lock information.</returns>
+        /// <example> mod3 call 000001 MOT_ReadLockStatus </example>
+        [COMF]
+        public MOT_LOCK_STATUS? MOT_ReadLockStatus(IMG_MEM_TYPE memTypes) =>
+            Call("%R1Q,6021:", memTypes, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
+                GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Not supported by Telescope Firmware."),
+                GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available full."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? (MOT_LOCK_STATUS)resp.Values[0] : default
+            });
+
+        #endregion MOTORISATION (MOT COMF)
+
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
 

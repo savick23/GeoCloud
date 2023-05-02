@@ -326,6 +326,17 @@ namespace RmSolution.Devices.Leica
         IMG_PC_CARD = 0x1
     }
 
+    /// <summary> Lock Conditions.</summary>
+    public enum MOT_LOCK_STATUS
+    {
+        /// <summary> Locked out.</summary>
+        MOT_LOCKED_OUT = 0,
+        /// <summary> Locked in.</summary>
+        MOT_LOCKED_IN = 1,
+        /// <summary> Prediction mode.</summary>
+        MOT_PREDICTION = 2
+    }
+
     #endregion Enums
 
     #region Structures
