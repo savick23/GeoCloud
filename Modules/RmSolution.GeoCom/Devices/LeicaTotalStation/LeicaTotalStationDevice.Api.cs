@@ -8,30 +8,10 @@ namespace RmSolution.Devices
     #region Using
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.Diagnostics;
-    using System.Diagnostics.Metrics;
-    using System.Drawing;
     using System.Globalization;
-    using System.Numerics;
     using System.Reflection;
-    using System.Reflection.Metadata;
-    using System.Reflection.PortableExecutable;
-    using System.Runtime.ConstrainedExecution;
-    using System.Runtime.InteropServices;
-    using System.Runtime.Intrinsics.Arm;
-    using System.Runtime.Intrinsics.X86;
-    using System.Security.Principal;
-    using System.Text;
-    using System.Threading;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.VisualBasic;
-    using Microsoft.VisualBasic.FileIO;
-    using RmSolution.Data;
+    using System.Text.Json;
     using RmSolution.Devices.Leica;
-    using RmSolution.Runtime;
-    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     /// <summary> Communication; a module, which handles the basic communication parameters. Most of these functions relate to both client and server side.</summary>
@@ -53,6 +33,14 @@ namespace RmSolution.Devices
         const double MIN_TOL = 3.141592654e-05;
         const int MOT_HZ_AXLE = 0;
         const int MOT_V_AXLE = 1;
+
+        /// <summary> Карта доступных функций устройства.</summary>
+        static GrcFunctionCollection _api = JsonSerializer.Deserialize<GrcFunctionCollection>(Assembly.GetAssembly(typeof(LeicaTotalStationDevice)).GetManifestResourceStream("RmSolution.GeoCom.Devices.LeicaTotalStation.LeicaTotalStationDevice.json"), new JsonSerializerOptions()
+        {
+            IncludeFields = true,
+            PropertyNameCaseInsensitive = true,
+
+        });
 
         #endregion Constants
 
@@ -1532,6 +1520,23 @@ namespace RmSolution.Devices
         #endregion CLIENT SPECIFIC GEOCOM FUNCTIONS
 
         #region Nested types
+
+        T? CallExperimental<T>(string funcName, params object[] args)
+        {
+            if (_api.Functions.Any(f => f.Name.Equals(funcName, StringComparison.OrdinalIgnoreCase)))
+            {
+                var extfunc = _api.Functions.First(f => f.Name.Equals(funcName, StringComparison.OrdinalIgnoreCase));
+                var resp = Request(RequestString(extfunc.Call, args));
+                if (extfunc.Return.Any(e => e.Code == resp.ReturnCode))
+                {
+                    var rc = extfunc.Return.First(e => e.Code == resp.ReturnCode);
+                    throw new LeicaException(rc.Code, rc.Text);
+                }
+                if (resp.Values.Length == 1)
+                    return (T)resp.Values[0];
+            }
+            return default;
+        }
 
         internal struct GrcFunctionCollection
         {

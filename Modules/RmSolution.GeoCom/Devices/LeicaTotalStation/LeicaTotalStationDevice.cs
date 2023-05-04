@@ -15,7 +15,6 @@ namespace RmSolution.Devices
     using System.Linq;
     using System.Reflection;
     using System.Text;
-    using System.Text.Json;
     using System.Text.RegularExpressions;
     using RmSolution.Data;
     using RmSolution.Devices.Leica;
@@ -31,12 +30,6 @@ namespace RmSolution.Devices
         readonly static byte[] TERM = "\r\n"u8.ToArray();
 
         readonly object _lockRoot = new();
-        static GrcFunctionCollection _functions = JsonSerializer.Deserialize<GrcFunctionCollection>(Assembly.GetAssembly(typeof(LeicaTotalStationDevice)).GetManifestResourceStream("RmSolution.GeoCom.Devices.LeicaTotalStation.LeicaTotalStationDevice.json"), new JsonSerializerOptions()
-        {
-            IncludeFields = true,
-            PropertyNameCaseInsensitive = true,
-
-        });
 
         IDeviceConnection? _connection;
 
