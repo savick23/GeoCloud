@@ -46,7 +46,7 @@ namespace RmSolution.Devices.Leica
         /// <summary> [6] Function execution timed out. Result unspecified.</summary>
         TIME_OUT = 0x0006,
         /// <summary> [7] Parameter setup for subsystem is incomplete.</summary>
-        SET_INCOMPL = 0x0007,
+        SET_SETINCOMPLETE = 0x0007,
         /// <summary> [8] Function execution has been aborted.</summary>
         ABORT = 0x0008,
         /// <summary> [9] Fatal error - not enough memory.</summary>

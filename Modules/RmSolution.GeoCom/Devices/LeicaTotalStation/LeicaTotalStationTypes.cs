@@ -687,5 +687,29 @@ namespace RmSolution.Devices.Leica
         public TMC_FACE Face;
     }
 
+    /// <summary> Atmospheric Correction Data.</summary>
+    public struct TMC_ATMOS_TEMPERATURE
+    {
+        /// <summary> Wave length of the EDM transmitter [m].</summary>
+        public double Lambda;
+        /// <summary> Atmospheric pressure [mbar].</summary>
+        public double Pressure;
+        /// <summary> Dry temperature, °C.</summary>
+        public double DryTemperature;
+        /// <summary> Wet temperature, °C.</summary>
+        public double WetTemperature;
+    }
+
+    /// <summary> Refraction Control Data.</summary>
+    public struct TMC_REFRACTION
+    {
+        /// <summary> Refraction correction On/Off.</summary>
+        public ON_OFF_TYPE RefOn;
+        /// <summary> Radius of the earth [m].</summary>
+        public double EarthRadius;
+        /// <summary> Refraction coefficient.</summary>
+        public double RefractiveScale;
+    }
+
     #endregion Structures
 }

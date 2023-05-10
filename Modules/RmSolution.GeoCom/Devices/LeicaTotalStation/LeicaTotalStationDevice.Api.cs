@@ -10,6 +10,8 @@ namespace RmSolution.Devices
     using System.Collections.Generic;
     using System.Globalization;
     using System.Reflection;
+    using System.Reflection.Metadata;
+    using System.Runtime.Intrinsics.X86;
     using System.Text.Json;
     using RmSolution.Devices.Leica;
     #endregion Using
@@ -142,7 +144,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 AUT_ReadTol </example>
         [COMF]
         public AUT_POSTOL? AUT_ReadTol() =>
-            Call("%R1Q,9008:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES ? new AUT_POSTOL()
+            Call("%R1Q,9008:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES ? new AUT_POSTOL
             {
                 PosTol = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
             }
@@ -178,7 +180,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 AUT_ReadTimeout </example>
         [COMF]
         public AUT_TIMEOUT? AUT_ReadTimeout() =>
-            Call("%R1Q,9012:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES ? new AUT_TIMEOUT()
+            Call("%R1Q,9012:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == MOT_AXES ? new AUT_TIMEOUT
             {
                 PosTimeout = new double[] { double.Parse(resp.Values[MOT_HZ_AXLE].ToString()), double.Parse(resp.Values[MOT_V_AXLE].ToString()) }
             }
@@ -370,7 +372,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 AUT_GetSearchArea </example>
         [COMF]
         public AUT_SEARCH_AREA? AUT_GetSearchArea() =>
-            Call("%R1Q,9042:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 5 ? new AUT_SEARCH_AREA()
+            Call("%R1Q,9042:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 5 ? new AUT_SEARCH_AREA
             {
                 CenterHz = double.Parse(resp.Values[0].ToString()),
                 CenterV = double.Parse(resp.Values[1].ToString()),
@@ -403,7 +405,7 @@ namespace RmSolution.Devices
         /// <example> mod3 call 000001 AUT_GetUserSpiral </example>
         [COMF]
         public AUT_SEARCH_SPIRAL? AUT_GetUserSpiral() =>
-            Call("%R1Q,9040:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 2 ? new AUT_SEARCH_SPIRAL()
+            Call("%R1Q,9040:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 2 ? new AUT_SEARCH_SPIRAL
             {
                 RangeHz = double.Parse(resp.Values[0].ToString()),
                 RangeV = double.Parse(resp.Values[1].ToString())
@@ -1123,7 +1125,7 @@ namespace RmSolution.Devices
                 GRC.NA => throw new LeicaException(resp.ReturnCode, "Imaging license key not available."),
                 GRC.FATAL => throw new LeicaException(resp.ReturnCode, "CF card is not available or configuration file does not exist."),
                 GRC.IVVERSION => throw new LeicaException(resp.ReturnCode, "Configuration file version differs from that of system firmware."),
-                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? new IMG_TCC_CONFIG()
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 1 ? new IMG_TCC_CONFIG
                 {
                     ImageNumber = (long)resp.Values[0],
                     Quality = (long)resp.Values[1],
@@ -1280,7 +1282,7 @@ namespace RmSolution.Devices
                 GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
                 GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
                 GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
-                _ => Successful(resp.ReturnCode) && resp.Values.Length == 8 ? new TMC_COORDINATE()
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 8 ? new TMC_COORDINATE
                 {
                     E = double.Parse(resp.Values[0].ToString()),
                     N = double.Parse(resp.Values[1].ToString()),
@@ -1495,6 +1497,110 @@ namespace RmSolution.Devices
             });
 
         #endregion MEASUREMENT CONTROL FUNCTIONS (TMC CONF)
+
+        #region DATA SETUP FUNCTIONS
+
+        /// <summary> Returning the current reflector height.</summary>
+        /// <remarks> This function returns the current reflector height.</remarks>
+        /// <returns> Current reflector height [m].</returns>
+        /// <example> mod3 call 000001 TMC_GetHeight </example>
+        [COMF]
+        public double TMC_GetHeight() => CallGet<double>("%R1Q,2011:");
+
+        /// <summary> Setting a new reflector height.</summary>
+        /// <remarks> This function sets a new reflector height.</remarks>
+        /// <param name="height"> New reflector height [m].</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetHeight </example>
+        [COMF]
+        public bool TMC_SetHeight(double height) =>
+            Call("%R1Q,2012:", height, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. The reflector height is not set. Repeat measurement."),
+                GRC.IVPARAM => throw new LeicaException(resp.ReturnCode, "A reflector height less than 10m or greater than 100m is entered. Invalid parameter."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Getting the atmospheric correction parameters.</summary>
+        /// <remarks> This function is used to get the parameters for the atmospheric correction.</remarks>
+        /// <returns> Atmospheric Correction Data.</returns>
+        /// <example> mod3 call 000001 TMC_GetAtmCorr </example>
+        [COMF]
+        public TMC_ATMOS_TEMPERATURE? TMC_GetAtmCorr() => Call("%R1Q,2029:",
+            resp => Successful(resp.ReturnCode) && resp.Values.Length == 4 ? new TMC_ATMOS_TEMPERATURE
+            {
+                Lambda = double.Parse(resp.Values[0].ToString()),
+                Pressure = double.Parse(resp.Values[0].ToString()),
+                DryTemperature = double.Parse(resp.Values[0].ToString()),
+                WetTemperature = double.Parse(resp.Values[0].ToString())
+            } : default);
+
+        /// <summary> Setting the atmospheric correction parameters.</summary>
+        /// <remarks> This function is used to set the parameters for the atmospheric correction.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetAtmCorr </example>
+        [COMF]
+        public bool TMC_SetAtmCorr(TMC_ATMOS_TEMPERATURE atm) =>
+            Call("%R1Q,2028:", atm.Lambda, atm.Pressure, atm.DryTemperature, atm.WetTemperature, (resp) => Successful(resp.ReturnCode));
+
+        /// <summary> Orientating the instrument in hz-direction.</summary>
+        /// <remarks> This function is used to orientate the instrument in Hz direction. It is a combination of an angle measurement to get the Hz offset and afterwards setting the angle Hz offset in order to orientates onto a target.Before the new orientation can be set an existing distance must be cleared(use TMC_DoMeasure with the command = TMC_CLEAR).</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetOrientation </example>
+        [COMF]
+        public bool TMC_SetOrientation(double hzOrientation) =>
+            Call("%R1Q,2113:", hzOrientation, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed, because the result are consist of measuring data which accuracy could not be verified by the system. Co-ordinates are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Getting the prism constant.</summary>
+        /// <remarks> This function is used to get the prism constant.</remarks>
+        /// <returns> Prism constant [m].</returns>
+        /// <example> mod3 call 000001 TMC_GetPrismCorr </example>
+        [COMF]
+        public double TMC_GetPrismCorr() => CallGet<double>("%R1Q,2023:");
+
+        /// <summary> Getting the refraction coefficient.</summary>
+        /// <remarks> This function is used to get the refraction coefficient for correction of measured height difference.</remarks>
+        /// <returns> Refraction control data.</returns>
+        /// <example> mod3 call 000001 TMC_GetRefractiveCorr </example>
+        [COMF]
+        public TMC_REFRACTION? TMC_GetRefractiveCorr() => Call("%R1Q,2031:",
+            resp => Successful(resp.ReturnCode) && resp.Values.Length == 3 ? new TMC_REFRACTION
+            {
+                RefOn = resp.Values[0].Equals(1L) ? ON_OFF_TYPE.ON : ON_OFF_TYPE.OFF,
+                EarthRadius = double.Parse(resp.Values[1].ToString()),
+                RefractiveScale = double.Parse(resp.Values[2].ToString())
+            } : default);
+
+        /// <summary> Setting the refraction coefficient.</summary>
+        /// <remarks> This function is used to set the refraction distortion coefficient for correction of measured height difference.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetRefractiveCorr </example>
+        [COMF]
+        public bool TMC_SetRefractiveCorr(TMC_REFRACTION refractive) =>
+            Call("%R1Q,2030:", refractive.RefOn, refractive.EarthRadius, refractive.RefractiveScale, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. The refraction distortion factor is not set. Repeat measurement."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "Wrong values entered."),
+                GRC.IVRESULT => throw new LeicaException(resp.ReturnCode, "Wrong values entered."),
+                GRC.SET_SETINCOMPLETE => throw new LeicaException(resp.ReturnCode, "Invalid number of parameters."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        #endregion DATA SETUP FUNCTIONS
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
