@@ -1667,10 +1667,10 @@ namespace RmSolution.Devices
         /// <param name="offsetCentralMeridian"> Offset from central meridian [m].</param>
         /// <param name="heightReductionPPM"> ppm value due to height above reference.</param>
         /// <param name="individualPPM"> Individual ppm value.</param>
-        /// <returns> Instrument station co-ordinates [m].</returns>
+        /// <returns> Geometric ppm correction factor.</returns>
         /// <example> mod3 call 000001 TMC_GetGeoPpm </example>
         [COMF]
-        public bool TMC_GetGeoPpm(out int geomUseAutomatic, double scaleFactorCentralMeridian, double offsetCentralMeridian, double heightReductionPPM, double individualPPM)
+        public bool TMC_GetGeoPpm(out int geomUseAutomatic, out double scaleFactorCentralMeridian, out double offsetCentralMeridian, out double heightReductionPPM, out double individualPPM)
         {
             var resp = Call("%R1Q,2154:", resp => resp);
             geomUseAutomatic = (int)(long)resp.Values[0];
@@ -1680,6 +1680,19 @@ namespace RmSolution.Devices
             individualPPM = double.Parse(resp.Values[4].ToString());
             return resp.Values.Length == 5;
         }
+
+        /// <summary> Setting the geometric ppm correction factor.</summary>
+        /// <remarks> This function is used to set the geometric ppm values.</remarks>
+        /// <param name="geomUseAutomatic"> Current state of the Geometric ppm calculation switch (automatic or manual).</param>
+        /// <param name="scaleFactorCentralMeridian"> Scale factor on central meridian.</param>
+        /// <param name="offsetCentralMeridian"> Offset from central meridian [m].</param>
+        /// <param name="heightReductionPPM"> ppm value due to height above reference.</param>
+        /// <param name="individualPPM"> Individual ppm value.</param>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetGeoPpm </example>
+        [COMF]
+        public bool TMC_SetGeoPpm(int geomUseAutomatic, double scaleFactorCentralMeridian, double offsetCentralMeridian, double heightReductionPPM, double individualPPM) =>
+            CallSet("%R1Q,2153:", geomUseAutomatic, scaleFactorCentralMeridian, offsetCentralMeridian, heightReductionPPM, individualPPM);
 
         #endregion DATA SETUP FUNCTIONS
 
