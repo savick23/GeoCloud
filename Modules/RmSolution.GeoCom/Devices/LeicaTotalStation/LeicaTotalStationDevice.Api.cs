@@ -15,6 +15,7 @@ namespace RmSolution.Devices
     using System.Runtime.Intrinsics.Arm;
     using System.Runtime.Intrinsics.X86;
     using System.Text.Json;
+    using Microsoft.VisualBasic;
     using RmSolution.Devices.Leica;
     using static System.Collections.Specialized.BitVector32;
     using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -1729,6 +1730,93 @@ namespace RmSolution.Devices
         #endregion INFORMATION FUNCTIONS
 
         #region CONFIGURATION FUNCTIONS
+
+        /// <summary> Getting the angular correction status.</summary>
+        /// <remarks> This function returns the angular corrections status.</remarks>
+        /// <returns> Angular corrections status.</returns>
+        /// <example> mod3 call 000001 TMC_GetAngSwitch </example>
+        [COMF]
+        public TMC_ANG_SWITCH? TMC_GetAngSwitch() => Call("%R1Q,2014:", (resp) => Successful(resp.ReturnCode) && resp.Values.Length == 4 ? new TMC_ANG_SWITCH
+        {
+            InclineCorr = (ON_OFF_TYPE)resp.Values[0],
+            StandAxisCorr = (ON_OFF_TYPE)resp.Values[1],
+            CollimationCorr = (ON_OFF_TYPE)resp.Values[2],
+            TiltAxisCorr = (ON_OFF_TYPE)resp.Values[3]
+        } : default);
+
+        /// <summary> Getting the dual axis compensator status.</summary>
+        /// <remarks> This function returns the current dual axis compensator status.</remarks>
+        /// <returns> Dual axis compensator status.</returns>
+        /// <example> mod3 call 000001 TMC_GetInclineSwitch </example>
+        [COMF]
+        public ON_OFF_TYPE TMC_GetInclineSwitch() => CallGet<ON_OFF_TYPE>("%R1Q,2007:");
+
+        /// <summary> Switching the dual axis compensator on/off.</summary>
+        /// <remarks> This function switches the dual axis compensator on or off.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetInclineSwitch </example>
+        [COMF]
+        public bool TMC_SetInclineSwitch() => CallSet("%R1Q,2006:");
+
+        /// <summary> Getting the EDM measurement mode.</summary>
+        /// <remarks> This function returns the EDM measurement mode.</remarks>
+        /// <returns> EDM measurement mode.</returns>
+        /// <example> mod3 call 000001 TMC_GetEdmMode </example>
+        [COMF]
+        public EDM_MODE TMC_GetEdmMode() => CallGet<EDM_MODE>("%R1Q,2021:");
+
+        /// <summary> Setting EDM measurement modes.</summary>
+        /// <remarks> This function sets the current measurement mode. The measure function TMC_DoMeasure(TMC_DEF_DIST) uses this configuration.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetEdmMode </example>
+        [COMF]
+        public bool TMC_SetEdmMode(EDM_MODE mode) => Call("%R1Q,2020:", mode, (resp) => (resp.ReturnCode) switch
+        {
+            GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. The EDM mode is not set. Repeat measurement."),
+            _ => Successful(resp.ReturnCode)
+        });
+
+        /// <summary> Getting cartesian coordinates.</summary>
+        /// <remarks> This function gets the cartesian co-ordinates if a valid distance exists. The parameter WaitTime defined the max wait time in order to get a valid distance.If after the wait time a valid distance does not exist, the function initialises the parameter for the co-ordinates (E, N, H) with 0 and returns an error. For the co-ordinate calculate will require incline results. With the parameter eProg you have the possibility to either measure an inclination, use the pre-determined plane to calculate an inclination, or use the automatic mode wherein the system decides which method is appropriate.</remarks>
+        /// <returns> Easting.<br/>Northing.<br/>Orthometric height.</returns>
+        /// <example> mod3 call 000001 TMC_GetSimpleCoord </example>
+        [COMF]
+        public bool TMC_GetSimpleCoord(long waitTime, long prog, out double coordE, out double coordN, out double coordH)
+        {
+            var resp = Call("%R1Q,2116:", waitTime, prog, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_ACCURACY_GUARANTEE => throw new LeicaException(resp.ReturnCode, "Accuracy is not guaranteed, because the result are consist of measuring data which accuracy could not be verified by the system. Co-ordinates are available."),
+                GRC.TMC_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "The results are not corrected by all active sensors. Coordinates are available. In order to secure which correction is missing use the both functions TMC_IfDataAzeCorrError and TMC_IfDataIncCorrError."),
+                GRC.TMC_ANGLE_OK => throw new LeicaException(resp.ReturnCode, "Angle values okay, but no valid distance. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_NO_ACC_GUARANTY => throw new LeicaException(resp.ReturnCode, "Only the angle measurement is valid but its accuracy cannot be guaranteed (the tilt measurement is not available)."),
+                GRC.TMC_ANGLE_NO_FULL_CORRECTION => throw new LeicaException(resp.ReturnCode, "No distance data available but angle data are valid. The return code is equivalent to the GRC_TMC_NO_FULL_CORRECTION and relates to the angle data. Co-ordinates are not available. Perform a distance measurement first before you call this function."),
+                GRC.TMC_DIST_ERROR => throw new LeicaException(resp.ReturnCode, "No measuring, because of missing target point, co-ordinates are not available. Aim target point and try it again."),
+                GRC.TMC_DIST_PPM => throw new LeicaException(resp.ReturnCode, "No distance measurement respectively no distance data because of wrong EDM settings. Co-ordinates are not available."),
+                GRC.TMC_ANGLE_ERROR => throw new LeicaException(resp.ReturnCode, "Angle or inclination measurement error. Check inclination modes in commands."),
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. Repeat measurement."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) ? resp : resp
+            });
+            coordE = double.Parse(resp.Values[0].ToString());
+            coordN = double.Parse(resp.Values[1].ToString());
+            coordH = double.Parse(resp.Values[2].ToString());
+            return resp.Values.Length == 3;
+        }
+
+        /// <summary> Returning the status if an ATR error occurs.</summary>
+        /// <remarks> This function returns the status of the ATR correction of the last measurement. If you get a return code GRC_TMC_ANGLE_NOT_FULL_CORR or GRC_TMC_ NO_FULL_CORRECTION from a measurement function, this function indicates whether the returned data is missing a deviation correction of the ATR or not.</remarks>
+        /// <returns> Flag, if ATR correction error occurred or not FALSE: no error occurred<br/>TRUE: last data record not corrected with the ATRdeviation.</returns>
+        /// <example> mod3 call 000001 TMC_IfDataAzeCorrError </example>
+        [COMF]
+        public bool TMC_IfDataAzeCorrError() => CallGet<bool>("%R1Q,2114:");
+
+        /// <summary> Returning the status if an incline error occurs.</summary>
+        /// <remarks> This function returns the status of the inclination correction of the last measurement. If you get a return code GRC_TMC_ANGLE_NOT_FULL_CORR or GRC_TMC_ NO_FULL_CORRECTION from a measurement function, this function indicates whether the returned data is missing an inclination correction or not. Error information can only occur if the incline sensor is active.</remarks>
+        /// <returns> Flag, if incline correction error occurred or not<br/>FALSE: no error occurred<br/>TRUE: last data record not corrected with the incline-correction.</returns>
+        /// <example> mod3 call 000001 TMC_IfDataIncCorrError </example>
+        [COMF]
+        public bool TMC_IfDataIncCorrError() => CallGet<bool>("%R1Q,2115:");
 
         #endregion CONFIGURATION FUNCTIONS
 

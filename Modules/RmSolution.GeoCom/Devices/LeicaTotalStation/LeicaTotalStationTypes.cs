@@ -742,5 +742,18 @@ namespace RmSolution.Devices.Leica
         public long Time;
     }
 
+    /// <summary> Correction Switches.</summary>
+    public struct TMC_ANG_SWITCH
+    {
+        /// <summary> Inclination correction.</summary>
+        public ON_OFF_TYPE InclineCorr;
+        /// <summary> Standing axis corr.</summary>
+        public ON_OFF_TYPE StandAxisCorr;
+        /// <summary> Collimation error corr.</summary>
+        public ON_OFF_TYPE CollimationCorr;
+        /// <summary> Tilting axis corr.</summary>
+        public ON_OFF_TYPE TiltAxisCorr;
+    }
+
     #endregion Structures
 }
