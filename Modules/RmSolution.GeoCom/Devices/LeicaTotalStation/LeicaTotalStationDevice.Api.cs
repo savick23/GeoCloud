@@ -1818,6 +1818,31 @@ namespace RmSolution.Devices
         [COMF]
         public bool TMC_IfDataIncCorrError() => CallGet<bool>("%R1Q,2115:");
 
+        /// <summary> Enabling/disabling the angle corrections.</summary>
+        /// <remarks> With this function you can enable/disable the following angle measurement corrections.<br/>incline: The inclination will be considered for the angle measurement if enabled.<br/>stand axis: The standard axis correction will be considered for the angle measurement if enabled.<br/>collimation: The collimation will be considered for the angle measurement if enabled<br/>tilt axis: The tilt axis will be considered in the angle measurement if enabled.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetAngSwitch </example>
+        [COMF]
+        public bool TMC_SetAngSwitch(TMC_ANG_SWITCH @switch) =>
+            Call("%R1Q,2016:", @switch.InclineCorr, @switch.StandAxisCorr, @switch.CollimationCorr, @switch.TiltAxisCorr, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy or a distance exists. Clear distance and try it again."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Getting the total ppm and prism correction factors.</summary>
+        /// <remarks> This function retrieves the total ppm value (atmospheric+geometric ppm) plus the current prism constant.</remarks>
+        /// <returns> Total ppm correction factor.<br/>The correction factor of the prism.</returns>
+        /// <example> mod3 call 000001 TMC_GetSlopeDistCorr </example>
+        [COMF]
+        public bool TMC_GetSlopeDistCorr(out double ppmCorr, out double prismCorr)
+        {
+            var resp = Call("%R1Q,2126:", (resp) => resp);
+            ppmCorr = double.Parse(resp.Values[0].ToString());
+            prismCorr = double.Parse(resp.Values[1].ToString());
+            return resp.Values.Length == 2;
+        }
+
         #endregion CONFIGURATION FUNCTIONS
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
