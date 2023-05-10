@@ -446,6 +446,15 @@ namespace RmSolution.Devices.Leica
         TMC_FREQUENCY = 11
     }
 
+    /// <summary> Face Position.</summary>
+    public enum TMC_FACE_DEF : long
+    {
+        /// <summary> Face in normal position.</summary>
+        TMC_FACE_NORMAL,
+        /// <summary> Face turned.</summary>
+        TMC_FACE_TURN
+    }
+
     #endregion Enums
 
     #region Structures
@@ -722,6 +731,15 @@ namespace RmSolution.Devices.Leica
         public double H0;
         /// <summary> Instrument height [m].</summary>
         public double Hi;
+    }
+
+    /// <summary> EDM Signal Information.</summary>
+    public struct TMC_EDM_SIGNAL
+    {
+        /// <summary> Signal intensity of EDM in %.</summary>
+        public double SignalIntensity;
+        /// <summary> [SYSTIME] Timestamp [ms].</summary>
+        public long Time;
     }
 
     #endregion Structures

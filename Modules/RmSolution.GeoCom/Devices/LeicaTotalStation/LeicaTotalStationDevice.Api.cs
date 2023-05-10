@@ -8,13 +8,16 @@ namespace RmSolution.Devices
     #region Using
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Metrics;
     using System.Globalization;
     using System.Reflection;
     using System.Reflection.Metadata;
+    using System.Runtime.Intrinsics.Arm;
     using System.Runtime.Intrinsics.X86;
     using System.Text.Json;
     using RmSolution.Devices.Leica;
     using static System.Collections.Specialized.BitVector32;
+    using static System.Runtime.InteropServices.JavaScript.JSType;
     #endregion Using
 
     /// <summary> Communication; a module, which handles the basic communication parameters. Most of these functions relate to both client and server side.</summary>
@@ -1695,6 +1698,39 @@ namespace RmSolution.Devices
             CallSet("%R1Q,2153:", geomUseAutomatic, scaleFactorCentralMeridian, offsetCentralMeridian, heightReductionPPM, individualPPM);
 
         #endregion DATA SETUP FUNCTIONS
+
+        #region INFORMATION FUNCTIONS
+
+        /// <summary> Getting the face information of the current telescope position.</summary>
+        /// <remarks> This function returns the face information of the current telescope position. The face information is only valid, if the instrument is in an active measurement state(that means a measurement function was called before the TMC_GetFace call, see example). Note that the instrument automatically turns into an inactive measurement state after a predefined timeout.</remarks>
+        /// <returns> Face position.</returns>
+        /// <example> mod3 call 000001 TMC_GetFace </example>
+        [COMF]
+        public TMC_FACE? TMC_GetFace() => CallGet<TMC_FACE>("%R1Q,2026:");
+
+        /// <summary> Getting information about the EDM signal intensity.</summary>
+        /// <remarks> This function returns information about the intensity of the EDM signal. The function can only perform a measurement if the signal measurement program is activated.Start the signal measurement program with TMC_DoMeasure where Command = TMC_SIGNAL.After the measurement the EDM must be switched off (use TMC_DoMeasure where Command = TMC_CLEAR). While measuring there is no angle measurement data available.</remarks>
+        /// <returns> Signal intensity information.</returns>
+        /// <example> mod3 call 000001 TMC_GetSignal </example>
+        [COMF]
+        public TMC_EDM_SIGNAL? TMC_GetSignal() =>
+            Call("%R1Q,2022:", (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_SIGNAL_ERROR => throw new LeicaException(resp.ReturnCode, "Error within signal measurement.\r\nAt repeated occur call service."),
+                GRC.ABORT => throw new LeicaException(resp.ReturnCode, "Measurement through customer aborted."),
+                GRC.SHUT_DOWN => throw new LeicaException(resp.ReturnCode, "System power off through customer."),
+                _ => Successful(resp.ReturnCode) && resp.Values.Length == 2 ? new TMC_EDM_SIGNAL
+                {
+                    SignalIntensity = double.Parse(resp.Values[0].ToString()),
+                    Time = (long)resp.Values[1]
+                } : default
+            });
+
+        #endregion INFORMATION FUNCTIONS
+
+        #region CONFIGURATION FUNCTIONS
+
+        #endregion CONFIGURATION FUNCTIONS
 
         #region CLIENT SPECIFIC GEOCOM FUNCTIONS
         /* The following functions are not applicable to the ASCII protocol, because these functions influence the behaviour of the client application only. */
