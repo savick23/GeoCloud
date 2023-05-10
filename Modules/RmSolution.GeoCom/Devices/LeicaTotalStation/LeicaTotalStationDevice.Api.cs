@@ -14,6 +14,7 @@ namespace RmSolution.Devices
     using System.Runtime.Intrinsics.X86;
     using System.Text.Json;
     using RmSolution.Devices.Leica;
+    using static System.Collections.Specialized.BitVector32;
     #endregion Using
 
     /// <summary> Communication; a module, which handles the basic communication parameters. Most of these functions relate to both client and server side.</summary>
@@ -1599,6 +1600,86 @@ namespace RmSolution.Devices
                 GRC.SET_SETINCOMPLETE => throw new LeicaException(resp.ReturnCode, "Invalid number of parameters."),
                 _ => Successful(resp.ReturnCode)
             });
+
+        /// <summary> Getting the refraction model.</summary>
+        /// <remarks> This function is used to get the current refraction model. Note that changing the refraction method is not indicated on the instrument’s interface.</remarks>
+        /// <returns> Refraction data:<br/>Method = 1 means method 1 (for the rest of the world).<br/>Method = 2 means method 2 (for Australia).</returns>
+        /// <example> mod3 call 000001 TMC_GetRefractiveMethod </example>
+        [COMF]
+        public int? TMC_GetRefractiveMethod() => CallGet<int>("%R1Q,2091:");
+
+        /// <summary> Setting the refraction model.</summary>
+        /// <remarks> This function is used to set the refraction model.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetRefractiveMethod </example>
+        [COMF]
+        public bool TMC_SetRefractiveMethod(int method) =>
+            Call("%R1Q,2090:", method, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. The refraction distortion factor is not set. Repeat measurement."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Getting the station coordinates of the instrument.</summary>
+        /// <remarks> This function is used to get the station coordinates of the instrument.</remarks>
+        /// <returns> Instrument station co-ordinates [m].</returns>
+        /// <example> mod3 call 000001 TMC_GetStation </example>
+        [COMF]
+        public TMC_STATION? TMC_GetStation() => Call("%R1Q,2009:",
+            resp => Successful(resp.ReturnCode) && resp.Values.Length == 3 ? new TMC_STATION
+            {
+                E0 = double.Parse(resp.Values[0].ToString()),
+                N0 = double.Parse(resp.Values[1].ToString()),
+                H0 = double.Parse(resp.Values[2].ToString()),
+                Hi = double.Parse(resp.Values[3].ToString())
+            } : default);
+
+        /// <summary> Setting the station coordinates of the instrument.</summary>
+        /// <remarks> This function is used to set the station coordinates of the instrument.</remarks>
+        /// <returns> Execution successful.</returns>
+        /// <example> mod3 call 000001 TMC_SetStation </example>
+        [COMF]
+        public bool TMC_SetStation(TMC_STATION station) =>
+            Call("%R1Q,2010:", station.E0, station.N0, station.H0, station.Hi, (resp) => (resp.ReturnCode) switch
+            {
+                GRC.TMC_BUSY => throw new LeicaException(resp.ReturnCode, "TMC resource is locked respectively TMC task is busy. The refraction distortion factor is not set. Repeat measurement."),
+                _ => Successful(resp.ReturnCode)
+            });
+
+        /// <summary> Getting the atmospheric ppm correction factor.</summary>
+        /// <remarks> This function retrieves the atmospheric ppm value.</remarks>
+        /// <returns> Atmospheric ppm correction factor.</returns>
+        /// <example> mod3 call 000001 TMC_GetAtmPpm </example>
+        [COMF]
+        public double? TMC_GetAtmPpm() => CallGet<double>("%R1Q,2151:");
+
+        /// <summary> Setting the atmospheric ppm correction factor.</summary>
+        /// <remarks> This function is used to set the atmospheric ppm value.</remarks>
+        /// <returns> Atmospheric ppm correction factor.</returns>
+        /// <example> mod3 call 000001 TMC_SetAtmPpm </example>
+        [COMF]
+        public bool TMC_SetAtmPpm(double ppmA) => CallSet("%R1Q,2148:", ppmA);
+
+        /// <summary> Getting the geometric ppm correction factor.</summary>
+        /// <remarks> This function is used to get the station coordinates of the instrument.</remarks>
+        /// <param name="geomUseAutomatic"> Current state of the Geometric ppm calculation switch (automatic or manual).</param>
+        /// <param name="scaleFactorCentralMeridian"> Scale factor on central meridian.</param>
+        /// <param name="offsetCentralMeridian"> Offset from central meridian [m].</param>
+        /// <param name="heightReductionPPM"> ppm value due to height above reference.</param>
+        /// <param name="individualPPM"> Individual ppm value.</param>
+        /// <returns> Instrument station co-ordinates [m].</returns>
+        /// <example> mod3 call 000001 TMC_GetGeoPpm </example>
+        [COMF]
+        public bool TMC_GetGeoPpm(out int geomUseAutomatic, double scaleFactorCentralMeridian, double offsetCentralMeridian, double heightReductionPPM, double individualPPM)
+        {
+            var resp = Call("%R1Q,2154:", resp => resp);
+            geomUseAutomatic = (int)(long)resp.Values[0];
+            scaleFactorCentralMeridian = double.Parse(resp.Values[1].ToString());
+            offsetCentralMeridian = double.Parse(resp.Values[2].ToString());
+            heightReductionPPM = double.Parse(resp.Values[3].ToString());
+            individualPPM = double.Parse(resp.Values[4].ToString());
+            return resp.Values.Length == 5;
+        }
 
         #endregion DATA SETUP FUNCTIONS
 

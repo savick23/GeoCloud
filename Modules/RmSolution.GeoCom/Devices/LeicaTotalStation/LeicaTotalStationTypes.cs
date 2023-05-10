@@ -711,5 +711,18 @@ namespace RmSolution.Devices.Leica
         public double RefractiveScale;
     }
 
+    /// <summary> Instrument Station Co-ordinates.</summary>
+    public struct TMC_STATION
+    {
+        /// <summary> Station easting coordinate [m].</summary>
+        public double E0;
+        /// <summary> Station northing coordinate [m].</summary>
+        public double N0;
+        /// <summary> Station height coordinate [m].</summary>
+        public double H0;
+        /// <summary> Instrument height [m].</summary>
+        public double Hi;
+    }
+
     #endregion Structures
 }
