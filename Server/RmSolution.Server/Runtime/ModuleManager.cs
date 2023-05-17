@@ -16,7 +16,7 @@ namespace RmSolution.Server
         #region Declarations
 
         readonly ILogger _logger;
-        readonly RuntimeService _rtm;
+        readonly SmartRuntime _rtm;
         readonly IConfiguration _cfg;
         readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
 
@@ -27,7 +27,7 @@ namespace RmSolution.Server
 
         #endregion Declarations
 
-        public ModuleManager(RuntimeService runtime, IConfiguration configuration, ILogger<RuntimeService> logger)
+        public ModuleManager(SmartRuntime runtime, IConfiguration configuration, ILogger<SmartRuntime> logger)
         {
             _rtm = runtime;
             _cfg = configuration;

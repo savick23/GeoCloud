@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: RuntimeService –
+// Описание: SmartRuntime –
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
@@ -14,11 +14,13 @@ namespace RmSolution.Server
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
 
-    public sealed class RuntimeService : BackgroundService, IRuntime
+    public delegate IDatabase DatabaseConnection();
+
+    public sealed class SmartRuntime : BackgroundService, IRuntime
     {
         #region Declarations
 
-        readonly ILogger<RuntimeService> _logger;
+        readonly ILogger<SmartRuntime> _logger;
 
         /// <summary> Системная шина предприятия. Очередь сообщений.</summary>
         readonly ConcurrentQueue<TMessage> _esb = new();
@@ -31,7 +33,7 @@ namespace RmSolution.Server
         /// <summary> Диспетчер системной шины предприятия ESB.</summary>
         internal readonly ConcurrentDictionary<int, ProcessMessageEventHandler> Dispatcher = new();
 
-        readonly Func<IDatabase> _dbf;
+        readonly DatabaseConnection _dbconn;
 
         #endregion Declarations
 
@@ -114,14 +116,14 @@ namespace RmSolution.Server
 
         #region Constructors
 
-        public RuntimeService(ILogger<RuntimeService> logger, IConfiguration config, Func<IDatabase> databaseF)
+        public SmartRuntime(ILogger<SmartRuntime> logger, IConfiguration config, DatabaseConnection dbconnection)
         {
             _logger = logger;
-            _dbf = databaseF;
+            _dbconn = dbconnection;
             Name = "Сервер приложений " + Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyProductAttribute>().FirstOrDefault()?.Product;
             Version = Assembly.GetExecutingAssembly().GetName()?.Version ?? new Version();
 
-            Metadata = _md = new SmartMetadata(logger, databaseF);
+            Metadata = _md = new SmartMetadata(logger, dbconnection);
             try
             {
                 _md.Open();
@@ -184,7 +186,7 @@ namespace RmSolution.Server
 
         public string GetWorkDirectory() => Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-        public IDatabase CreateDbConnection() => _dbf();
+        public IDatabase CreateDbConnection() => _dbconn();
 
         #region Events
 

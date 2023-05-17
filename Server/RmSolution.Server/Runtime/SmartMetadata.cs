@@ -22,7 +22,7 @@ namespace RmSolution.Server
     {
         #region Declarations
 
-        Func<IDatabase> _connectionf;
+        DatabaseConnection _dbconnection;
         ILogger _logger;
         IDatabase _db;
 
@@ -41,11 +41,11 @@ namespace RmSolution.Server
 
         #region Constuctors, Initialization
 
-        public SmartMetadata(ILogger logger, Func<IDatabase> connectionf)
+        public SmartMetadata(ILogger logger, DatabaseConnection dbconnection)
         {
-            _connectionf = connectionf;
+            _dbconnection = dbconnection;
             _logger = logger;
-            _db = _connectionf();
+            _db = _dbconnection();
         }
 
         public void Open()
@@ -224,7 +224,7 @@ namespace RmSolution.Server
                 newitem.Id = obj.Id + TType.NewId;
                 if (obj.AutoInc == TCodeAutoInc.Common && obj.Attributes.CodeField is TColumn fcode)
                 {
-                    var code = _connectionf().Open().Scalar<string>("SELECT max(code) FROM " + obj.TableName);
+                    var code = _dbconnection().Open().Scalar<string>("SELECT max(code) FROM " + obj.TableName);
                     if (code == null)
                         code = "1".PadLeft(fcode.Length, '0');
                     else if (long.TryParse(code, out var num))
@@ -244,7 +244,7 @@ namespace RmSolution.Server
         /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
         T UseDatabase<T>(Func<IDatabase, T> operation)
         {
-            var db = _connectionf();
+            var db = _dbconnection();
             try
             {
                 db.Open();
@@ -259,7 +259,7 @@ namespace RmSolution.Server
         /// <summary> Используется новое подключение к БД, после выполнения которое закрывается.</summary>
         async Task<T> UseDatabaseAsync<T>(Func<IDatabase, T> operation) => await Task.Run(() =>
         {
-            var db = _connectionf();
+            var db = _dbconnection();
             try
             {
                 db.Open();
