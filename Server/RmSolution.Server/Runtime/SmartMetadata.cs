@@ -22,7 +22,7 @@ namespace RmSolution.Server
     {
         #region Declarations
 
-        DatabaseConnection _dbconnection;
+        DatabaseConnectionHandler _dbconnection;
         ILogger _logger;
         IDatabase _db;
 
@@ -41,7 +41,7 @@ namespace RmSolution.Server
 
         #region Constuctors, Initialization
 
-        public SmartMetadata(ILogger logger, DatabaseConnection dbconnection)
+        public SmartMetadata(ILogger logger, DatabaseConnectionHandler dbconnection)
         {
             _dbconnection = dbconnection;
             _logger = logger;

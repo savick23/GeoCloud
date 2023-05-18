@@ -20,7 +20,7 @@ await Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices(srv =>
     {
-        srv.AddSingleton<DatabaseConnection>(srv => () => SmartRuntime.CreateDatabaseConnection(srv));
+        srv.AddSingleton<DatabaseConnectionHandler>(srv => () => SmartRuntime.CreateDatabaseConnection(srv));
         srv.AddHostedService<SmartRuntime>();
     })
     .Build()

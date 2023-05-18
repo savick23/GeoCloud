@@ -14,7 +14,7 @@ namespace RmSolution.Server
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
 
-    public delegate IDatabase DatabaseConnection();
+    public delegate IDatabase DatabaseConnectionHandler();
 
     public sealed class SmartRuntime : BackgroundService, IRuntime
     {
@@ -33,7 +33,7 @@ namespace RmSolution.Server
         /// <summary> Диспетчер системной шины предприятия ESB.</summary>
         internal readonly ConcurrentDictionary<int, ProcessMessageEventHandler> Dispatcher = new();
 
-        readonly DatabaseConnection _dbconn;
+        readonly DatabaseConnectionHandler _dbconn;
 
         #endregion Declarations
 
@@ -116,7 +116,7 @@ namespace RmSolution.Server
 
         #region Constructors
 
-        public SmartRuntime(ILogger<SmartRuntime> logger, IConfiguration config, DatabaseConnection dbconnection)
+        public SmartRuntime(ILogger<SmartRuntime> logger, IConfiguration config, DatabaseConnectionHandler dbconnection)
         {
             _logger = logger;
             _dbconn = dbconnection;

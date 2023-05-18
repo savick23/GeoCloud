@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RmSolution.Runtime.Modules
+﻿//--------------------------------------------------------------------------------------------------
+// (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
+// Описание: ModuleInfo –
+//--------------------------------------------------------------------------------------------------
+namespace RmSolution.Runtime
 {
+    using System;
+
     internal class ModuleInfo
     {
     }
