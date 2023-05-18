@@ -1,6 +1,6 @@
 ﻿//--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Description: TaskScheduler – Планировщик заданий.
+// Description: SmartScheduler – Планировщик заданий.
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Runtime
 {
@@ -11,11 +11,11 @@ namespace RmSolution.Runtime
     using System.Threading;
     #endregion Using
 
-    public class TaskScheduler<T>
+    public class SmartScheduler<T>
     {
         #region Declarations
 
-        readonly Thread _thread = new((o) => ((TaskScheduler<T>)o).ScheduleThreadFunc()) { IsBackground = true };
+        readonly Thread _thread = new((o) => ((SmartScheduler<T>)o).ScheduleThreadFunc()) { IsBackground = true };
 
         CancellationTokenSource _cts;
 
@@ -34,7 +34,7 @@ namespace RmSolution.Runtime
 
         #region Constructor
 
-        public TaskScheduler() => Start();
+        public SmartScheduler() => Start();
 
         #endregion
 

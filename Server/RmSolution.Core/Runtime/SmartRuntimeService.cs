@@ -21,7 +21,7 @@ namespace RmSolution.Runtime
         /// <summary> Системная шина предприятия. Очередь сообщений.</summary>
         readonly ConcurrentQueue<TMessage> _esb = new();
         /// <summary> Системная шина предприятия. Менеджер расписаний.</summary>
-        readonly TaskScheduler<TMessage> _schedule = new();
+        readonly SmartScheduler<TMessage> _schedule = new();
         readonly SmartMetadata _md;
 
         /// <summary> Запущенные модули в системе. Диспетчер задач.</summary>
@@ -138,6 +138,7 @@ namespace RmSolution.Runtime
             Modules = new ModuleManager(this, config, logger);
             Modules.Created += OnModuleCreated;
             Modules.Removed += OnModuleRemoved;
+            _schedule.Fire += (o, m) => Send(m);
         }
 
         #endregion Constructors
