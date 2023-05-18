@@ -11,7 +11,6 @@ namespace Inforser.Runtime
     using System.Text.RegularExpressions;
     using Microsoft.Extensions.Configuration;
     using RmSolution.Runtime;
-    using RmSolution.Server;
     #endregion Using
 
     /// <summary> [Системный модуль] Диспетчер задач. Сервис управления модулями (микросервисами).</summary>

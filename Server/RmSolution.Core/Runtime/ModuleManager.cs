@@ -2,14 +2,13 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: ModuleManager – Модуль управления модулями в Системе.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Server
+namespace RmSolution.Runtime
 {
     #region Using
     using System.Collections;
     using System.Collections.Concurrent;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
-    using RmSolution.Runtime;
     #endregion Using
 
     /// <summary> Модуль управления модулями (микросервисами).</summary>

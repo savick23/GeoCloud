@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------------------------------
 using System.Reflection;
 using System.Text;
-using RmSolution.Server;
+using RmSolution.Runtime;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // fix error: No data is available for encoding 1251
 

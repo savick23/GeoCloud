@@ -10,9 +10,7 @@ namespace RmSolution.Runtime
     using System.Text;
     using System.Data;
     using RmSolution.Data;
-    using RmSolution.Server;
     using System.Text.RegularExpressions;
-    using Microsoft.AspNetCore.DataProtection.KeyManagement;
     #endregion Using
 
     /// <summary> [Системный модуль] Терминальная клиентская сессия Telnet.</summary>

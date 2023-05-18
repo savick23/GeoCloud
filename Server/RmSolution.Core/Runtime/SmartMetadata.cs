@@ -2,20 +2,16 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: SmartMetadata – Метаданные.
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Server
+namespace RmSolution.Runtime
 {
     #region Using
-    using System.Reflection;
-    using RmSolution.Runtime;
-    using RmSolution.DataAnnotations;
     using System;
-    using RmSolution.Data;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Dynamic;
+    using System.Reflection;
+    using System.Data;
     using System.Text;
     using Microsoft.Extensions.Logging;
-    using System.Data;
-    using System.Runtime.InteropServices.JavaScript;
+    using RmSolution.DataAnnotations;
+    using RmSolution.Data;
     #endregion Using
 
     internal class SmartMetadata : IMetadata

@@ -2,14 +2,13 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: SmartRuntimeExtensions –
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Server
+namespace RmSolution.Runtime
 {
     #region Using
     using System.Text.RegularExpressions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using RmSolution.Runtime;
     #endregion Using
 
     delegate void ProcessMessageEventHandler(ref TMessage m);

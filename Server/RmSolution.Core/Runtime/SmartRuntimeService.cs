@@ -2,7 +2,7 @@
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
 // Описание: SmartRuntimeService –
 //--------------------------------------------------------------------------------------------------
-namespace RmSolution.Server
+namespace RmSolution.Runtime
 {
     #region Using
     using System.Collections.Concurrent;
@@ -10,7 +10,6 @@ namespace RmSolution.Server
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using RmSolution.Runtime;
     #endregion Using
 
     public sealed class SmartRuntimeService : BackgroundService, IRuntime
