@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\RmSolution.RmGeo.3.1.csproj" />
+
+  <PropertyGroup>
+    <BaseOutputPath>..\..\Bin</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\RmSolution.GeoCom\RmSolution.GeoCom.csproj" />
+    <ProjectReference Include="..\..\Resources\RmSolution.resources.ru\RmSolution.resources.ru.csproj" />
+    <ProjectReference Include="..\RmSolution.MsSql\RmSolution.MsSql.csproj" />
+    <ProjectReference Include="..\RmSolution.PostgreSql\RmSolution.PostgreSql.csproj" />
+    <ProjectReference Include="..\RmSolution.Runtime\RmSolution.Runtime.csproj" />
+    <ProjectReference Include="..\..\Modules\RmSolution.DataAccess\RmSolution.DataAccess.csproj" />
+  </ItemGroup>
+
+</Project>

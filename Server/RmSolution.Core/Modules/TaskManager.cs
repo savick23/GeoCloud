@@ -8,8 +8,8 @@ namespace Inforser.Runtime
     using System;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.Intrinsics.Arm;
     using System.Text.RegularExpressions;
+    using Microsoft.Extensions.Configuration;
     using RmSolution.Runtime;
     using RmSolution.Server;
     #endregion Using
@@ -21,7 +21,7 @@ namespace Inforser.Runtime
 
         const string ASMEXT = ".dll";
 
-        readonly SmartRuntime _rtm;
+        readonly SmartRuntimeService _rtm;
         readonly IConfiguration _cfg;
 
         #endregion Declarations
@@ -30,7 +30,7 @@ namespace Inforser.Runtime
         {
             Subscribe = new[] { MSG.RuntimeStarted, MSG.Start };
             Name = "Диспетчер задач";
-            _rtm = (SmartRuntime)runtime;
+            _rtm = (SmartRuntimeService)runtime;
             _cfg = config;
         }
 
@@ -84,7 +84,7 @@ namespace Inforser.Runtime
         /// <summary> Запуск системы. Инициалиазация всех приложений и модулей. Даётся 3 мин.</summary>
         void StartModules()
         {
-            var rtm = (SmartRuntime)Runtime;
+            var rtm = (SmartRuntimeService)Runtime;
             var startlist = ReadModulesConfiguration().Values.ToList();
 
             var started = DateTime.Now;

@@ -183,7 +183,7 @@ namespace RmSolution.Runtime
             _client = null;
             await base.ExecuteProcess();
 
-            ((SmartRuntime)Runtime).Modules.Remove(this);
+            ((SmartRuntimeService)Runtime).Modules.Remove(this);
         }
 
         string StringException(Exception? ex)

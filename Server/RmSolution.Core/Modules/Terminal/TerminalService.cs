@@ -71,7 +71,7 @@ namespace RmSolution.Runtime
                 try
                 {
                     if (e.SocketError == SocketError.Success)
-                        ((SmartRuntime)Runtime).Modules.AddSingleton(typeof(TelnetSession), e.AcceptSocket);
+                        ((SmartRuntimeService)Runtime).Modules.AddSingleton(typeof(TelnetSession), e.AcceptSocket);
                 }
                 catch
                 { }

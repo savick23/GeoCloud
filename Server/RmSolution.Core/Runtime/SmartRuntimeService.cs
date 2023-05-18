@@ -1,24 +1,23 @@
 //--------------------------------------------------------------------------------------------------
 // (С) 2020-2023 ООО «РМ Солюшн». RM System Platform 3.1. Все права защищены.
-// Описание: SmartRuntime –
+// Описание: SmartRuntimeService –
 //--------------------------------------------------------------------------------------------------
 namespace RmSolution.Server
 {
     #region Using
     using System.Collections.Concurrent;
     using System.Reflection;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
     using RmSolution.Runtime;
-    using RmSolution.Data;
-    using System.Text.RegularExpressions;
     #endregion Using
 
-    delegate void ProcessMessageEventHandler(ref TMessage m);
-
-    public sealed class SmartRuntime : BackgroundService, IRuntime
+    public sealed class SmartRuntimeService : BackgroundService, IRuntime
     {
         #region Declarations
 
-        readonly ILogger<SmartRuntime> _logger;
+        readonly ILogger<SmartRuntimeService> _logger;
 
         /// <summary> Системная шина предприятия. Очередь сообщений.</summary>
         readonly ConcurrentQueue<TMessage> _esb = new();
@@ -114,7 +113,7 @@ namespace RmSolution.Server
 
         #region Constructors
 
-        public SmartRuntime(ILogger<SmartRuntime> logger, IConfiguration config, DatabaseConnectionHandler dbconnection)
+        public SmartRuntimeService(ILogger<SmartRuntimeService> logger, IConfiguration config, DatabaseConnectionHandler dbconnection)
         {
             _logger = logger;
             _dbconn = dbconnection;

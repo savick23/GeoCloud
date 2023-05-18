@@ -30,10 +30,10 @@ namespace RmSolution.Runtime
                 new DataColumn("Сообщений"),
                 new DataColumn("Время")
             });
-            var rtm = (SmartRuntime)Runtime;
+            var rtm = (SmartRuntimeService)Runtime;
             data.Rows.Add(0, rtm.Name, RuntimeStatus.Running, rtm.MessageCount);
 
-            ((SmartRuntime)Runtime).Modules.ToList().ForEach(m =>
+            ((SmartRuntimeService)Runtime).Modules.ToList().ForEach(m =>
                 data.Rows.Add(
                     m.ProcessId,
                     m.Name,
@@ -48,7 +48,7 @@ namespace RmSolution.Runtime
         /// <summary> Получить сведения о системе СКПТ (объектовый сервер).</summary>
         void ShowSystemInfo(StringBuilder output, string command, string[] args) => UseDatabase(db =>
         {
-            var rtm = (SmartRuntime)Runtime;
+            var rtm = (SmartRuntimeService)Runtime;
             var prc = Process.GetCurrentProcess();
 
             PrintDictionary(output, new Dictionary<string, string>()
@@ -87,7 +87,7 @@ namespace RmSolution.Runtime
         #region Module command (control)
 
         List<IModule> GetModules() =>
-            ((SmartRuntime)Runtime).Modules.GetModules<IModule>();
+            ((SmartRuntimeService)Runtime).Modules.GetModules<IModule>();
 
         IModule GetModuleByNumber(int id) =>
             GetModules().FirstOrDefault(m => m.ProcessId == id);

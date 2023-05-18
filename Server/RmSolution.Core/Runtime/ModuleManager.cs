@@ -7,6 +7,8 @@ namespace RmSolution.Server
     #region Using
     using System.Collections;
     using System.Collections.Concurrent;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
     using RmSolution.Runtime;
     #endregion Using
 
@@ -16,7 +18,7 @@ namespace RmSolution.Server
         #region Declarations
 
         readonly ILogger _logger;
-        readonly SmartRuntime _rtm;
+        readonly SmartRuntimeService _rtm;
         readonly IConfiguration _cfg;
         readonly ConcurrentDictionary<ModuleDescript, IModule> _modules = new();
 
@@ -27,7 +29,7 @@ namespace RmSolution.Server
 
         #endregion Declarations
 
-        public ModuleManager(SmartRuntime runtime, IConfiguration configuration, ILogger<SmartRuntime> logger)
+        public ModuleManager(SmartRuntimeService runtime, IConfiguration configuration, ILogger<SmartRuntimeService> logger)
         {
             _rtm = runtime;
             _cfg = configuration;
