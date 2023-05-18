@@ -14,8 +14,6 @@ namespace RmSolution.Server
 
     delegate void ProcessMessageEventHandler(ref TMessage m);
 
-    public delegate IDatabase DatabaseConnectionHandler();
-
     public sealed class SmartRuntime : BackgroundService, IRuntime
     {
         #region Declarations
@@ -208,22 +206,6 @@ namespace RmSolution.Server
 
         static Type _connType;
         static string _connStr;
-
-        internal static IDatabase CreateDatabaseConnection(IServiceProvider services)
-        {
-            if (_connType == null)
-            {
-                var cfg = services.GetService<IConfiguration>();
-                var providers = cfg.GetSection("runtimeOptions:providers").GetChildren().ToDictionary(sect => cfg[sect.Path + ":name"], sect => cfg[sect.Path + ":type"]);
-                _connStr = cfg.GetSection("runtimeOptions:datasource").Value;
-                var provider = Regex.Match(_connStr, "(?<=Provider=).*?(?=;)").Value;
-                if (!providers.ContainsKey(provider)) return null;
-                _connStr = Regex.Replace(_connStr, @"Provider=[^;.]*;", string.Empty);
-                if (!_connStr.EndsWith(";")) _connStr += ";";
-                _connType = Type.GetType(providers[provider]);
-            }
-            return (IDatabase)Activator.CreateInstance(_connType, _connStr);
-        }
 
         #endregion Static methods
 
